@@ -1,4 +1,4 @@
-# Network Meta-analysis 
+# Network Meta-Analysis 
 
 This is a network meta-analysis R package under development. Can use devtools to install the package.
 
