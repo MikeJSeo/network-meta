@@ -8,7 +8,7 @@ install_github("MikeJSeo/network-meta")
 library(mcnet)
 ```
 
-More details about the R functions in this package and examples on how to use this package is in mcnet-manual.pdf.
+More details on how to use this package is described in mcnet-manual.pdf.
 
 Thank you,    
 Michael Seo
