@@ -1,9 +1,13 @@
 # Network Meta-analysis 
 
+This is a network Meta-analysis under development for R package. Can use devtools to install the package and try it out!
+
 ```{r}
 library(devtools)
 install_github("MikeJSeo/network-meta")
 ```
+
+More details about the function is in mcnet-manual.pdf and example data is in the data folder.
 
 Thank you,    
 Michael Seo
