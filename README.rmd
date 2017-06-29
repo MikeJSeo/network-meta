@@ -5,6 +5,7 @@ This is a network Meta-analysis under development for R package. Can use devtool
 ```{r}
 library(devtools)
 install_github("MikeJSeo/network-meta")
+library(mcnet)
 ```
 
 More details about the function is in mcnet-manual.pdf and example data is in the data folder.
