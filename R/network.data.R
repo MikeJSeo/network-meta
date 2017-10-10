@@ -108,6 +108,7 @@ network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, response =
 
   #relabel Treatment and Study names into to a numeric sequence (1:nstudy)
   na <- rle(Study)$lengths
+  print(na)
   if(any(na == 1)) stop("study cannot have only 1 arm or arms have to be next to each other in each study")
   Study <- rep(1:length(unique(Study)), times = na)
   Treat <- relabel.vec(Treat, Treat.order)

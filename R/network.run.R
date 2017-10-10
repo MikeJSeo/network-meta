@@ -30,6 +30,17 @@
 #' str(result)
 #' @export
 
+# Outcomes <- parkinsons[[1]]
+# Study <- parkinsons[[2]]
+# Treat <- parkinsons[[3]]
+# SE <- parkinsons[[4]]
+# 
+# with(parkinsons,{
+#   network <- network.data(Outcomes, Treat, Study, SE = SE, response = "normal")
+#  # result <- network.run(network)
+# #  return(result)
+# })
+
 network.run <- function(network, inits = NULL, n.chains = 3, max.run = 100000, setsize = 10000, n.run = 50000,
                         conv.limit = 1.05, extra.pars.save = NULL){
 
