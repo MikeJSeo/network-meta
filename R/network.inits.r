@@ -1,10 +1,12 @@
 network.inits <- function(network, n.chains){
 
-  if(network$response == "multinomial"){
+  response <- network$response
+  
+  if(response == "multinomial"){
     inits = multinomial.inits(network, n.chains)
-  } else if(network$response == "binomial"){
+  } else if(response == "binomial"){
     inits = binomial.inits(network, n.chains)
-  } else if(network$response == "normal"){
+  } else if(response == "normal"){
     inits = normal.inits(network, n.chains)
   }
   return(inits)
@@ -12,54 +14,44 @@ network.inits <- function(network, n.chains){
 
 normal.inits <- function(network, n.chains){
 
-  Y = network$Outcomes
-  se.Y = network$SE
-  b.id = network$b.id
-  na = network$na
+  with(network,{
+    delta = Outcomes
+    Eta = Outcomes[b.id]
+    se.Eta = SE[b.id]
+    delta = Outcomes - rep(Eta, times = na)
+    delta <- delta[!b.id,] #eliminate base-arm
+    
+    inits = make.inits(network, n.chains, delta, Eta, se.Eta)
+    return(inits)
+  })
 
-  delta = Y
-  Eta = Y[b.id]
-  se.Eta = se.Y[b.id]
-  delta = Y - rep(Eta, times = na)
-  delta <- delta[!b.id,] #eliminate base-arm
-
-  inits = make.inits(network, n.chains, delta, Eta, se.Eta)
-  return(inits)
 }
 
 binomial.inits <- function(network, n.chains){
 
-  Outcomes <- network$Outcomes + 0.5 # ensure ratios are always defined
-  N <- network$N + 1
-  p <- Outcomes/N
-  logits <- log(p/(1-p))
-  se.logits <- sqrt(1/Outcomes + 1/(N - Outcomes))
+  with(network,{
+  
+    Outcomes <- Outcomes + 0.5 # ensure ratios are always defined
+    N <- N + 1
+    p <- Outcomes/N
+    logits <- log(p/(1-p))
+    se.logits <- sqrt(1/Outcomes + 1/(N - Outcomes))
 
-  b.id <- network$b.id
-  na <- network$na
+    Eta <- logits[b.id]
+    se.Eta <- se.logits[b.id]
+    delta <- logits - rep(Eta, times = na)
+    delta <- delta[!b.id,]
+    
+    inits = make.inits(network, n.chains, delta, Eta, se.Eta)
+    return(inits)  
 
-  Eta <- logits[b.id]
-  se.Eta <- se.logits[b.id]
-  delta <- logits - rep(Eta, times = na)
-  delta <- delta[!b.id,]
-
-  inits = make.inits(network, n.chains, delta, Eta, se.Eta)
-  return(inits)
+  })
 }
 
 make.inits <- function(network, n.chains, delta, Eta, se.Eta){
 
-  Treat = network$Treat
-  b.id = network$b.id
-  na = network$na
-  nstudy = network$nstudy
-  ntreat = network$ntreat
-  covariate = network$covariate
-  covariate.model <- network$covariate.model
-  baseline = network$baseline
-  t = network$t
-  hy.prior = network$hy.prior
-
+  with(network,{
+    
   # dependent variable for regression
   y <- delta
 
@@ -135,7 +127,7 @@ make.inits <- function(network, n.chains, delta, Eta, se.Eta){
       random.d = rnorm(length(d))
       initial.values[[i]][["d"]] <- d + se.d * random.d
 
-      if(network$type == "random"){
+      if(type == "random"){
 
         df <- fit$df[2]
         random.ISigma <- rchisq(1, df)
@@ -149,7 +141,7 @@ make.inits <- function(network, n.chains, delta, Eta, se.Eta){
 
         if(hy.prior[[1]] == "dgamma"){
           initial.values[[i]][["prec"]] <- 1/sigma2
-        } else if(hy.prior[[1]] == "dunif" || network$hy.prior[[1]] == "dhnorm"){
+        } else if(hy.prior[[1]] == "dunif" || hy.prior[[1]] == "dhnorm"){
           initial.values[[i]][["sd"]] <- sqrt(sigma2)
         }
 
@@ -186,34 +178,26 @@ make.inits <- function(network, n.chains, delta, Eta, se.Eta){
     }
   }
   return(initial.values)
+  })
+  
+  
 }
 
 ############################################ multinomial inits functions
 
 multinomial.inits <- function(network, n.chains)
 {
-  if (length(network$miss.patterns[[1]])!= 1){
+  with(network,{
+    
+  if (length(miss.patterns[[1]])!= 1){
     Dimputed <- multi.impute.data(network)
   } else{
-    Dimputed <- network$Outcomes
+    Dimputed <- Outcomes
   }
   Dimputed = Dimputed + 0.5
 
   logits <- as.matrix(log(Dimputed[, -1]) - log(Dimputed[, 1]))
   se.logits <- as.matrix(sqrt(1/Dimputed[, -1] + 1/Dimputed[, 1]))
-
-  nstudy <- network$nstudy
-  ncat <- network$ncat
-  b.id <- network$b.id
-  na <- network$na
-  Treat <- network$Treat
-  nstudy <- network$nstudy
-  ntreat <- network$ntreat
-  covariate <- network$covariate
-  covariate.model <- network$covariate.model
-  baseline <- network$baseline
-  t <- network$t
-  hy.prior <- network$hy.prior
 
   Eta <- se.Eta <- matrix(NA, nstudy, ncat)
   Eta[,2:ncat] <- logits[b.id,]
@@ -308,7 +292,7 @@ multinomial.inits <- function(network, n.chains)
       random.d = matrix(rnorm(dim(d)[1]*dim(d)[2]),dim(d)[1],dim(d)[2])
       initial.values[[i]][["d"]] = d + se.d * random.d
 
-      if(network$type == "random"){
+      if(type == "random"){
         df <- fit$df[2]
         random.ISigma <- rchisq(1, df)
         sigma2 <- resid.var * df/random.ISigma
@@ -352,6 +336,7 @@ multinomial.inits <- function(network, n.chains)
   }
 
   return(initial.values)
+  })
 }
 
 
@@ -367,15 +352,8 @@ multi.impute.data <- function(network)
   #6. Apply correction factor to ensure that sum of imputed values add up to total to be imputed
   #
 
-  miss.patterns <- network$miss.patterns
-  npattern <- network$npattern
-  pattern <- network$pattern
-  D <- network$Outcomes
-  ncat <- network$ncat
-  nrow <- network$nrow
-  N <- network$N
-  Study <- network$Study
-
+  with(network,{
+  
   rows.all = vector("list", length = npattern)
   for(i in seq(npattern)){
     rows.all[[i]] = seq(nrow)[pattern == levels(pattern)[i]]
@@ -426,6 +404,7 @@ multi.impute.data <- function(network)
     imputed.prop = running.total/sum(running.total) # Proportion of events in each category
   }
   return(Dimputed)
+  })
 }
 
 

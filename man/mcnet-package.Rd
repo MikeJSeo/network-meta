@@ -10,9 +10,9 @@ A package for running bayesian network meta analysis
 \details{
 Network meta-analysis or mixed treatment comparison (MTC) is a method that allows simultaneous comparison of more than two treatments.
 We use a bayesian approach to combine both direct and indirect evidence as in Dias et al. 2013a.
-This package is a user friendly application that can run network meta analysis models without having to code the rjags model.
-It takes the input data and transforms it to a suitable format of analysis, generates a rjags model and reasonable
-initial values and run the model through the rjags package.
+This package is a user friendly application that can run network meta analysis models without having to code a JAGS model.
+The program takes the input data and transforms it to a suitable format of analysis, generates a JAGS model and reasonable
+initial values and runs the model through the rjags package.
 }
 \references{
 S. Dias, A.J. Sutton, A.E. Ades, and N.J. Welton (2013a), \emph{A Generalized Linear Modeling Framework for Pairwise and Network Meta-analysis of Randomized Controlled Trials}, Medical Decision Making 33(5):607-617. [\url{https://doi.org/10.1177/0272989X12458724}]

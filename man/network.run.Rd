@@ -42,11 +42,9 @@ Run the model using the network object
 \examples{
 #parkinson's example (normal)
 parkinsons
-Outcomes <- parkinsons[[1]]
-Study <- parkinsons[[2]]
-Treat <- parkinsons[[3]]
-SE <- parkinsons[[4]]
-network <- network.data(Outcomes, Treat, Study, SE = SE, response = "normal")
+network <- with(parkinsons,{
+ network.data(Outcomes, Study, Treat, SE = SE, response = "normal")
+})
 result <- network.run(network)
 str(result)
 }

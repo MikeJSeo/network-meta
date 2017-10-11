@@ -1,21 +1,26 @@
 network.rjags <- function(network){
 
+  response <- network$response
+  
   code <- paste0("model\n{")
-  code <- with(network, paste0(code, if(network$response == "binomial"){
-    model.binomial(nstudy, ntreat, baseline, hy.prior.base, covariate, covariate.model, hy.prior.cov, hy.prior, dic, rank.preference, type)
-  } else if(network$response == "normal"){
-    model.normal(nstudy, ntreat, baseline, hy.prior.base, covariate, covariate.model, hy.prior.cov, hy.prior, dic, rank.preference, type)
-  } else if(network$response == "multinomial"){
-    model.multinomial(miss.matrix, miss.patterns, na, nstudy, ncat, ntreat, baseline, hy.prior.base, covariate, covariate.model, hy.prior.cov, hy.prior, dic, rank.preference, type)
-  }))
-  code <- paste0(code, "\n}")
+  code2 <- if(response == "binomial"){
+    model.binomial(network)
+  } else if(response == "normal"){
+    model.normal(network)
+  } else if(response == "multinomial"){
+    model.multinomial(network)
+  }
+  code <- paste0(code, code2, "\n}")
+  
 }
 
 ############################################## Functions for normal and binomial
 ################################################################################
 
-model.normal <- function(nstudy, ntreat, baseline, hy.prior.base, covariate, covariate.model, hy.prior.cov, hy.prior, dic, rank.preference, type){
-
+model.normal <- function(network){
+  
+  with(network, {
+  
   code <- paste0(
     "\n\tfor (i in 1:", nstudy, ") {",
     "\n\t\tw[i,1] <- 0",
@@ -31,15 +36,6 @@ model.normal <- function(nstudy, ntreat, baseline, hy.prior.base, covariate, cov
     code <- paste0(code, "\n\t\t\ttheta[i,k] <- Eta[i] + delta[i,k]")
   }
 
-  if(baseline != "none"){
-    code <- paste0(code, " + (b_bl[t[i,k]] - b_bl[t[i,1]]) * (Eta[i] - mx_bl)")
-  }
-  if(!is.null(covariate)){
-    for(i in 1:dim(covariate)[2]){
-      code <- paste0(code, " + (beta", i, "[t[i,k]]- beta", i, "[t[i,1]]) * (x", i, "[i]-mx", i, ")")
-    }
-  }
-
   if(dic == TRUE){
     code <- paste0(code, "\n\t\t\tdev[i,k] <- (r[i,k]-theta[i,k])*(r[i,k]-theta[i,k])*tau[i,k]")
   }
@@ -52,12 +48,36 @@ model.normal <- function(nstudy, ntreat, baseline, hy.prior.base, covariate, cov
   if(type == "random"){
     code <- paste0(code, "\n\t\tfor(k in 2:na[i]){",
       "\n\t\t\tdelta[i,k] ~ dnorm(md[i,k],precd[i,k])",
-      "\n\t\t\tmd[i,k] <- d[t[i,k]] - d[t[i,1]] + sw[i,k]",
-      "\n\t\t\tprecd[i,k] <- prec *2*(k-1)/k",
-      "\n\t\t\tw[i,k] <- (delta[i,k] - d[t[i,k]] + d[t[i,1]])",
+      "\n\t\t\tmd[i,k] <- d[t[i,k]] - d[t[i,1]] + sw[i,k]")
+    
+    if(baseline != "none"){
+      code <- paste0(code, " + (b_bl[t[i,k]] - b_bl[t[i,1]]) * (Eta[i] - mx_bl)")
+    }
+    
+    if(!is.null(covariate)){
+      for(i in 1:dim(covariate)[2]){
+        code <- paste0(code, " + (beta", i, "[t[i,k]]- beta", i, "[t[i,1]]) * (x", i, "[i]-mx", i, ")")
+      }
+    }
+    
+    code <- paste0(code, "\n\t\t\tprecd[i,k] <- prec *2*(k-1)/k",
+      "\n\t\t\tw[i,k] <- (delta[i,k] - d[t[i,k]] + d[t[i,1]])")
+    
+    if(baseline != "none"){
+      code <- paste0(code, " - (b_bl[t[i,k]] - b_bl[t[i,1]]) * (Eta[i] - mx_bl)")
+    }
+    
+    if(!is.null(covariate)){
+      for(i in 1:dim(covariate)[2]){
+        code <- paste0(code, " - (beta", i, "[t[i,k]]- beta", i, "[t[i,1]]) * (x", i, "[i]-mx", i, ")")
+      }
+    }
+    
+    code <- paste0(code, 
       "\n\t\t\tsw[i,k] <- sum(w[i,1:(k-1)])/(k-1)",
       "\n\t\t}",
       "\n\t}")
+    
   } else if(type == "fixed"){
     code <- paste0(code, "\n\t}")
   }
@@ -82,10 +102,12 @@ model.normal <- function(nstudy, ntreat, baseline, hy.prior.base, covariate, cov
     code <- paste0(code, rank.rjags(rank.preference, ntreat))
   }
   return(code)
+  })
 }
 
-model.binomial <- function(nstudy, ntreat, baseline, hy.prior.base, covariate, covariate.model, hy.prior.cov, hy.prior, dic, rank.preference, type)
+model.binomial <- function(network)
 {
+  with(network, {
   code <- paste0(
     "\n\tfor (i in 1:", nstudy, ") {",
     "\n\t\tw[i,1] <- 0",
@@ -98,15 +120,6 @@ model.binomial <- function(nstudy, ntreat, baseline, hy.prior.base, covariate, c
     code <- paste0(code, "\n\t\t\tlogit(p[i,k]) <- Eta[i] + d[t[i,k]] - d[t[i,1]]")
   } else if(type == "random"){
     code <- paste0(code, "\n\t\t\tlogit(p[i,k]) <- Eta[i] + delta[i,k]")
-  }
-
-  if(baseline != "none"){
-    code <- paste0(code, " + (b_bl[t[i,k]] - b_bl[t[i,1]]) * (Eta[i] - mx_bl)")
-  }
-  if(!is.null(covariate)){
-    for(i in 1:dim(covariate)[2]){
-      code <- paste0(code, " + (beta", i, "[t[i,k]]- beta", i, "[t[i,1]]) * (x", i, "[i]-mx", i, ")")
-    }
   }
 
   if(dic == TRUE){
@@ -123,12 +136,35 @@ model.binomial <- function(nstudy, ntreat, baseline, hy.prior.base, covariate, c
     code <- paste0(code,
       "\n\t\tfor(k in 2:na[i]){",
       "\n\t\t\tdelta[i,k] ~ dnorm(md[i,k],precd[i,k])",
-      "\n\t\t\tmd[i,k] <- d[t[i,k]] - d[t[i,1]] + sw[i,k]",
+      "\n\t\t\tmd[i,k] <- d[t[i,k]] - d[t[i,1]] + sw[i,k]")
+    
+    if(baseline != "none"){
+      code <- paste0(code, " + (b_bl[t[i,k]] - b_bl[t[i,1]]) * (Eta[i] - mx_bl)")
+    }
+    if(!is.null(covariate)){
+      for(i in 1:dim(covariate)[2]){
+        code <- paste0(code, " + (beta", i, "[t[i,k]]- beta", i, "[t[i,1]]) * (x", i, "[i]-mx", i, ")")
+      }
+    }
+      
+    code <- paste0(code, 
       "\n\t\t\tprecd[i,k] <- prec *2*(k-1)/k",
-      "\n\t\t\tw[i,k] <- (delta[i,k] - d[t[i,k]] + d[t[i,1]])",
+      "\n\t\t\tw[i,k] <- (delta[i,k] - d[t[i,k]] + d[t[i,1]])")
+    
+    if(baseline != "none"){
+      code <- paste0(code, " - (b_bl[t[i,k]] - b_bl[t[i,1]]) * (Eta[i] - mx_bl)")
+    }
+    if(!is.null(covariate)){
+      for(i in 1:dim(covariate)[2]){
+        code <- paste0(code, " - (beta", i, "[t[i,k]]- beta", i, "[t[i,1]]) * (x", i, "[i]-mx", i, ")")
+      }
+    } 
+      
+    code <- paste0(code,   
       "\n\t\t\tsw[i,k] <- sum(w[i,1:(k-1)])/(k-1)",
       "\n\t\t}",
       "\n\t}")
+    
   } else if (type == "fixed"){
     code <- paste0(code, "\n\t}")
   }
@@ -156,6 +192,7 @@ model.binomial <- function(nstudy, ntreat, baseline, hy.prior.base, covariate, c
     code <- paste0(code, rank.rjags(rank.preference, ntreat))
   }
   return(code)
+  })
 }
 
 
@@ -540,8 +577,10 @@ model.multinomial.prior <- function(nstudy, ncat, ntreat, baseline, hy.prior.bas
   return(code)
 }
 
-model.multinomial <- function(miss.matrix, miss.patterns, na, nstudy, ncat, ntreat, baseline, hy.prior.base, covariate, covariate.model, hy.prior.cov, hy.prior, dic, rank.preference, type){
-
+model.multinomial <- function(network){
+  
+  with(network, {
+  
   code <- ""
   if(is.null(miss.matrix)){
     code <- paste0(code, model.multinomial.complete(nstudy, ncat, dic))
@@ -555,6 +594,7 @@ model.multinomial <- function(miss.matrix, miss.patterns, na, nstudy, ncat, ntre
   }
   code <- paste0(code, model.multinomial.prior(nstudy, ncat, ntreat, baseline, hy.prior.base, covariate, covariate.model, hy.prior.cov), rank.rjags.multinomial(rank.preference, ntreat, ncat))
   return(code)
+  })
 }
 
 ###################################### Function used for all the distribution

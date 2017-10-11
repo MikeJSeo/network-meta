@@ -21,25 +21,11 @@
 #' @examples
 #' #parkinson's example (normal)
 #' parkinsons
-#' Outcomes <- parkinsons[[1]]
-#' Study <- parkinsons[[2]]
-#' Treat <- parkinsons[[3]]
-#' SE <- parkinsons[[4]]
-#' network <- network.data(Outcomes, Treat, Study, SE = SE, response = "normal")
+#' network <- with(parkinsons,{
+#'  network.data(Outcomes, Study, Treat, SE = SE, response = "normal")
+#' })
 #' result <- network.run(network)
-#' str(result)
 #' @export
-
-# Outcomes <- parkinsons[[1]]
-# Study <- parkinsons[[2]]
-# Treat <- parkinsons[[3]]
-# SE <- parkinsons[[4]]
-# 
-# with(parkinsons,{
-#   network <- network.data(Outcomes, Treat, Study, SE = SE, response = "normal")
-#  # result <- network.run(network)
-# #  return(result)
-# })
 
 network.run <- function(network, inits = NULL, n.chains = 3, max.run = 100000, setsize = 10000, n.run = 50000,
                         conv.limit = 1.05, extra.pars.save = NULL){
@@ -119,6 +105,9 @@ network.run <- function(network, inits = NULL, n.chains = 3, max.run = 100000, s
   }
   if(network$baseline != "none"){
     pars.save = c(pars.save, "b_bl")
+    if(network$baseline %in% c("common", "exchangeable")){
+      pars.save <- c(pars.save, "B")
+    }
   }
   if(!is.null(network$covariate)){
     for(i in seq(dim(network$covariate)[2])){
@@ -130,6 +119,7 @@ network.run <- function(network, inits = NULL, n.chains = 3, max.run = 100000, s
   if(is.null(inits)){
     inits <- network.inits(network, n.chains)
   }
+  
   samples <- jags.fit(network, data, pars.save, inits, n.chains, max.run, setsize, n.run, conv.limit)
 
   result <- list(network = network, data.rjags = data, inits = inits, pars.save = pars.save)
@@ -147,8 +137,18 @@ network.run <- function(network, inits = NULL, n.chains = 3, max.run = 100000, s
 
 jags.fit <- function(network, data, pars.save, inits, n.chains, max.run, setsize, n.run, conv.limit) {
 
-  mod = rjags::jags.model(textConnection(network$code), data = data, inits = inits, n.chains = n.chains, n.adapt = setsize)
+  mod = rjags::jags.model(textConnection(network$code), data = data, inits = inits, n.chains = n.chains, n.adapt = 0)
 
+  adapted <- FALSE
+  count <- 0
+  while(!adapted){
+    adapted <- adapt(mod, setsize, end.adaptation = FALSE)
+    count <- count + 1
+    if(count == 100){
+      stop("algorithm has not adapted")
+    }
+  }
+  
   conv.save <- if(network$response == "multinomial"){
     c("d", "Eta", "sigma_transformed")
   } else if(network$response == "binomial" || network$response == "normal"){

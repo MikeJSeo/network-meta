@@ -10,7 +10,7 @@ pick.summary.variables <- function(result, extra.pars = NULL, only.pars = NULL){
     }
   }
   if(is.null(only.pars)){
-    pars <- c("d", "sd", "sigma", "b_bl", "beta")
+    pars <- c("d", "sd", "sigma", "b_bl", "beta", "B")
   } else{
     pars <- only.pars
   }
@@ -68,11 +68,9 @@ plot.network.result <- function(x, ...) {
 #' @param only.pars parameters that user wants to plot only
 #' @examples
 #' #blocker
-#' Outcomes <- blocker[["Outcomes"]]
-#' Study <- blocker[["Study"]]
-#' Treat <- blocker[["Treat"]]
-#' N <- blocker[["N"]]
-#' network <- network.data(Outcomes, Study, Treat, N = N, response = "binomial")
+#' network <- with(blocker,{
+#'  network.data(Outcomes, Study, Treat, N = N, response = "binomial")
+#' })
 #' result <- network.run(network)
 #' network.gelman.plot(result, only.pars = "d")
 #' @export
@@ -92,15 +90,10 @@ network.gelman.plot <- function(result, extra.pars = NULL, only.pars = NULL){
 #' @param extra.pars extra parameters that the user wants to plot other than the default parameters.
 #' @param only.pars parameters that user wants to plot only
 #' @examples
-#' #statins example (binomial)
-#' Outcomes <- statins[["Outcomes"]]
-#' Study <- statins[["Study"]]
-#' Treat <- statins[["Treat"]]
-#' N <- statins[["N"]]
-#' covariate <- statins[["covariate"]]
-#' Treat.order <- statins[["Treat.order"]]
-#' network <- network.data(Outcomes, Study, Treat, N = N, response = "binomial",
-#' Treat.order = c("Placebo", "Statin"), covariate = covariate, covariate.type = "discrete")
+#' network <- with(statins, {
+#'  network.data(Outcomes, Study, Treat, N = N, response = "binomial",
+#'  Treat.order = c("Placebo", "Statin"), covariate = covariate, covariate.type = "discrete")
+#' })
 #' result <- network.run(network)
 #' network.gelman.diag(result, extra.pars = "Eta")
 #' @export
@@ -119,11 +112,10 @@ network.gelman.diag <- function(result, extra.pars = NULL, only.pars = NULL){
 #' @param extra.pars extra parameters that the user wants to plot other than the default parameters.
 #' @param only.pars parameters that user wants to plot only
 #' @examples
-#' Outcomes <- blocker[["Outcomes"]]
-#' Study <- blocker[["Study"]]
-#' Treat <- blocker[["Treat"]]
-#' N <- blocker[["N"]]
-#' network <- network.data(Outcomes, Study, Treat, N = N, response = "binomial")
+#' network <- with(blocker, {
+#'  network.data(Outcomes, Study, Treat, N = N, response = "binomial")
+#' })
+#' 
 #' result <- network.run(network)
 #' network.autocorr.diag(result, only.pars = "d")
 #' @export
@@ -146,7 +138,9 @@ network.autocorr.diag <- function(result, lags = c(0,1,5,10,50), extra.pars = NU
 #' Treat <- cardiovascular[["Treat"]]
 #' Outcomes <- cardiovascular[["Outcomes"]]
 #' N <- cardiovascular[["N"]]
-#' network <- network.data(Outcomes, Study, Treat, N, response = "multinomial")
+#' network <- with(cardiovascular, {
+#'  network.data(Outcomes, Study, Treat, N, response = "multinomial")
+#' })
 #' result <- network.run(network)
 #' network.autocorr.plot(result, only.pars = "d")
 #' @export
@@ -172,34 +166,33 @@ network.autocorr.plot <- function(result, extra.pars = NULL, only.pars = NULL){
 #' #We can fit two different models with different base treatment and we can
 #' #obtain same relative effects estimate using this function
 #' #parkinsons
-#' Outcomes <- parkinsons[["Outcomes"]]
-#' Study <- parkinsons[["Study"]]
-#' Treat <- parkinsons[["Treat"]]
-#' SE <- parkinsons[["SE"]]
-#' network <- network.data(Outcomes, Study, Treat, SE = SE, response = "normal")
-#' result <- network.run(network)
+#' network <- with(parkinsons, {
+#'  network.data(Outcomes, Study, Treat, SE = SE, response = "normal")
+#' })
+#' result <- network.run(network) 
+#' summary(result)
 #'
-#' Treat.order <- c(2,1,3,4,5)
-#' network2 <- network.data(Outcomes, Study, Treat, SE = SE, response = "normal",
-#' Treat.order = Treat.order)
+#' network2 <- with(parkinsons, {
+#'  network.data(Outcomes, Study, Treat, SE = SE, response = "normal",
+#'  Treat.order = c(2,1,3,4,5))
+#' })
 #' result2 <- network.run(network2)
 #'
-#' summary(result2)
-#' summary(relative.effects(result2, base.treatment = 2))
+#' summary(result)
+#' summary(relative.effects(result2, base.treatment = 1))
 #'
 #' #This also works for comparing different base.category for multinomial.
 #' #We fit two different models and compare the estimates again.
 #' #cardiovascular
-#'
-#' Study <- cardiovascular[["Study"]]
-#' Treat <- cardiovascular[["Treat"]]
-#' Outcomes <- cardiovascular[["Outcomes"]]
-#' N <- cardiovascular[["N"]]
-#' network3 <- network.data(Outcomes, Study, Treat, N, response = "multinomial")
+#' 
+#' network3 <- with(cardiovascular, {
+#'  network.data(Outcomes, Study, Treat, N, response = "multinomial")
+#' })
 #' result3 <- network.run(network3)
-#'
-#' Outcomes <- Outcomes[,c(2,1,3)]
-#' network4 <- network.data(Outcomes, Study, Treat, N, response = "multinomial")
+#' 
+#' network4 <- with(cardiovascular, {
+#'  network.data(Outcomes[,c(2,1,3)], Study, Treat, N, response = "multinomial")
+#' })
 #' result4 <- network.run(network4)
 #'
 #' summary(result3)
@@ -326,11 +319,9 @@ relative.effects <- function(result, base.treatment = NULL, comparison.treatment
 #' @param base.category specifies for which base category user wants for the summary. Used only for multinoimal.
 #' @examples
 #' #cardiovascular
-#' Study <- cardiovascular[["Study"]]
-#' Treat <- cardiovascular[["Treat"]]
-#' Outcomes <- cardiovascular[["Outcomes"]]
-#' N <- cardiovascular[["N"]]
-#' network <- network.data(Outcomes, Study, Treat, N, response = "multinomial")
+#' network <- with(cardiovascular,{
+#'  network.data(Outcomes, Study, Treat, N, response = "multinomial")
+#' })
 #' result <- network.run(network)
 #' exp(relative.effects.table(result)) #look at odds ratio instead of log odds ratio
 #' @seealso \code{\link{relative.effects}}
@@ -401,11 +392,9 @@ relative.effects.table <- function(result, summary_stat = "mean", base.category 
 #' This makes a table of ranking for each treament. Each number in the cell represents a probability certain treatment was in such rank.
 #' This table is also stored as an output from \code{network.run}.
 #' @examples
-#' Outcomes <- blocker[["Outcomes"]]
-#' Study <- blocker[["Study"]]
-#' Treat <- blocker[["Treat"]]
-#' N <- blocker[["N"]]
-#' network <- network.data(Outcomes, Study, Treat, N = N, response = "binomial")
+#' network <- with(blocker, {
+#'  network.data(Outcomes, Study, Treat, N = N, response = "binomial")
+#' })
 #' result <- network.run(network)
 #' rank.tx(result)
 #' @seealso \code{\link{network.rank.tx.plot}}
@@ -450,11 +439,9 @@ rank.tx <- function(result){
 #' @param catnames category names. Only used in multinomial.
 #' @param legend.position x,y position of the legend
 #' @examples
-#' Outcomes <- blocker[["Outcomes"]]
-#' Study <- blocker[["Study"]]
-#' Treat <- blocker[["Treat"]]
-#' N <- blocker[["N"]]
-#' network <- network.data(Outcomes, Study, Treat, N = N, response = "binomial")
+#' network <-with(blocker, {
+#'  network.data(Outcomes, Study, Treat, N = N, response = "binomial")
+#' })
 #' result <- network.run(network)
 #' network.rank.tx.plot(result, txnames = c("a", "b"))
 #' @seealso \code{\link{rank.tx}}
@@ -497,11 +484,9 @@ network.rank.tx.plot <- function(result, txnames = NULL, catnames = NULL, legend
 #' @param catnames category names. Only used in multinomial.
 #' @param legend.position x,y position of the legend
 #' @examples
-#' Outcomes <- blocker[["Outcomes"]]
-#' Study <- blocker[["Study"]]
-#' Treat <- blocker[["Treat"]]
-#' N <- blocker[["N"]]
-#' network <- network.data(Outcomes, Study, Treat, N = N, response = "binomial")
+#' network <- with(blocker, {
+#'  network.data(Outcomes, Study, Treat, N = N, response = "binomial")
+#' })
 #' result <- network.run(network)
 #' network.cumrank.tx.plot(result, txnames = c("control", "beta blocker"))
 #' @seealso \code{\link{rank.tx}}
@@ -546,14 +531,10 @@ network.cumrank.tx.plot <- function(result, txnames = NULL, catnames = NULL, leg
 #' @param catnames category names. Only used in multinomial.
 #' @examples
 #' ########### certolizumab (with baseline risk)
-#' Outcomes <- certolizumab[["Outcomes"]]
-#' N <- certolizumab[["N"]]
-#' Study <- certolizumab[["Study"]]
-#' Treat <- certolizumab[["Treat"]]
-#' covariate <- certolizumab[["covariate"]]
-#' Treat.order <- certolizumab[["Treat.order"]]
-#' network <- network.data(Outcomes, Study, Treat, N=N, response = "binomial", Treat.order,
-#' baseline = "common", hy.prior = list("dhnorm", 0, 9.77))
+#' network <- with(certolizumab, {
+#'  network.data(Outcomes, Study, Treat, N=N, response = "binomial", Treat.order,
+#'  baseline = "common", hy.prior = list("dhnorm", 0, 9.77))
+#' })
 #' result <- network.run(network)
 #' sucra(result)
 #' @seealso \code{\link{rank.tx}}
@@ -608,11 +589,9 @@ sucra = function(result, txnames = NULL, catnames = NULL)
 #' \item{ybar_arm}{posterior mean of the fitted value for normal}
 #' @examples
 #' #parkinsons
-#' Outcomes <- parkinsons[["Outcomes"]]
-#' Study <- parkinsons[["Study"]]
-#' Treat <- parkinsons[["Treat"]]
-#' SE <- parkinsons[["SE"]]
-#' network <- network.data(Outcomes, Study, Treat, SE = SE, response = "normal")
+#' network <- with(parkinsons, {
+#'  network.data(Outcomes, Study, Treat, SE = SE, response = "normal")
+#' })
 #' result <- network.run(network)
 #' calculate.deviance(result)
 #' @references S. Dias, A.J. Sutton, A.E. Ades, and N.J. Welton (2013a), \emph{A Generalized Linear Modeling Framework for Pairwise and Network Meta-analysis of Randomized Controlled Trials}, Medical Decision Making 33(5):607-617. [\url{https://doi.org/10.1177/0272989X12458724}]
@@ -765,11 +744,9 @@ calculate.deviance <- function(result){
 #' This makes a deviance plot which plots residual deviance (dev_arm) vs. all the arms for each study.
 #' @param result object created by \code{network.run} function
 #' @examples
-#' Outcomes <- blocker[["Outcomes"]]
-#' Study <- blocker[["Study"]]
-#' Treat <- blocker[["Treat"]]
-#' N <- blocker[["N"]]
-#' network <- network.data(Outcomes, Study, Treat, N = N, response = "binomial")
+#' network <- with(blocker, {
+#'  network.data(Outcomes, Study, Treat, N = N, response = "binomial")
+#' })
 #' result <- network.run(network)
 #' network.deviance.plot(result)
 #' @export
@@ -811,14 +788,10 @@ network.leverage.plot <- function(result){
 #' @param covariate.name A vector of covariate names naming of the covariate that goes into x axis label
 #' @examples
 #' ########### certolizumab (with covariate)
-#' Outcomes <- certolizumab[["Outcomes"]]
-#' N <- certolizumab[["N"]]
-#' Study <- certolizumab[["Study"]]
-#' Treat <- certolizumab[["Treat"]]
-#' covariate <- certolizumab[["covariate"]]
-#' Treat.order <- certolizumab[["Treat.order"]]
-#' network <- network.data(Outcomes, Study, Treat, N=N, response="binomial", Treat.order,
-#' covariate = covariate, hy.prior = list("dhnorm", 0, 9.77))
+#' network <- with(certolizumab, {
+#'  network.data(Outcomes, Study, Treat, N=N, response="binomial", Treat.order,
+#'  covariate = covariate, hy.prior = list("dhnorm", 0, 9.77))
+#' })
 #' result <- network.run(network)
 #' network.covariate.plot(result, base.treatment = "Placebo", comparison.treatment = "CZP",
 #' covariate.name = "Disease Duration")
@@ -887,11 +860,9 @@ network.covariate.plot <- function(result, base.treatment = NULL, comparison.tre
 #' @param result object created by \code{network.run} function
 #' @examples
 #' #cardiovascular
-#' Study <- cardiovascular[["Study"]]
-#' Treat <- cardiovascular[["Treat"]]
-#' Outcomes <- cardiovascular[["Outcomes"]]
-#' N <- cardiovascular[["N"]]
-#' network <- network.data(Outcomes, Study, Treat, N, response = "multinomial")
+#' network <- with(cardiovascular, {
+#'  network.data(Outcomes, Study, Treat, N, response = "multinomial")
+#' })
 #' result <- network.run(network)
 #' variance.tx.effects(result)
 #' @export

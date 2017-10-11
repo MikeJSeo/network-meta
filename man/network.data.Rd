@@ -9,8 +9,9 @@ network.data(Outcomes, Study, Treat, N = NULL, SE = NULL,
   rank.preference = "higher", miss.matrix = NULL, baseline = "none",
   covariate = NULL, covariate.type = NULL, covariate.model = NULL,
   dic = TRUE, mean.d = NULL, prec.d = NULL, mean.Eta = NULL,
-  prec.Eta = NULL, mean.bl = NULL, prec.bl = NULL, mean.cov = NULL,
-  prec.cov = NULL, hy.prior = NULL)
+  prec.Eta = NULL, mean.bl = NULL, prec.bl = NULL, hy.prior.base = NULL,
+  mean.cov = NULL, prec.cov = NULL, hy.prior.cov = NULL,
+  hy.prior = NULL)
 }
 \arguments{
 \item{Outcomes}{Arm-level outcomes. If it is multinomial response, the matrix would have arms for the row and categories for the column. Otherwise, it would be a vector.}
@@ -39,7 +40,7 @@ network.data(Outcomes, Study, Treat, N = NULL, SE = NULL,
 
 \item{covariate.type}{Should be a vector indicating the type of the covariate. Covariate can be either "continuous" or "discrete". If it continuous, covariates are centered. If the covariate is discrete it is not centered and it has to be in a dummy integer format (i.e. 0,1,2,...). The code doesn't factor the covariates for the user, so user needs to specify dummy variables if factor is needed.}
 
-\item{covariate.model}{"independent" allows covariate effects for each treatment while "common" restricts same covariate effect for all treatment. We set "common" to be default if not specified.}
+\item{covariate.model}{"independent" allows covariate effects for each treatment. "common" restricts same covariate effect for all treatment. Lastly, "exchangeable"  assumes that the covariate effects are different but related and strength is borrowed across them. We set "common" to be default.}
 
 \item{dic}{This is an indicator for whether you want to calculate DIC. It stores less information if you set it to FALSE.}
 
@@ -59,7 +60,11 @@ network.data(Outcomes, Study, Treat, N = NULL, SE = NULL,
 
 \item{prec.cov}{Prior precision for the covariate effect}
 
+\item{hy.prior.cov}{Between treatment heterogeneity in covariate effect (for exchangeable regression coefficient only). Format of the data is same as hy.prior. Default is set to be dunif(0, 5) for binary, dunif(0, 100) for normal, and wishart with identity scale matrix and (# of categories - 1) degrees of freedom.}
+
 \item{hy.prior}{Prior for the heterogeneity parameter. Supports uniform, gamma, and half normal for normal and binomial response and wishart for multinomial response. It should be a list of length 3, where first element should be the distribution (one of dunif, dgamma, dhnorm, dwish) and the next two are the parameters associated with the distribution. For example, list("dunif", 0, 5) give uniform prior with lower bound 0 and upper bound 5 for the heterogeneity parameter. For wishart distribution, the last two parameter would be the scale matrix and the degrees of freedom.}
+
+\item{hy.prior.bl}{Between treatment heterogeneity in baseline effect (for exchangeable regression coefficient only). Format of the data is same as hy.prior.}
 }
 \value{
 Creates list of variables that are used to run the model.

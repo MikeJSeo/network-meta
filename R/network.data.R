@@ -10,7 +10,7 @@
 #' @param type Type of model fitted: either "random" for random effects model or "fixed" for fixed effects model. The default is "random".
 #' @param rank.preference Set it equal to "higher" if higher values are preferred (i.e. assumes events are good). Set it equal to "lower if lower values are preferred (i.e. assumes events are bad).
 #' @param miss.matrix This is parameter for running incomplete multinomial. Still under revision.
-#' @param baseline "independent" allows baseline effects for each treatment while "common" restricts same baseline effect for all treatment. Default is "none" which doesn't incorporate baseline effect.
+#' @param baseline "independent" allows baseline effects for each treatment while "common" restricts same baseline effect for all treatment. Lastly, "exchangeable"  assumes that the covariate effects are different but related and strength is borrowed across them. Default is "none" which doesn't incorporate baseline effect.
 #' @param covariate A covariate matrix with each row representing each trial and column representing each covariate. Covariate information is needed for each study, and so the user doesn't need to repeatly specify covariates for each arm.
 #' @param covariate.type Should be a vector indicating the type of the covariate. Covariate can be either "continuous" or "discrete". If it continuous, covariates are centered. If the covariate is discrete it is not centered and it has to be in a dummy integer format (i.e. 0,1,2,...). The code doesn't factor the covariates for the user, so user needs to specify dummy variables if factor is needed.
 #' @param covariate.model "independent" allows covariate effects for each treatment. "common" restricts same covariate effect for all treatment. Lastly, "exchangeable"  assumes that the covariate effects are different but related and strength is borrowed across them. We set "common" to be default.
@@ -43,12 +43,9 @@
 #' @examples
 #' ###Blocker data example
 #' blocker
-#' Outcomes <- blocker[["Outcomes"]]
-#' Study <- blocker[["Study"]]
-#' Treat <- blocker[["Treat"]]
-#' N <- blocker[["N"]]
-#' network <- network.data(Outcomes, Study, Treat, N = N, response = "binomial")
-#' str(network)
+#' network <- with(blocker, {
+#'  network.data(Outcomes, Study, Treat, N = N, response = "binomial")
+#' })
 #' @references S. Dias, A.J. Sutton, A.E. Ades, and N.J. Welton (2013a), \emph{A Generalized Linear Modeling Framework for Pairwise and Network Meta-analysis of Randomized Controlled Trials}, Medical Decision Making 33(5):607-617. [\url{https://doi.org/10.1177/0272989X12458724}]
 #' @export
 
@@ -108,8 +105,6 @@ network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, response =
 
   #relabel Treatment and Study names into to a numeric sequence (1:nstudy)
   na <- rle(Study)$lengths
-  print(na)
-  print(Study)
   if(any(na == 1)) stop("study cannot have only 1 arm or arms have to be next to each other in each study")
   Study <- rep(1:length(unique(Study)), times = na)
   Treat <- relabel.vec(Treat, Treat.order)

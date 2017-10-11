@@ -2,12 +2,8 @@
 
 network.prior.default <- function(network, mean.d, prec.d, mean.Eta, prec.Eta, mean.bl, prec.bl, hy.prior.base, mean.cov, prec.cov, hy.prior.cov, hy.prior) {
 
-  response <- network$response
-  ncat <- network$ncat
-  baseline <- network$baseline
-  covariate <- network$covariate
-  covariate.model <- network$covariate.model
-
+  with(network, {
+    
   if(response == "binomial" || response == "normal"){
     if(is.null(mean.d)){
       mean.d = 0
@@ -56,7 +52,6 @@ network.prior.default <- function(network, mean.d, prec.d, mean.Eta, prec.Eta, m
         prior.data$hy.prior.cov.2 <- hy.prior.cov[[3]]
       }
     }
-    return(prior.data)
   } else if(response == "multinomial"){
     if(is.null(mean.d)){
       mean.d = rep(0, ncat - 1)
@@ -105,12 +100,13 @@ network.prior.default <- function(network, mean.d, prec.d, mean.Eta, prec.Eta, m
     }
   }
   return(prior.data)
+  })
 }
 
 hy.prior.default <- function(network){
-  response <- network$response
-  ncat <- network$ncat
 
+  with(network,{
+    
   hy.prior <- if(response == "binomial"){
     list("dunif", 0, 5)
   } else if(response == "normal"){
@@ -119,4 +115,5 @@ hy.prior.default <- function(network){
     list("dwish", diag(ncat - 1), ncat -1)
   }
   return(hy.prior)
+  })
 }
