@@ -142,7 +142,7 @@ jags.fit <- function(network, data, pars.save, inits, n.chains, max.run, setsize
   adapted <- FALSE
   count <- 0
   while(!adapted){
-    adapted <- adapt(mod, setsize, end.adaptation = FALSE)
+    adapted <- rjags::adapt(mod, setsize, end.adaptation = FALSE)
     count <- count + 1
     if(count == 100){
       stop("algorithm has not adapted")
