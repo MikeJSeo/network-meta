@@ -10,18 +10,20 @@
 #' @param type Type of model fitted: either "random" for random effects model or "fixed" for fixed effects model. The default is "random".
 #' @param rank.preference Set it equal to "higher" if higher values are preferred (i.e. assumes events are good). Set it equal to "lower if lower values are preferred (i.e. assumes events are bad).
 #' @param miss.matrix This is parameter for running incomplete multinomial. Still under revision.
-#' @param baseline "independent" allows baseline effects for each treatment while "common" restricts same baseline effect for all treatment. Lastly, "exchangeable"  assumes that the covariate effects are different but related and strength is borrowed across them. Default is "none" which doesn't incorporate baseline effect.
-#' @param covariate A covariate matrix with each row representing each trial and column representing each covariate. Covariate information is needed for each study, and so the user doesn't need to repeatly specify covariates for each arm.
+#' @param baseline Three different assumptions for treatment x covariate interactions (slopes): "independent", "common", or "exchangeable". Default is "none" which doesn't incorporate baseline risk. 
+#' @param baseline.risk Two different assumptions for baseline risk: "independent" or "exchangeable". 
+#' @param covariate A covariate matrix with each row representing each trial and column representing each covariate. Covariate information is needed for each study, and so the user doesn't need to repeatedly specify covariates for each arm.
 #' @param covariate.type Should be a vector indicating the type of the covariate. Covariate can be either "continuous" or "discrete". If it continuous, covariates are centered. If the covariate is discrete it is not centered and it has to be in a dummy integer format (i.e. 0,1,2,...). The code doesn't factor the covariates for the user, so user needs to specify dummy variables if factor is needed.
 #' @param covariate.model "independent" allows covariate effects for each treatment. "common" restricts same covariate effect for all treatment. Lastly, "exchangeable"  assumes that the covariate effects are different but related and strength is borrowed across them. We set "common" to be default.
 #' @param dic This is an indicator for whether you want to calculate DIC. It stores less information if you set it to FALSE.
 #' @param mean.d Prior mean for the relative effect
 #' @param prec.d Prior precision for the relative effect
-#' @param mean.Eta Prior mean for the study effect
-#' @param prec.Eta Prior precision for the study effect
-#' @param mean.bl Prior mean for the baseline effect
-#' @param prec.bl Prior precision for the baseline effect
-#' @param hy.prior.bl Between treatment heterogeneity in baseline effect (for exchangeable regression coefficient only). Format of the data is same as hy.prior.
+#' @param mean.Eta Prior mean for the study effect (baseline risk)
+#' @param prec.Eta Prior precision for the study effect (baseline risk)
+#' @param hy.prior.Eta Between treatment heterogeneity in baseline risk (for exchangeable assumption only). Format of the data is same as hy.prior. 
+#' @param mean.bl Prior mean for the baseline slope
+#' @param prec.bl Prior precision for the baseline slope
+#' @param hy.prior.bl Between treatment heterogeneity in baseline slope (for exchangeable regression coefficient only). Format of the data is same as hy.prior.
 #' @param mean.cov Prior mean for the covariate effect
 #' @param prec.cov Prior precision for the covariate effect
 #' @param hy.prior.cov Between treatment heterogeneity in covariate effect (for exchangeable regression coefficient only). Format of the data is same as hy.prior. Default is set to be dunif(0, 5) for binary, dunif(0, 100) for normal, and wishart with identity scale matrix and (# of categories - 1) degrees of freedom.
@@ -50,8 +52,8 @@
 #' @export
 
 network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, response = "multinomial", Treat.order = NULL, type = "random", rank.preference = "higher",
-                         miss.matrix = NULL, baseline = "none", covariate = NULL, covariate.type = NULL, covariate.model = NULL, dic = TRUE,
-                         mean.d = NULL, prec.d = NULL, mean.Eta = NULL, prec.Eta = NULL, mean.bl = NULL, prec.bl = NULL, hy.prior.base = NULL,
+                         miss.matrix = NULL, baseline = "none", baseline.risk = "independent", covariate = NULL, covariate.type = NULL, covariate.model = NULL, dic = TRUE,
+                         mean.d = NULL, prec.d = NULL, mean.Eta = NULL, prec.Eta = NULL, hy.prior.Eta = NULL, mean.bl = NULL, prec.bl = NULL, hy.prior.bl = NULL,
                          mean.cov = NULL, prec.cov = NULL, hy.prior.cov = NULL, hy.prior = NULL) {
 
   if(missing(Study) || missing(Treat) || missing(Outcomes)){
@@ -68,11 +70,13 @@ network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, response =
     }
   }
 
-  if(is.null(baseline)){
+  if(is.null(baseline) || !baseline %in% c("none", "independent", "exchangeable", "common")){
     stop("baseline has to be none, independent, exchangeable, or common")
-  } else if(!baseline %in% c("none", "independent", "exchangeable", "common")){
-    stop("baseline has to be none, independent, exchangeable, or common")
-  }
+  } 
+  
+  if(is.null(baseline.risk) || !baseline.risk %in% c("independent", "exchangeable")){
+    stop("baseline risk has to be independent or exchangeable")
+  } 
 
   if(!type %in% c("fixed", "random")){
     stop("type has to be either fixed or random")
@@ -157,7 +161,7 @@ network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, response =
   if(response != "multinomial"){
     r <- r[,,1]
   }
-  network <- list(data = data, Outcomes = Outcomes, Study = Study, Treat = Treat, Treat.order = Treat.order, type = type, rank.preference = rank.preference, miss.matrix = miss.matrix, nrow = nrow, ncol = ncol, nstudy = nstudy, na = na, ntreat = ntreat, b.id = b.id, t = t, r = r, response = response, baseline = baseline, covariate = covariate, covariate.model = covariate.model, dic = dic)
+  network <- list(data = data, Outcomes = Outcomes, Study = Study, Treat = Treat, Treat.order = Treat.order, type = type, rank.preference = rank.preference, miss.matrix = miss.matrix, nrow = nrow, ncol = ncol, nstudy = nstudy, na = na, ntreat = ntreat, b.id = b.id, t = t, r = r, response = response, baseline = baseline, baseline.risk = baseline.risk, covariate = covariate, covariate.model = covariate.model, dic = dic)
 
   ######################### missing pattern ##############################
   # check miss.matrix is specified correctly (multinomial only)
@@ -263,14 +267,22 @@ network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, response =
   }
 
   if(baseline == "exchangeable"){
-    if(!is.null(hy.prior.base)){
-      check.hy.prior(hy.prior.base, response)
+    if(!is.null(hy.prior.bl)){
+      check.hy.prior(hy.prior.bl, response)
     } else{
-      hy.prior.base <- hy.prior.default(network)
+      hy.prior.bl <- hy.prior.default(network)
+    }
+  }
+  
+  if(baseline.risk == "exchangeable"){
+    if(!is.null(hy.prior.Eta)){
+      check.hy.prior(hy.prior.Eta, response)
+    } else{
+      hy.prior.Eta <- hy.prior.default(network)
     }
   }
 
-  prior.data <- network.prior.default(network, mean.d, prec.d, mean.Eta, prec.Eta, mean.bl, prec.bl, hy.prior.base, mean.cov, prec.cov, hy.prior.cov, hy.prior)
+  prior.data <- network.prior.default(network, mean.d, prec.d, mean.Eta, prec.Eta, hy.prior.Eta, mean.bl, prec.bl, hy.prior.bl, mean.cov, prec.cov, hy.prior.cov, hy.prior)
   if(type == "fixed"){
     prior.data <- prior.data[!names(prior.data) %in% c("hy.prior.1", "hy.prior.2")]
   }
@@ -278,7 +290,8 @@ network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, response =
   network$prior.data <- prior.data
   network$hy.prior <- hy.prior
   network$hy.prior.cov <- hy.prior.cov
-  network$hy.prior.base <- hy.prior.base
+  network$hy.prior.bl <- hy.prior.bl
+  network$hy.prior.Eta <- hy.prior.Eta
 
   code <- network.rjags(network)
   network$code <- code

@@ -1,6 +1,6 @@
 ### set prior to default values if not specified
 
-network.prior.default <- function(network, mean.d, prec.d, mean.Eta, prec.Eta, mean.bl, prec.bl, hy.prior.base, mean.cov, prec.cov, hy.prior.cov, hy.prior) {
+network.prior.default <- function(network, mean.d, prec.d, mean.Eta, prec.Eta, hy.prior.Eta, mean.bl, prec.bl, hy.prior.bl, mean.cov, prec.cov, hy.prior.cov, hy.prior) {
 
   with(network, {
     
@@ -32,9 +32,14 @@ network.prior.default <- function(network, mean.d, prec.d, mean.Eta, prec.Eta, m
       prior.data$mean.bl = mean.bl
       prior.data$prec.bl = prec.bl
       if(baseline == "exchangeable"){
-        prior.data$hy.prior.base.1 <- hy.prior.base[[2]]
-        prior.data$hy.prior.base.2 <- hy.prior.base[[3]]
+        prior.data$hy.prior.bl.1 <- hy.prior.bl[[2]]
+        prior.data$hy.prior.bl.2 <- hy.prior.bl[[3]]
       }
+    }
+    
+    if(baseline.risk == "exchangeable"){
+      prior.data$hy.prior.Eta.1 <- hy.prior.Eta[[2]]
+      prior.data$hy.prior.Eta.2 <- hy.prior.Eta[[3]]
     }
 
     if(!is.null(covariate)){
@@ -69,7 +74,7 @@ network.prior.default <- function(network, mean.d, prec.d, mean.Eta, prec.Eta, m
     hy.prior.2 <- hy.prior[[3]]
     prior.data = list(mean.d = mean.d, prec.d = prec.d, mean.Eta = mean.Eta, prec.Eta = prec.Eta, hy.prior.1 = hy.prior.1, hy.prior.2 = hy.prior.2)
 
-    if(network$baseline != "none"){
+    if(baseline != "none"){
       if(is.null(mean.bl)){
         mean.bl = rep(0, network$ncat - 1)
       }
@@ -79,10 +84,16 @@ network.prior.default <- function(network, mean.d, prec.d, mean.Eta, prec.Eta, m
       prior.data$mean.bl = mean.bl
       prior.data$prec.bl = prec.bl
       if(baseline == "exchangeable"){
-        prior.data$hy.prior.base.1 <- hy.prior.base[[2]]
-        prior.data$hy.prior.base.2 <- hy.prior.base[[3]]
+        prior.data$hy.prior.bl.1 <- hy.prior.bl[[2]]
+        prior.data$hy.prior.bl.2 <- hy.prior.bl[[3]]
       }
     }
+    
+    if(baseline.risk == "exchangeable"){
+      prior.data$hy.prior.Eta.1 <- hy.prior.Eta[[2]]
+      prior.data$hy.prior.Eta.2 <- hy.prior.Eta[[3]] 
+    }
+    
     if(!is.null(network$covariate)){
       if(is.null(mean.cov)){
         mean.cov = rep(0, network$ncat - 1)

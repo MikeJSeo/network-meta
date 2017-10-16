@@ -11,7 +11,6 @@ network.rjags <- function(network){
     model.multinomial(network)
   }
   code <- paste0(code, code2, "\n}")
-  
 }
 
 ############################################## Functions for normal and binomial
@@ -24,11 +23,14 @@ model.normal <- function(network){
   code <- paste0(
     "\n\tfor (i in 1:", nstudy, ") {",
     "\n\t\tw[i,1] <- 0",
-    "\n\t\tdelta[i,1] <- 0",
-    "\n\t\tEta[i] ~ dnorm(mean.Eta,prec.Eta)",
+    "\n\t\tdelta[i,1] <- 0")
+  
+  code <- paste0(code, baseline.risk.rjags(baseline.risk, ntreat, hy.prior.Eta))
+  
+  code <- paste0(code, 
     "\n\t\tfor(k in 1:na[i]){",
     "\n\t\t\ttau[i,k] <- 1/pow(se[i,k],2)",
-    "\n\t\t\tr[i,k] ~ dnorm(theta[i,k], tau[i,k])")
+    "\n\t\t\tr[i,k] ~ dnorm(theta[i,k], tau[i,k])") 
 
   if(type == "fixed"){
     code <- paste0(code, "\n\t\t\ttheta[i,k] <- Eta[i] + d[t[i,k]] - d[t[i,1]]")
@@ -91,7 +93,7 @@ model.normal <- function(network){
     "\n\t}")
 
   if(baseline != "none"){
-    code <- paste0(code, baseline.rjags(baseline, ntreat, hy.prior.base))
+    code <- paste0(code, baseline.rjags(baseline, ntreat, hy.prior.bl))
   }
   if(!is.null(covariate)){
     code <- paste0(code, covariate.rjags(covariate, covariate.model, ntreat, hy.prior.cov))
@@ -108,11 +110,13 @@ model.normal <- function(network){
 model.binomial <- function(network)
 {
   with(network, {
-  code <- paste0(
+
+  code <- baseline.risk.rjags(network)
+    
+  code <- paste0(code, 
     "\n\tfor (i in 1:", nstudy, ") {",
     "\n\t\tw[i,1] <- 0",
     "\n\t\tdelta[i,1] <- 0",
-    "\n\t\tEta[i] ~ dnorm(mean.Eta,prec.Eta)",
     "\n\t\tfor(k in 1:na[i]){",
     "\n\t\t\tr[i,k] ~ dbin(p[i,k],n[i,k])")
 
@@ -179,7 +183,7 @@ model.binomial <- function(network)
     "\n\t}")
 
   if(baseline != "none"){
-    code <- paste0(code, baseline.rjags(baseline, ntreat, hy.prior.base))
+    code <- paste0(code, baseline.rjags(baseline, ntreat, hy.prior.bl))
   }
 
   if(!is.null(covariate)){
@@ -195,8 +199,31 @@ model.binomial <- function(network)
   })
 }
 
+baseline.risk.rjags <- function(network){
+  
+  with(network, {
+    code <- paste0("\n\tfor (i in 1:", nstudy, ") {")
+    if(baseline.risk == "independent"){
+      code <- paste0(code, 
+                     "\n\t\tEta[i] ~ dnorm(mean.Eta, prec.Eta)")
+    } else if(baseline.risk == "exchangeable"){
+      code <- paste0(code, 
+                     "\n\t\tEta[i] ~ dnorm(E, precE)")
+                     
+    }
+    code <- paste0(code, "\n\t}")
+    
+    if(baseline.risk == "exchangeable"){
+      code <- paste0(code,
+                     "\n\tE ~ dnorm(mean.Eta, prec.Eta)",
+                     hy.prior.Eta.rjags(hy.prior.Eta, 0))
+    }
+    return(code)  
+  })
+}
 
-baseline.rjags <- function(baseline, ntreat, hy.prior.base){
+
+baseline.rjags <- function(baseline, ntreat, hy.prior.bl){
 
   code <- "\n\tb_bl[1] <- 0"
   if(baseline == "common"){
@@ -216,7 +243,7 @@ baseline.rjags <- function(baseline, ntreat, hy.prior.base){
                    "\n\t\tb_bl[k] ~ dnorm(B, precB)",
                    "\n\t}",
                    "\n\tB ~ dnorm(mean.bl, prec.bl)",
-                   hy.prior.base.rjags(hy.prior.base, 0))
+                   hy.prior.bl.rjags(hy.prior.bl, 0))
   }
   return(code)
 }
@@ -259,8 +286,10 @@ covariate.rjags <- function(covariate, covariate.model, ntreat, hy.prior.cov){
 ################################################## Functions for multinomial distribution
 #########################################################################################
 
-model.multinomial.complete <- function(nstudy, ncat, dic){
+model.multinomial.complete <- function(network){
 
+  with(network, {
+    
   code <- paste0(
     "\n\tfor (i in 1:",nstudy,") {",
     "\n\t\tfor (k in 1:na[i]) {",
@@ -285,10 +314,14 @@ model.multinomial.complete <- function(nstudy, ncat, dic){
               "\n\t\t}",
               "\n\t}")
   }
+  return(code)
+  })
 }
 
-model.multinomial.incomplete <- function(miss.patterns, nstudy, ncat, dic)
+model.multinomial.incomplete <- function(network)
 {
+  with(network, {
+
   npattern = length(miss.patterns[[1]]) # number of missing patterns
   nobs = integer(npattern)
   for(i in seq(npattern)){
@@ -360,10 +393,14 @@ model.multinomial.incomplete <- function(miss.patterns, nstudy, ncat, dic)
     "\n\t\t\t}",
     "\n\t\t}",
     "\n\t}")
+  return(code)
+  })
 }
 
-model.randomeffects.twoarms <- function(nstudy, ncat, baseline, covariate, hy.prior, type){
+model.randomeffects.twoarms <- function(network){
 
+  with(network, {
+  
   code <- paste0(
     "\n\tfor(i in 1:", nstudy, "){",
     "\n\t\tfor(m in 1:", ncat, "){",
@@ -401,10 +438,13 @@ model.randomeffects.twoarms <- function(nstudy, ncat, baseline, covariate, hy.pr
     code <- paste0(code, hy.prior.rjags(hy.prior, ncat))
   }
   return(code)
+  })
 }
 
-model.randomeffects.threearms <- function(nstudy, ncat, baseline, covariate, hy.prior, type){
+model.randomeffects.threearms <- function(network){
 
+  with(network, {
+    
   if(type == "random"){
   code <- paste0(
     "\n\tfor(i in 1:", nstudy, "){",
@@ -480,18 +520,33 @@ model.randomeffects.threearms <- function(nstudy, ncat, baseline, covariate, hy.
       "\n\t}")
   }
   return(code)
+  })
 }
 
 
 
-model.multinomial.prior <- function(nstudy, ncat, ntreat, baseline, hy.prior.base, covariate, covariate.model, hy.prior.cov){
+model.multinomial.prior <- function(network){
 
-  code <- paste0(
-    "\n\tfor(i in 1:", nstudy, "){",
-    "\n\t\tEta[i,1] <- 0",
-    "\n\t\tEta[i,2:", ncat, "] ~ dmnorm(mean.Eta[], prec.Eta[,])",
-    "\n\t}",
-    "\n\tfor(k in 1:", ncat-1, "){",
+  with(network, {
+  
+      
+  code <- if(baseline.risk == "independent"){
+    paste0(
+      "\n\tfor(i in 1:", nstudy, "){",
+      "\n\t\tEta[i,1] <- 0",
+      "\n\t\tEta[i,2:", ncat, "] ~ dmnorm(mean.Eta[], prec.Eta[,])",
+      "\n\t}")
+  } else if(baseline.risk == "exchangeable"){
+    paste0(
+      "\n\tfor(i in 1:", nstudy, "){",
+      "\n\t\tEta[i,1] <- 0",
+      "\n\t\tEta[i,2:", ncat, "] ~ dmnorm(E, precE)",
+      "\n\t}",
+      "\n\tE ~ dmnorm(mean.Eta[], prec.Eta[,])",
+      hy.prior.Eta.rjags(hy.prior.Eta, ncat))
+  }
+  
+  code <- paste0(code, "\n\tfor(k in 1:", ncat-1, "){",
     "\n\t\td[1,k] <- 0",
     "\n\t}",
     "\n\tfor(j in 2:", ntreat, "){",
@@ -524,7 +579,7 @@ model.multinomial.prior <- function(nstudy, ncat, ntreat, baseline, hy.prior.bas
       "\n\t\tb_bl[j,1:", ncat -1, "] ~ dmnorm(B, precB)",
       "\n\t}",
       "\n\tB ~ dmnorm(mean.bl[], prec.bl[,])",
-      hy.prior.base.rjags(hy.prior.base, ncat))
+      hy.prior.bl.rjags(hy.prior.bl, ncat))
   }
 
 
@@ -575,24 +630,26 @@ model.multinomial.prior <- function(nstudy, ncat, ntreat, baseline, hy.prior.bas
     }
   }
   return(code)
+  
+  })
 }
 
 model.multinomial <- function(network){
   
   with(network, {
-  
+    
   code <- ""
   if(is.null(miss.matrix)){
-    code <- paste0(code, model.multinomial.complete(nstudy, ncat, dic))
+    code <- paste0(code, model.multinomial.complete(network))
   } else{
-    code <- paste0(code, model.multinomial.incomplete(miss.patterns, nstudy, ncat, dic))
+    code <- paste0(code, model.multinomial.incomplete(network))
   }
   if(max(na) == 2){
-    code <- paste0(code, model.randomeffects.twoarms(nstudy, ncat, baseline, covariate, hy.prior, type))
+    code <- paste0(code, model.randomeffects.twoarms(network))
   } else{
-    code <- paste0(code, model.randomeffects.threearms(nstudy, ncat, baseline, covariate, hy.prior, type))
+    code <- paste0(code, model.randomeffects.threearms(network))
   }
-  code <- paste0(code, model.multinomial.prior(nstudy, ncat, ntreat, baseline, hy.prior.base, covariate, covariate.model, hy.prior.cov), rank.rjags.multinomial(rank.preference, ntreat, ncat))
+  code <- paste0(code, model.multinomial.prior(network), rank.rjags.multinomial(network))
   return(code)
   })
 }
@@ -601,25 +658,51 @@ model.multinomial <- function(network){
 #############################################################################
 
 
-hy.prior.base.rjags <- function(hy.prior.base, ncat){
+hy.prior.Eta.rjags <- function(hy.prior.Eta, ncat){
+  
+  code <- ""
+  distr <- hy.prior.Eta[[1]]
+  if(distr == "dunif"){
+    code <- paste0(code,
+                   "\n\tprecE <- pow(sdE, -2)",
+                   "\n\tsdE ~ dunif(hy.prior.Eta.1, hy.prior.Eta.2)")
+  } else if(distr == "dgamma"){
+    code <- paste0(code,
+                   "\n\tprecE ~ dgamma(hy.prior.Eta.1, hy.prior.Eta.2)",
+                   "\n\tsdE <- pow(precE, -0.5)")
+  } else if(distr == "dhnorm"){
+    code <- paste0(code,
+                   "\n\tprecE <- pow(sdE, -2)",
+                   "\n\tsdE ~ dnorm(hy.prior.Eta.1, hy.prior.Eta.2)T(0,)")
+  } else if (distr == "dwish"){
+    code <- paste0(code,
+                   "\n\tprecE[1:", ncat-1, ",1:", ncat-1, "] ~ dwish(hy.prior.Eta.1, hy.prior.Eta.2)",
+                   "\n\tsigmaE[1:", ncat-1, ",1:", ncat-1, "] <- inverse(precE[,])")
+  }
+  return(code)
+}
+
+
+
+hy.prior.bl.rjags <- function(hy.prior.bl, ncat){
 
   code <- ""
-  distr <- hy.prior.base[[1]]
+  distr <- hy.prior.bl[[1]]
   if(distr == "dunif"){
     code <- paste0(code,
                    "\n\tprecB <- pow(sdB, -2)",
-                   "\n\tsdB ~ dunif(hy.prior.base.1, hy.prior.base.2)")
+                   "\n\tsdB ~ dunif(hy.prior.bl.1, hy.prior.bl.2)")
   } else if(distr == "dgamma"){
     code <- paste0(code,
-                   "\n\tprecB ~ dgamma(hy.prior.base.1, hy.prior.base.2)",
+                   "\n\tprecB ~ dgamma(hy.prior.bl.1, hy.prior.bl.2)",
                    "\n\tsdB <- pow(precB, -0.5)")
   } else if(distr == "dhnorm"){
     code <- paste0(code,
                    "\n\tprecB <- pow(sdB, -2)",
-                   "\n\tsdB ~ dnorm(hy.prior.base.1, hy.prior.base.2)T(0,)")
+                   "\n\tsdB ~ dnorm(hy.prior.bl.1, hy.prior.bl.2)T(0,)")
   } else if (distr == "dwish"){
     code <- paste0(code,
-                   "\n\tprecB[1:", ncat-1, ",1:", ncat-1, "] ~ dwish(hy.prior.base.1, hy.prior.base.2)",
+                   "\n\tprecB[1:", ncat-1, ",1:", ncat-1, "] ~ dwish(hy.prior.bl.1, hy.prior.bl.2)",
                    "\n\tsigmaB[1:", ncat-1, ",1:", ncat-1, "] <- inverse(precB[,])")
   }
   return(code)
@@ -712,8 +795,10 @@ rank.rjags <- function(rank.preference, ntreat){
   return(code)
 }
 
-rank.rjags.multinomial <- function(rank.preference, ntreat, ncat){
+rank.rjags.multinomial <- function(network){
 
+  with(network, {
+    
   code <- paste0(
     "\n\tfor(j in 1:", ncat -1, "){",
     "\n\t\trank_number[1:", ntreat, ",j] <- rank(d[1:", ntreat, ",j])",
@@ -729,5 +814,6 @@ rank.rjags.multinomial <- function(rank.preference, ntreat, ncat){
     "\n\t\t}",
     "\n\t}")
   return(code)
+  })
 }
 
