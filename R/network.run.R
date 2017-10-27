@@ -79,7 +79,7 @@ network.run <- function(network, inits = NULL, n.chains = 3, max.run = 100000, s
     c("Eta", "d", "sd", "logvar","prob")
   } else if(response == "multinomial"){
     c("Eta", "d", "sigma", "sigma_transformed","prob")
-  })
+  }
   if(type == "fixed"){
     pars.save <- pars.save[!pars.save %in% c("sd", "sigma", "logvar", "sigma_transformed")]
   }
