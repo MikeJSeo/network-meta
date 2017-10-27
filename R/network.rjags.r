@@ -25,7 +25,7 @@ model.normal <- function(network){
     "\n\t\tw[i,1] <- 0",
     "\n\t\tdelta[i,1] <- 0")
   
-  code <- paste0(code, baseline.risk.rjags(baseline.risk, ntreat, hy.prior.Eta))
+  code <- paste0(code, baseline.risk.rjags(network))
   
   code <- paste0(code, 
     "\n\t\tfor(k in 1:na[i]){",
