@@ -108,6 +108,9 @@ network.run <- function(network, inits = NULL, n.chains = 3, max.run = 100000, s
     if(network$baseline %in% c("common", "exchangeable")){
       pars.save <- c(pars.save, "B")
     }
+    if(network$baseline == "exchangeable"){
+      pars.save <- c(pars.save, "sdB")
+    }
   }
   if(!is.null(network$covariate)){
     for(i in seq(dim(network$covariate)[2])){
