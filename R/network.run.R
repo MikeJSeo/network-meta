@@ -37,49 +37,50 @@ network.run <- function(network, inits = NULL, n.chains = 3, max.run = 100000, s
   if(max.run < setsize){
     stop("setsize should be smaller than max.run")
   }
-
-  data <- with(network,
-    if(response == "binomial"){
-      list(na = na, t = t, r = r, n = n)
-    } else if(response == "normal"){
-      list(na = na, t = t, r = r, se = se)
-    } else if(response == "multinomial"){
-      list(na = na, t = t)
-    })
-
-  if(network$response == "multinomial"){
-    if(is.null(network$miss.matrix)){
-      data$r <- network$r
-      data$n <- network$n
+  
+  with(network, {
+    
+  data <- if(response == "binomial"){
+    list(na = na, t = t, r = r, n = n)
+  } else if(response == "normal"){
+    list(na = na, t = t, r = r, se = se)
+  } else if(response == "multinomial"){
+    list(na = na, t = t)
+  })    
+    
+  if(response == "multinomial"){
+    if(is.null(miss.matrix)){
+      data$r <- r
+      data$n <- n
     }
-    for(i in 1:length(network$miss.patterns[[1]])){
+    for(i in 1:length(miss.patterns[[1]])){
       data[[paste("r",i,sep="")]] <- network[[paste("r",i,sep="")]]
       data[[paste("n",i,sep="")]] <- network[[paste("n",i,sep="")]]
     }
   }
-  data <- c(data, network$prior.data)
-
+  data <- c(data, prior.data)
+  
   # add covariate info
-  if(!is.null(network$covariate)){
-    for(i in seq(dim(network$covariate)[2])){
+  if(!is.null(covariate)){
+    for(i in seq(dim(covariate)[2])){
       data[[paste("mx",i, sep = "")]] = network[[paste("mx",i, sep = "")]]
       data[[paste("x",i, sep = "")]] = network[[paste("x",i, sep = "")]]
     }
   }
-
+    
   # add baseline info
-  if(network$baseline != "none"){
-    data$mx_bl = network$mx_bl
+  if(baseline != "none"){
+    data$mx_bl = mx_bl
   }
 
   ########## parameters to save in the model
-  pars.save <- with(network,
-    if(network$response == "binomial" || network$response == "normal"){
-      c("Eta", "d", "sd", "logvar","prob")
-    } else if(network$response == "multinomial"){
-      c("Eta", "d", "sigma", "sigma_transformed","prob")
-    })
-  if(network$type == "fixed"){
+  pars.save <-
+  if(response == "binomial" || response == "normal"){
+    c("Eta", "d", "sd", "logvar","prob")
+  } else if(response == "multinomial"){
+    c("Eta", "d", "sigma", "sigma_transformed","prob")
+  })
+  if(type == "fixed"){
     pars.save <- pars.save[!pars.save %in% c("sd", "sigma", "logvar", "sigma_transformed")]
   }
 
@@ -87,33 +88,33 @@ network.run <- function(network, inits = NULL, n.chains = 3, max.run = 100000, s
     extra.pars.save.check(extra.pars.save)
     pars.save <- c(pars.save, extra.pars.save)
   }
-  if(network$dic == TRUE){
+  if(dic == TRUE){
     pars.save <- c(pars.save, "totresdev")
-    if(network$response == "binomial"){
+    if(response == "binomial"){
       pars.save <- c(pars.save, "rhat", "dev")
-    } else if(network$response == "normal"){
+    } else if(response == "normal"){
       pars.save <- c(pars.save, "theta", "dev")
-    } else if(network$response == "multinomial"){
-      if(is.null(network$miss.matrix)){
+    } else if(response == "multinomial"){
+      if(is.null(miss.matrix)){
         pars.save <- c(pars.save, "rhat", "dev")
       } else{
-        for(i in 1:network$npattern){
+        for(i in 1:npattern){
           pars.save <- c(pars.save, paste0("rhat", i), paste0("dev", i))
         }
       }
     }
   }
-  if(network$baseline != "none"){
-    pars.save = c(pars.save, "b_bl")
-    if(network$baseline %in% c("common", "exchangeable")){
+  if(baseline != "none"){
+    pars.save <- c(pars.save, "b_bl")
+    if(baseline %in% c("common", "exchangeable")){
       pars.save <- c(pars.save, "B")
     }
-    if(network$baseline == "exchangeable"){
+    if(baseline == "exchangeable"){
       pars.save <- c(pars.save, "sdB")
     }
   }
-  if(!is.null(network$covariate)){
-    for(i in seq(dim(network$covariate)[2])){
+  if(!is.null(covariate)){
+    for(i in seq(dim(covariate)[2])){
       pars.save = c(pars.save, paste("beta",i,sep = ""))
     }
   }
@@ -128,7 +129,7 @@ network.run <- function(network, inits = NULL, n.chains = 3, max.run = 100000, s
   result <- list(network = network, data.rjags = data, inits = inits, pars.save = pars.save)
   result <- c(result, samples)
 
-  if(network$dic == TRUE){
+  if(dic == TRUE){
     result$deviance <- calculate.deviance(result)
   }
   result$rank.tx <- rank.tx(result)
