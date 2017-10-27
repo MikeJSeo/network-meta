@@ -46,7 +46,7 @@ network.run <- function(network, inits = NULL, n.chains = 3, max.run = 100000, s
     list(na = na, t = t, r = r, se = se)
   } else if(response == "multinomial"){
     list(na = na, t = t)
-  })    
+  }    
     
   if(response == "multinomial"){
     if(is.null(miss.matrix)){
