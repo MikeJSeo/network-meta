@@ -25,7 +25,7 @@ model.normal <- function(network){
   code <- paste0(code,
     "\n\tfor (i in 1:", nstudy, ") {",
     "\n\t\tw[i,1] <- 0",
-    "\n\t\tdelta[i,1] <- 0"),
+    "\n\t\tdelta[i,1] <- 0",
     "\n\t\tfor(k in 1:na[i]){",
     "\n\t\t\ttau[i,k] <- 1/pow(se[i,k],2)",
     "\n\t\t\tr[i,k] ~ dnorm(theta[i,k], tau[i,k])") 
