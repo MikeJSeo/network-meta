@@ -135,7 +135,8 @@ network.run <- function(network, inits = NULL, n.chains = 3, max.run = 100000, s
   result$rank.tx <- rank.tx(result)
 
   class(result) <- "network.result"
-  result
+  return(result)
+  })
 }
 
 
