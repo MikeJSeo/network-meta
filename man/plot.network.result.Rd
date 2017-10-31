@@ -7,9 +7,9 @@
 \method{plot}{network.result}(x, ...)
 }
 \arguments{
-\item{...}{additional arguments affecting the plot produced}
+\item{x}{result object created by \code{network.run} function}
 
-\item{object}{result object created by \code{network.run} function}
+\item{...}{additional arguments affecting the plot produced}
 }
 \description{
 Use plotting function in \code{coda} to plot mcmc.list object

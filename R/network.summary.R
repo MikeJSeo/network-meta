@@ -59,7 +59,7 @@ summary.network.result <- function(object, ...){
 #'
 #' Use plotting function in \code{coda} to plot mcmc.list object
 #'
-#' @param object result object created by \code{network.run} function
+#' @param x result object created by \code{network.run} function
 #' @param ... additional arguments affecting the plot produced
 #' @examples
 #' network <- with(statins, {
