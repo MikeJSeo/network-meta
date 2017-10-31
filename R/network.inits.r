@@ -68,7 +68,7 @@ make.inits <- function(network, n.chains, delta, Eta, se.Eta){
       design.mat[j+rows[i],nonbase.tx[j]] <- 1
   }
   design.mat <- design.mat[,-1,drop=F]
-
+  
   fit <- summary(lm(y ~ design.mat - 1))
   d <- se.d <- rep(NA, ntreat)
   d[-1] <- coef(fit)[,1]
