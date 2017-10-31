@@ -25,11 +25,9 @@ Calculates deviance statistics. This function is automatically called in \code{n
 }
 \examples{
 #parkinsons
-Outcomes <- parkinsons[["Outcomes"]]
-Study <- parkinsons[["Study"]]
-Treat <- parkinsons[["Treat"]]
-SE <- parkinsons[["SE"]]
-network <- network.data(Outcomes, Study, Treat, SE = SE, response = "normal")
+network <- with(parkinsons, {
+ network.data(Outcomes, Study, Treat, SE = SE, response = "normal")
+})
 result <- network.run(network)
 calculate.deviance(result)
 }

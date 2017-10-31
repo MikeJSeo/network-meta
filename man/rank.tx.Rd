@@ -17,11 +17,9 @@ This table is also stored as an output from \code{network.run}.
 Creates a treatment rank table
 }
 \examples{
-Outcomes <- blocker[["Outcomes"]]
-Study <- blocker[["Study"]]
-Treat <- blocker[["Treat"]]
-N <- blocker[["N"]]
-network <- network.data(Outcomes, Study, Treat, N = N, response = "binomial")
+network <- with(blocker, {
+ network.data(Outcomes, Study, Treat, N = N, response = "binomial")
+})
 result <- network.run(network)
 rank.tx(result)
 }

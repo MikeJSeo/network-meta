@@ -32,34 +32,33 @@ Find relative effects for different base treatment and comparison treatments
 #We can fit two different models with different base treatment and we can
 #obtain same relative effects estimate using this function
 #parkinsons
-Outcomes <- parkinsons[["Outcomes"]]
-Study <- parkinsons[["Study"]]
-Treat <- parkinsons[["Treat"]]
-SE <- parkinsons[["SE"]]
-network <- network.data(Outcomes, Study, Treat, SE = SE, response = "normal")
-result <- network.run(network)
+network <- with(parkinsons, {
+ network.data(Outcomes, Study, Treat, SE = SE, response = "normal")
+})
+result <- network.run(network) 
+summary(result)
 
-Treat.order <- c(2,1,3,4,5)
-network2 <- network.data(Outcomes, Study, Treat, SE = SE, response = "normal",
-Treat.order = Treat.order)
+network2 <- with(parkinsons, {
+ network.data(Outcomes, Study, Treat, SE = SE, response = "normal",
+ Treat.order = c(2,1,3,4,5))
+})
 result2 <- network.run(network2)
 
-summary(result2)
-summary(relative.effects(result2, base.treatment = 2))
+summary(result)
+summary(relative.effects(result2, base.treatment = 1))
 
 #This also works for comparing different base.category for multinomial.
 #We fit two different models and compare the estimates again.
 #cardiovascular
 
-Study <- cardiovascular[["Study"]]
-Treat <- cardiovascular[["Treat"]]
-Outcomes <- cardiovascular[["Outcomes"]]
-N <- cardiovascular[["N"]]
-network3 <- network.data(Outcomes, Study, Treat, N, response = "multinomial")
+network3 <- with(cardiovascular, {
+ network.data(Outcomes, Study, Treat, N, response = "multinomial")
+})
 result3 <- network.run(network3)
 
-Outcomes <- Outcomes[,c(2,1,3)]
-network4 <- network.data(Outcomes, Study, Treat, N, response = "multinomial")
+network4 <- with(cardiovascular, {
+ network.data(Outcomes[,c(2,1,3)], Study, Treat, N, response = "multinomial")
+})
 result4 <- network.run(network4)
 
 summary(result3)

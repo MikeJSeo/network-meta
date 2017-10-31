@@ -21,7 +21,7 @@ pick.summary.variables <- function(result, extra.pars = NULL, only.pars = NULL){
     pars <- c(pars, extra.pars)
   }
   summary.samples <- lapply(samples, function(x){x[,varnames.split %in% pars, drop = F]})
-  summary.samples <- mcmc.list(summary.samples)
+  summary.samples <- coda::mcmc.list(summary.samples)
   summary.samples
 }
 
@@ -38,7 +38,7 @@ summary.network.result <- function(object, ...){
   if(!inherits(object, "network.result")) {
     stop('This is not the output from network.run. Need to run network.run function first')
   }
-  summary.samples <- pick.summary.variables(object)
+  summary.samples <- pick.summary.variables(object, ...)
 
   rval <- list("summary.samples"= summary(summary.samples),
                "Treat.order" =  object$network$Treat.order,
@@ -48,15 +48,23 @@ summary.network.result <- function(object, ...){
   rval
 }
 
-print.summary.network.result <- function(x) {
-  print(x[["summary.samples"]])
-  cat("Treatment order:", x[["Treat.order"]], "\n")
-  cat("Model fit (residual deviance) -", x[["total_n"]], "total arms", "\n")
-  print(x[["deviance"]])
-}
+#' plot traceplot and posterior density of the result
+#'
+#' Use plotting function in \code{coda} to plot mcmc.list object
+#'
+#' @param object result object created by \code{network.run} function
+#' @param ... additional arguments affecting the plot produced
+#' @examples
+#' network <- with(statins, {
+#'  network.data(Outcomes, Study, Treat, N = N, response = "binomial",
+#'  Treat.order = c("Placebo", "Statin"), covariate = covariate, covariate.type = "discrete")
+#' })
+#' result <- network.run(network)
+#' plot(result, only.pars = "sd")
+#' @export
 
 plot.network.result <- function(x, ...) {
-  summary.samples <- pick.summary.variables(x)
+  summary.samples <- pick.summary.variables(x, ...)
   plot(summary.samples)
 }
 

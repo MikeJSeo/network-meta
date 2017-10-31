@@ -18,14 +18,10 @@ SUCRA is the surface under the cumulative ranking distribution defined in Salant
 }
 \examples{
 ########### certolizumab (with baseline risk)
-Outcomes <- certolizumab[["Outcomes"]]
-N <- certolizumab[["N"]]
-Study <- certolizumab[["Study"]]
-Treat <- certolizumab[["Treat"]]
-covariate <- certolizumab[["covariate"]]
-Treat.order <- certolizumab[["Treat.order"]]
-network <- network.data(Outcomes, Study, Treat, N=N, response = "binomial", Treat.order,
-baseline = "common", hy.prior = list("dhnorm", 0, 9.77))
+network <- with(certolizumab, {
+ network.data(Outcomes, Study, Treat, N=N, response = "binomial", Treat.order,
+ baseline = "common", hy.prior = list("dhnorm", 0, 9.77))
+})
 result <- network.run(network)
 sucra(result)
 }

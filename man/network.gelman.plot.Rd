@@ -18,11 +18,9 @@ Use coda package to plot gelman-diagnostic plot
 }
 \examples{
 #blocker
-Outcomes <- blocker[["Outcomes"]]
-Study <- blocker[["Study"]]
-Treat <- blocker[["Treat"]]
-N <- blocker[["N"]]
-network <- network.data(Outcomes, Study, Treat, N = N, response = "binomial")
+network <- with(blocker,{
+ network.data(Outcomes, Study, Treat, N = N, response = "binomial")
+})
 result <- network.run(network)
 network.gelman.plot(result, only.pars = "d")
 }

@@ -7,11 +7,11 @@
 network.data(Outcomes, Study, Treat, N = NULL, SE = NULL,
   response = "multinomial", Treat.order = NULL, type = "random",
   rank.preference = "higher", miss.matrix = NULL, baseline = "none",
-  covariate = NULL, covariate.type = NULL, covariate.model = NULL,
-  dic = TRUE, mean.d = NULL, prec.d = NULL, mean.Eta = NULL,
-  prec.Eta = NULL, mean.bl = NULL, prec.bl = NULL, hy.prior.base = NULL,
-  mean.cov = NULL, prec.cov = NULL, hy.prior.cov = NULL,
-  hy.prior = NULL)
+  baseline.risk = "independent", covariate = NULL, covariate.type = NULL,
+  covariate.model = NULL, dic = TRUE, mean.d = NULL, prec.d = NULL,
+  mean.Eta = NULL, prec.Eta = NULL, hy.prior.Eta = NULL, mean.bl = NULL,
+  prec.bl = NULL, hy.prior.bl = NULL, mean.cov = NULL, prec.cov = NULL,
+  hy.prior.cov = NULL, hy.prior = NULL)
 }
 \arguments{
 \item{Outcomes}{Arm-level outcomes. If it is multinomial response, the matrix would have arms for the row and categories for the column. Otherwise, it would be a vector.}
@@ -34,9 +34,11 @@ network.data(Outcomes, Study, Treat, N = NULL, SE = NULL,
 
 \item{miss.matrix}{This is parameter for running incomplete multinomial. Still under revision.}
 
-\item{baseline}{"independent" allows baseline effects for each treatment while "common" restricts same baseline effect for all treatment. Default is "none" which doesn't incorporate baseline effect.}
+\item{baseline}{Three different assumptions for treatment x covariate interactions (slopes): "independent", "common", or "exchangeable". Default is "none" which doesn't incorporate baseline risk.}
 
-\item{covariate}{A covariate matrix with each row representing each trial and column representing each covariate. Covariate information is needed for each study, and so the user doesn't need to repeatly specify covariates for each arm.}
+\item{baseline.risk}{Two different assumptions for baseline risk: "independent" or "exchangeable".}
+
+\item{covariate}{A covariate matrix with each row representing each trial and column representing each covariate. Covariate information is needed for each study, and so the user doesn't need to repeatedly specify covariates for each arm.}
 
 \item{covariate.type}{Should be a vector indicating the type of the covariate. Covariate can be either "continuous" or "discrete". If it continuous, covariates are centered. If the covariate is discrete it is not centered and it has to be in a dummy integer format (i.e. 0,1,2,...). The code doesn't factor the covariates for the user, so user needs to specify dummy variables if factor is needed.}
 
@@ -48,13 +50,17 @@ network.data(Outcomes, Study, Treat, N = NULL, SE = NULL,
 
 \item{prec.d}{Prior precision for the relative effect}
 
-\item{mean.Eta}{Prior mean for the study effect}
+\item{mean.Eta}{Prior mean for the study effect (baseline risk)}
 
-\item{prec.Eta}{Prior precision for the study effect}
+\item{prec.Eta}{Prior precision for the study effect (baseline risk)}
 
-\item{mean.bl}{Prior mean for the baseline effect}
+\item{hy.prior.Eta}{Between treatment heterogeneity in baseline risk (for exchangeable assumption only). Format of the data is same as hy.prior.}
 
-\item{prec.bl}{Prior precision for the baseline effect}
+\item{mean.bl}{Prior mean for the baseline slope}
+
+\item{prec.bl}{Prior precision for the baseline slope}
+
+\item{hy.prior.bl}{Between treatment heterogeneity in baseline slope (for exchangeable regression coefficient only). Format of the data is same as hy.prior.}
 
 \item{mean.cov}{Prior mean for the covariate effect}
 
@@ -63,8 +69,6 @@ network.data(Outcomes, Study, Treat, N = NULL, SE = NULL,
 \item{hy.prior.cov}{Between treatment heterogeneity in covariate effect (for exchangeable regression coefficient only). Format of the data is same as hy.prior. Default is set to be dunif(0, 5) for binary, dunif(0, 100) for normal, and wishart with identity scale matrix and (# of categories - 1) degrees of freedom.}
 
 \item{hy.prior}{Prior for the heterogeneity parameter. Supports uniform, gamma, and half normal for normal and binomial response and wishart for multinomial response. It should be a list of length 3, where first element should be the distribution (one of dunif, dgamma, dhnorm, dwish) and the next two are the parameters associated with the distribution. For example, list("dunif", 0, 5) give uniform prior with lower bound 0 and upper bound 5 for the heterogeneity parameter. For wishart distribution, the last two parameter would be the scale matrix and the degrees of freedom.}
-
-\item{hy.prior.bl}{Between treatment heterogeneity in baseline effect (for exchangeable regression coefficient only). Format of the data is same as hy.prior.}
 }
 \value{
 Creates list of variables that are used to run the model.
@@ -88,12 +92,9 @@ Make a network object containing data, priors, and a jags model file
 \examples{
 ###Blocker data example
 blocker
-Outcomes <- blocker[["Outcomes"]]
-Study <- blocker[["Study"]]
-Treat <- blocker[["Treat"]]
-N <- blocker[["N"]]
-network <- network.data(Outcomes, Study, Treat, N = N, response = "binomial")
-str(network)
+network <- with(blocker, {
+ network.data(Outcomes, Study, Treat, N = N, response = "binomial")
+})
 }
 \references{
 S. Dias, A.J. Sutton, A.E. Ades, and N.J. Welton (2013a), \emph{A Generalized Linear Modeling Framework for Pairwise and Network Meta-analysis of Randomized Controlled Trials}, Medical Decision Making 33(5):607-617. [\url{https://doi.org/10.1177/0272989X12458724}]

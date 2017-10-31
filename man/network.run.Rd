@@ -46,5 +46,4 @@ network <- with(parkinsons,{
  network.data(Outcomes, Study, Treat, SE = SE, response = "normal")
 })
 result <- network.run(network)
-str(result)
 }

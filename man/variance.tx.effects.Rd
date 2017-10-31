@@ -14,11 +14,9 @@ Calculates correlation matrix from the variance matrix for heterogeneity paramet
 }
 \examples{
 #cardiovascular
-Study <- cardiovascular[["Study"]]
-Treat <- cardiovascular[["Treat"]]
-Outcomes <- cardiovascular[["Outcomes"]]
-N <- cardiovascular[["N"]]
-network <- network.data(Outcomes, Study, Treat, N, response = "multinomial")
+network <- with(cardiovascular, {
+ network.data(Outcomes, Study, Treat, N, response = "multinomial")
+})
 result <- network.run(network)
 variance.tx.effects(result)
 }

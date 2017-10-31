@@ -20,11 +20,10 @@ network.autocorr.diag(result, lags = c(0, 1, 5, 10, 50), extra.pars = NULL,
 Use coda package to find autocorrelation diagnostics
 }
 \examples{
-Outcomes <- blocker[["Outcomes"]]
-Study <- blocker[["Study"]]
-Treat <- blocker[["Treat"]]
-N <- blocker[["N"]]
-network <- network.data(Outcomes, Study, Treat, N = N, response = "binomial")
+network <- with(blocker, {
+ network.data(Outcomes, Study, Treat, N = N, response = "binomial")
+})
+
 result <- network.run(network)
 network.autocorr.diag(result, only.pars = "d")
 }

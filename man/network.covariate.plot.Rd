@@ -29,14 +29,10 @@ It then uses the \code{\link{relative.effects}} to calculate the correct relativ
 }
 \examples{
 ########### certolizumab (with covariate)
-Outcomes <- certolizumab[["Outcomes"]]
-N <- certolizumab[["N"]]
-Study <- certolizumab[["Study"]]
-Treat <- certolizumab[["Treat"]]
-covariate <- certolizumab[["covariate"]]
-Treat.order <- certolizumab[["Treat.order"]]
-network <- network.data(Outcomes, Study, Treat, N=N, response="binomial", Treat.order,
-covariate = covariate, hy.prior = list("dhnorm", 0, 9.77))
+network <- with(certolizumab, {
+ network.data(Outcomes, Study, Treat, N=N, response="binomial", Treat.order,
+ covariate = covariate, hy.prior = list("dhnorm", 0, 9.77))
+})
 result <- network.run(network)
 network.covariate.plot(result, base.treatment = "Placebo", comparison.treatment = "CZP",
 covariate.name = "Disease Duration")

@@ -17,15 +17,10 @@ network.gelman.diag(result, extra.pars = NULL, only.pars = NULL)
 Use coda package to find gelman-diagnostic diagnostics
 }
 \examples{
-#statins example (binomial)
-Outcomes <- statins[["Outcomes"]]
-Study <- statins[["Study"]]
-Treat <- statins[["Treat"]]
-N <- statins[["N"]]
-covariate <- statins[["covariate"]]
-Treat.order <- statins[["Treat.order"]]
-network <- network.data(Outcomes, Study, Treat, N = N, response = "binomial",
-Treat.order = c("Placebo", "Statin"), covariate = covariate, covariate.type = "discrete")
+network <- with(statins, {
+ network.data(Outcomes, Study, Treat, N = N, response = "binomial",
+ Treat.order = c("Placebo", "Statin"), covariate = covariate, covariate.type = "discrete")
+})
 result <- network.run(network)
 network.gelman.diag(result, extra.pars = "Eta")
 }

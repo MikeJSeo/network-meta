@@ -19,11 +19,9 @@ Make a summary table for relative effects
 }
 \examples{
 #cardiovascular
-Study <- cardiovascular[["Study"]]
-Treat <- cardiovascular[["Treat"]]
-Outcomes <- cardiovascular[["Outcomes"]]
-N <- cardiovascular[["N"]]
-network <- network.data(Outcomes, Study, Treat, N, response = "multinomial")
+network <- with(cardiovascular,{
+ network.data(Outcomes, Study, Treat, N, response = "multinomial")
+})
 result <- network.run(network)
 exp(relative.effects.table(result)) #look at odds ratio instead of log odds ratio
 }
