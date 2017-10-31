@@ -119,7 +119,7 @@ hy.prior.default <- function(network){
   with(network,{
     
   hy.prior <- if(response == "binomial"){
-    list("dunif", 0, 100)
+    list("dunif", 0, 5)
   } else if(response == "normal"){
     list("dunif", 0, 100)
   } else if(response == "multinomial"){
