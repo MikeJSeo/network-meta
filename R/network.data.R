@@ -212,7 +212,7 @@ network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, response =
       rdummy = r[,1]
       rdummy[r[,1] == 0] = 0.5
       ndummy = n[,1]
-      ndummy[r[,1] == 0] = ndummy[r[,1] == 0] + 1
+      ndummy[r[,1] == 0 & !is.na(r[,1])] = ndummy[r[,1] == 0 & !is.na(r[,1])] + 1
 
       #take only the non-active control group (treatment A) to calculate the observed mean log odds
       p = (rdummy/ndummy)[t[,1]==1]
