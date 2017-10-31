@@ -31,6 +31,13 @@ pick.summary.variables <- function(result, extra.pars = NULL, only.pars = NULL){
 #'
 #' @param object result object created by \code{network.run} function
 #' @param ... additional arguments affecting the summary produced
+#' #' @examples
+#' network <- with(statins, {
+#'  network.data(Outcomes, Study, Treat, N = N, response = "binomial",
+#'  Treat.order = c("Placebo", "Statin"), covariate = covariate, covariate.type = "discrete")
+#' })
+#' result <- network.run(network)
+#' summary(result)
 #' @export
 
 summary.network.result <- function(object, ...){

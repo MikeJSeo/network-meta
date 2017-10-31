@@ -9,7 +9,14 @@
 \arguments{
 \item{object}{result object created by \code{network.run} function}
 
-\item{...}{additional arguments affecting the summary produced}
+\item{...}{additional arguments affecting the summary produced
+#' @examples
+network <- with(statins, {
+ network.data(Outcomes, Study, Treat, N = N, response = "binomial",
+ Treat.order = c("Placebo", "Statin"), covariate = covariate, covariate.type = "discrete")
+})
+result <- network.run(network)
+summary(result)}
 }
 \description{
 Use summary function in \code{coda} to summarize mcmc.list object
