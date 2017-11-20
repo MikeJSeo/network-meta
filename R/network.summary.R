@@ -327,6 +327,8 @@ relative.effects <- function(result, base.treatment = NULL, comparison.treatment
 }
 
 #' Make a summary table for relative effects
+#' 
+#' Relative effects in units of log odds ratio for binomial and multinomial data and real number scale for normal data.
 #'
 #' @param result object created by \code{network.run} function
 #' @param summary_stat specifies what type of statistics user wants. Options are: "mean", "quantile", "sd", "p-value".
@@ -896,4 +898,47 @@ variance.tx.effects = function(result)
 
   return(list(sigma_matrix = sigma_matrix, cor_matrix = cor_matrix))
 }
+
+
+#' Draws forest plot
+#' 
+#' Draws forest plot using odds ratio of pooled treatment effect
+#' @export
+
+
+network.forest.plot <- function(result, level = 0.95, xlim = NULL, ylim = NULL, refline = 0){
+  
+  mean_store <- relative.effects.table(result)
+  y <- mean_store[result$network$Treat.order[1],]
+  y <- y[!is.na(y)]
+  
+  se_store <- relative.effects.table(result, summary_stat = "sd")
+  se <- se_store[result$network$Treat.order[1],]
+  se <- se[!is.na(se)]
+    
+  if(result$network$response %in% c("binomial", "multinomial")){
+    y <- exp(y)
+    se <- exp(se)
+  } 
+  
+  if(is.null(xlim)){
+    xlim <- c(min(y, na.rm = TRUE), max(y, na.rm = TRUE))
+  }
+  
+  if(is.null(ylim)){
+    ylim <- c(0.5, length(y) + 3)
+  }
+  
+  print(xlim)
+  print(ylim)
+  
+  plot(NA, NA, xlim = c(-2,2), ylim = c(-10,10), xlab = "", ylab = "", yaxt = "n", xaxt = "n", xaxs = "i", bty = "n", col = "black")
+  abline(h = ylim[2] -2)
+  
+  if(is.numeric(refline)){
+    segments(refline, ylim[1] - 5, refline, ylim[2] - 2, lty = "dotted", col = "black")
+  }
+  
+}
+
 

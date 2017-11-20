@@ -15,7 +15,7 @@ Quantile use c(0.025, 0.5, 0.975). P-value is the probability relative effect is
 \item{base.category}{specifies for which base category user wants for the summary. Used only for multinoimal.}
 }
 \description{
-Make a summary table for relative effects
+Relative effects in units of log odds ratio for binomial and multinomial data and real number scale for normal data.
 }
 \examples{
 #cardiovascular
