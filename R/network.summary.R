@@ -938,10 +938,28 @@ network.forest.plot2 <- function(result, level = 0.95){
     y <- exp(y)
   } 
   
+  
+  
   Treat.order <- result$network$Treat.order
   
   ts <- 1:length(Treat.order)
   comps <- combn(ts, 2)
+  
+  for(i in 1:length(Treat.order)){
+    for(j in i:legnth(Treat.order)){
+      lower[comps[,1][1], comps[,1][2]]
+    }
+  }
+  
+  lower <- relative.effects.table(result, summary_stat = "quantile", probs = 0.025)
+  lower <- lower[upper.tri(lower)]
+
+  OR <- relative.effects.table(result, summary_stat = "quantile", probs = 0.5)
+  OR <- median[upper.tri(median)]
+
+  upper <- relative.effects.table(result, summary_stat = "quantile", probs = 0.975)
+  upper <- upper[upper.tri(upper)]
+  
   
   # if(result$network$response != "multinomial"){
   #   tbl <- matrix(NA, nrow = length(ts), ncol = length(ts), dimnames = list(Treat.order, Treat.order))
