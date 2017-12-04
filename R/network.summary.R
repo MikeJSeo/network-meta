@@ -1093,8 +1093,3 @@ network.forest.plot <- function(result, level = 0.95, xlim = NULL, alim = NULL, 
   
   text(x = alim[1], ylim[2]-1, pos = 4, "Comparison: other vs 'placebo'", cex = 1.5)
 }
-
-
-#forest.default(x = y, sei = se, slab = 1:6)
-
-
