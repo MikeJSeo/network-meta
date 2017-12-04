@@ -350,7 +350,7 @@ relative.effects.table <- function(result, summary_stat = "mean", probs = NULL, 
   stopifnot(summary_stat %in% c("mean", "quantile", "sd", "p-value"))
 
   if(!is.null(probs)){
-    if(length(probs) == 1){
+    if(length(probs) != 1){
       stop("length of probs should be 1")
     }
   }
