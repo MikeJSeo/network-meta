@@ -332,8 +332,8 @@ relative.effects <- function(result, base.treatment = NULL, comparison.treatment
 #'
 #' @param result object created by \code{network.run} function
 #' @param summary_stat specifies what type of statistics user wants. Options are: "mean", "ci", "quantile", "sd", "p-value".
-#' ci gives 95% confidence interval (0.025, 0.5, 0.975) and quantile gives specific quantile specified in probs parameter. 
-#' P-value is the probability relative effect (in binomial, log odds ratio) is less than 0.
+#' "ci" gives 95% confidence interval (0.025, 0.5, 0.975) and "quantile" gives specific quantile specified in probs parameter. 
+#' "p-value" is the probability relative effect (in binomial, log odds ratio) is less than 0.
 #' @param base.category specifies for which base category user wants for the summary. Used only for multinoimal.
 #' @examples
 #' #cardiovascular
