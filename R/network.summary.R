@@ -938,65 +938,39 @@ network.forest.plot2 <- function(result, level = 0.95){
     y <- exp(y)
   } 
   
-  
-  
-  Treat.order <- result$network$Treat.order
-  
-  ts <- 1:length(Treat.order)
-  comps <- combn(ts, 2)
-  
-  for(i in 1:length(Treat.order)){
-    for(j in i:legnth(Treat.order)){
-      lower[comps[,1][1], comps[,1][2]]
-    }
-  }
-  
   lower <- relative.effects.table(result, summary_stat = "quantile", probs = 0.025)
   lower <- lower[upper.tri(lower)]
 
   OR <- relative.effects.table(result, summary_stat = "quantile", probs = 0.5)
-  OR <- median[upper.tri(median)]
+  OR <- OR[upper.tri(OR)]
 
   upper <- relative.effects.table(result, summary_stat = "quantile", probs = 0.975)
   upper <- upper[upper.tri(upper)]
   
+  odds <- data.frame(lower = lower, OR = OR, upper = upper)  
   
-  # if(result$network$response != "multinomial"){
-  #   tbl <- matrix(NA, nrow = length(ts), ncol = length(ts), dimnames = list(Treat.order, Treat.order))
-  #   
-  #   for (i in 1:ncol(comps)) {
-  #     comp <- comps[, i]
-  #     samples <- as.matrix(relative.effects(result, base.treatment = Treat.order[comp[1]], comparison.treatments = Treat.order[comp[2]]))
-  #     
+  if(result$network$response %in% c("binomial", "multinomial")){
+    odds <- exp(odds)
+  } 
   
+  Treat.order <- result$network$Treat.order
+  ts <- 1:length(Treat.order)
+  comps <- combn(ts, 2)
   
-  odds_ratio <- matrix(NA, nrow = length(result.list), ncol = 3)
-  
-  for(i in 1:length(result.list)){
-    result <- result.list[[i]]
-    samples <- do.call(rbind, result$samples)
-    odds_ratio[i,] <- exp(quantile(samples[,grep("beta", colnames(samples))], c((1 -level)/2, 0.5, 1 - (1 -level)/2)))
+  name <- rep(NA, ncol(comps))
+  for(i in 1:ncol(comps)){
+    name[i] <- paste0(Treat.order[comps[2,i]]," vs ", Treat.order[comps[1,i]])
   }
+  odds$name <- name
   
-  odds <- as.data.frame(odds_ratio)
-  names(odds) <- c("lower", "OR", "upper")
-  
-  if(is.null(result.name)){
-    odds$vars <- row.names(odds)  
-  } else{
-    if(length(result.name) != length(result.list)){
-      stop("result.name should have same length as result.list")
-    }
-    odds$vars <- result.name
-  }
   ticks <- c(0.1, 0.2, 0.5, 1, 2, 5, 10)
-  ggplot(odds, aes(y = OR, x = factor(vars))) + 
+  ggplot(odds, aes(y = OR, x = factor(name))) + 
     geom_point() +
     geom_errorbar(aes(ymin = lower, ymax = upper), width = .2) +
     scale_y_log10(breaks = ticks, labels = ticks) +
     geom_hline(yintercept = 1, linetype = 2) +
     coord_flip() +
-    labs(x = "Variables", y = "Odds Ratio", title = title) +
+    labs(x = "Treatment comparison", y = "Odds Ratio", title = "Forest plot") +
     theme_bw()  
 }
 
