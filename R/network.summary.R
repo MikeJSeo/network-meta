@@ -331,8 +331,9 @@ relative.effects <- function(result, base.treatment = NULL, comparison.treatment
 #' Relative effects in units of log odds ratio for binomial and multinomial data and real number scale for normal data.
 #'
 #' @param result object created by \code{network.run} function
-#' @param summary_stat specifies what type of statistics user wants. Options are: "mean", "quantile", "sd", "p-value".
-#' Quantile use c(0.025, 0.5, 0.975). P-value is the probability relative effect is less than 0.
+#' @param summary_stat specifies what type of statistics user wants. Options are: "mean", "ci", "quantile", "sd", "p-value".
+#' ci gives 95% confidence interval (0.025, 0.5, 0.975) and quantile gives specific quantile specified in probs parameter. 
+#' P-value is the probability relative effect (in binomial, log odds ratio) is less than 0.
 #' @param base.category specifies for which base category user wants for the summary. Used only for multinoimal.
 #' @examples
 #' #cardiovascular
@@ -344,10 +345,16 @@ relative.effects <- function(result, base.treatment = NULL, comparison.treatment
 #' @seealso \code{\link{relative.effects}}
 #' @export
 
-relative.effects.table <- function(result, summary_stat = "mean", base.category = NULL){
+relative.effects.table <- function(result, summary_stat = "mean", probs = NULL, base.category = NULL){
 
   stopifnot(summary_stat %in% c("mean", "quantile", "sd", "p-value"))
 
+  if(!is.null(probs)){
+    if(length(probs) == 1){
+      stop("length of probs should be 1")
+    }
+  }
+  
   Treat.order <- result$network$Treat.order
 
   ts <- 1:length(Treat.order)
@@ -363,10 +370,13 @@ relative.effects.table <- function(result, summary_stat = "mean", base.category 
       if(summary_stat == "mean"){
         tbl[comp[1], comp[2]] <- mean(samples)
         tbl[comp[2], comp[1]] <- -tbl[comp[1], comp[2]]
-      } else if(summary_stat == "quantile"){
-        q <- round(quantile(samples, prob = c(0.025, 0.5, 0.975)), 6)
+      } else if(summary_stat == "ci"){
+        q <- round(quantile(samples, probs = c(0.025, 0.5, 0.975)), 6)
         tbl[comp[1], comp[2]] <- paste0("[", q[1], ",", q[2], ",", q[3], "]")
         tbl[comp[2], comp[1]] <- paste0("[", -q[3], ",", -q[2], ",", -q[1], "]")
+      } else if(summary_stat == "quantile"){
+        tbl[comp[1], comp[2]] <- round(quantile(samples, probs = probs), 6)
+        tbl[comp[2], comp[1]] <- -tbl[comp[1], comp[2]]
       } else if(summary_stat == "sd"){
         tbl[comp[1], comp[2]] <- tbl[comp[2], comp[1]] <- sd(samples)
       } else if(summary_stat == "p-value"){
@@ -385,12 +395,15 @@ relative.effects.table <- function(result, summary_stat = "mean", base.category 
       if(summary_stat == "mean"){
         tbl[comp[1], comp[2],] <- apply(samples, 2, mean)
         tbl[comp[2], comp[1],]  <- -tbl[comp[1], comp[2],]
-      } else if(summary_stat == "quantile"){
-        q <- round(apply(samples, 2, quantile, prob = c(0.025, 0.5, 0.975)), 6)
+      } else if(summary_stat == "ci"){
+        q <- round(apply(samples, 2, quantile, probs = c(0.025, 0.5, 0.975)), 6)
         q1 <- apply(q, 2, function(x){ paste0("[", x[1], ",", x[2], ",", x[3], "]")})
         q2 <- apply(q, 2, function(x){ paste0("[", -x[3], ",", -x[2], ",", -x[1], "]")})
         tbl[comp[1], comp[2],] <- q1
         tbl[comp[2], comp[1],] <- q2
+      } else if(summary_stat == "quantile"){
+        tbl[comp[1], comp[2],] <- apply(samples, 2, quantile, probs = probs)
+        tbl[comp[2], comp[1],] <- -tbl[comp[1], comp[2],]
       } else if(summary_stat == "sd"){
         tbl[comp[1], comp[2],] <- tbl[comp[2], comp[1],] <- apply(samples, 2, sd)
       } else if(summary_stat == "p-value"){
@@ -921,16 +934,22 @@ network.forest.plot2 <- function(result, level = 0.95){
   y <- mean_store[result$network$Treat.order[1],]
   y <- y[!is.na(y)]
   
-  se_store <- relative.effects.table(result, summary_stat = "sd")
-  se <- se_store[result$network$Treat.order[1],]
-  se <- se[!is.na(se)]
-  variance <- se^2
-  
   if(result$network$response %in% c("binomial", "multinomial")){
     y <- exp(y)
-    se <- exp(se)
-    variance <- exp(variance)
   } 
+  
+  Treat.order <- result$network$Treat.order
+  
+  ts <- 1:length(Treat.order)
+  comps <- combn(ts, 2)
+  
+  if(result$network$response != "multinomial"){
+    tbl <- matrix(NA, nrow = length(ts), ncol = length(ts), dimnames = list(Treat.order, Treat.order))
+    
+    for (i in 1:ncol(comps)) {
+      comp <- comps[, i]
+      samples <- as.matrix(relative.effects(result, base.treatment = Treat.order[comp[1]], comparison.treatments = Treat.order[comp[2]]))
+      
   
   
   odds_ratio <- matrix(NA, nrow = length(result.list), ncol = 3)
