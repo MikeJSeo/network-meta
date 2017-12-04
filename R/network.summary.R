@@ -943,13 +943,13 @@ network.forest.plot2 <- function(result, level = 0.95){
   ts <- 1:length(Treat.order)
   comps <- combn(ts, 2)
   
-  if(result$network$response != "multinomial"){
-    tbl <- matrix(NA, nrow = length(ts), ncol = length(ts), dimnames = list(Treat.order, Treat.order))
-    
-    for (i in 1:ncol(comps)) {
-      comp <- comps[, i]
-      samples <- as.matrix(relative.effects(result, base.treatment = Treat.order[comp[1]], comparison.treatments = Treat.order[comp[2]]))
-      
+  # if(result$network$response != "multinomial"){
+  #   tbl <- matrix(NA, nrow = length(ts), ncol = length(ts), dimnames = list(Treat.order, Treat.order))
+  #   
+  #   for (i in 1:ncol(comps)) {
+  #     comp <- comps[, i]
+  #     samples <- as.matrix(relative.effects(result, base.treatment = Treat.order[comp[1]], comparison.treatments = Treat.order[comp[2]]))
+  #     
   
   
   odds_ratio <- matrix(NA, nrow = length(result.list), ncol = 3)
