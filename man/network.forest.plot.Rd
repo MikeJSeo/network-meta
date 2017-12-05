@@ -10,6 +10,8 @@ network.forest.plot(result, level = 0.95, ticks = NULL,
 \arguments{
 \item{result}{object created by \code{network.run} function}
 
+\item{level}{confidence level. default is 95% C.I.}
+
 \item{ticks}{position of the x-axis tick marks. If left unspecified, the function tries to set it at sensible values}
 
 \item{label.multiplier}{This is a multiplying factor to move the position of the text associated with median[lower, upper] values. This number is multiplied by the range of x-axis and added to the x-axis limit.}

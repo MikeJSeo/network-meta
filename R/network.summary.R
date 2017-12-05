@@ -916,7 +916,7 @@ variance.tx.effects = function(result)
 #'
 #' Draws forest plot of pooled treatment effect. Reports odds ratio for binomial and multinomial outcomes and continuous scale for normal outcomes.
 #' @param result object created by \code{network.run} function
-#' @param level
+#' @param level confidence level. default is 95% C.I.
 #' @param label.multiplier This is a multiplying factor to move the position of the text associated with median[lower, upper] values. This number is multiplied by the range of x-axis and added to the x-axis limit.
 #' @param ticks position of the x-axis tick marks. If left unspecified, the function tries to set it at sensible values
 #' @references W. Viechtbauer (2010), \emph{Conducting meta-analyses in R with the metafor package}, Journal of Statistical Software, 36(3):1-48. [\url{https://doi.org/10.18637/jss.v036.i03}]
