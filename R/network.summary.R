@@ -918,12 +918,13 @@ variance.tx.effects = function(result)
 #'
 #' @param result object created by \code{network.run} function
 #' @param level confidence level. default is 95 percent C.I.
-#' @param label.multiplier This is a multiplying factor to move the position of the text associated with median[lower, upper] values. This number is multiplied by the range of x-axis and added to the x-axis limit.
 #' @param ticks position of the x-axis tick marks. If left unspecified, the function tries to set it at sensible values
+#' @param label.multiplier This is a multiplying factor to move the position of the text associated with median[lower, upper] values. This number is multiplied by the range of x-axis and added to the x-axis limit.
+#' @param label.margin This is how much margin space you specify to assign space for the median[lower, upper] values
 #' @references W. Viechtbauer (2010), \emph{Conducting meta-analyses in R with the metafor package}, Journal of Statistical Software, 36(3):1-48. [\url{https://doi.org/10.18637/jss.v036.i03}]
 #' @export
 
-network.forest.plot <- function(result, level = 0.95, ticks = NULL, label.multiplier = 0.2){
+network.forest.plot <- function(result, level = 0.95, ticks = NULL, label.multiplier = 0.2, label.margin = 10){
   
   lower <- relative.effects.table(result, summary_stat = "quantile", probs = 0.025)
   lower <- lower[upper.tri(lower)]
@@ -965,8 +966,8 @@ network.forest.plot <- function(result, level = 0.95, ticks = NULL, label.multip
     scale_x_discrete(limits = name) +
     geom_hline(yintercept = 1, linetype = 2) +
     coord_flip() +
-    theme_bw() 
-  #  theme(plot.margin = unit(c(1,,1,1), "lines")) 
+    theme_bw() +
+    theme(plot.margin = unit(c(1,label.margin,1,1), "lines")) 
     
   if(result$network$response %in% c("binomial", "multinomial")){
     p <- p + labs(x = "Treatment comparison", y = "Odds Ratio", title = "Network Meta-analysis Forest plot") +
