@@ -10,7 +10,7 @@ network.forest.plot(result, level = 0.95, ticks = NULL,
 \arguments{
 \item{result}{object created by \code{network.run} function}
 
-\item{level}{confidence level. default is 95% C.I.}
+\item{level}{confidence level. default is 95 percent C.I.}
 
 \item{ticks}{position of the x-axis tick marks. If left unspecified, the function tries to set it at sensible values}
 
