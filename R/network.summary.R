@@ -931,9 +931,9 @@ network.forest.plot <- function(result, level = 0.95, ticks.position = NULL, lab
   for(i in 1:ncat){
     
   if(result$network$response == "multinomial"){
-    lower <- relative.effects.table(result, summary_stat = "quantile", probs = (1- level)/2)[,i]
-    OR <- relative.effects.table(result, summary_stat = "quantile", probs = 0.5)[,i]
-    upper <- relative.effects.table(result, summary_stat = "quantile", probs = level + (1- level)/2)[,i]
+    lower <- relative.effects.table(result, summary_stat = "quantile", probs = (1- level)/2)[,,i]
+    OR <- relative.effects.table(result, summary_stat = "quantile", probs = 0.5)[,,i]
+    upper <- relative.effects.table(result, summary_stat = "quantile", probs = level + (1- level)/2)[,,i]
   } else{
     lower <- relative.effects.table(result, summary_stat = "quantile", probs = (1- level)/2)
     OR <- relative.effects.table(result, summary_stat = "quantile", probs = 0.5)
@@ -955,8 +955,8 @@ network.forest.plot <- function(result, level = 0.95, ticks.position = NULL, lab
   comps <- combn(ts, 2)
   
   name <- rep(NA, ncol(comps))
-  for(i in 1:ncol(comps)){
-    name[i] <- paste0(Treat.order[comps[2,i]]," vs ", Treat.order[comps[1,i]])
+  for(j in 1:ncol(comps)){
+    name[j] <- paste0(Treat.order[comps[2,j]]," vs ", Treat.order[comps[1,j]])
   }
   odds$name <- name
   
@@ -979,10 +979,12 @@ network.forest.plot <- function(result, level = 0.95, ticks.position = NULL, lab
     theme_bw() +
     theme(plot.margin = unit(c(1,label.margin,1,1), "lines")) 
     
-  if(result$network$response %in% c("binomial", "multinomial")){
+  if(result$network$response %in% c("binomial")){
     p <- p + labs(x = "Treatment comparison", y = "Odds Ratio", title = "Network Meta-analysis Forest plot") +
          scale_y_log10(breaks = ticks, labels = ticks) 
-    
+  } else if(result$network$response %in% c("multinomial")){
+    p <- p + labs(x = "Treatment comparison", y = "Odds Ratio", title = paste0("Network Meta-analysis Forest plot", ": Multinomial Category ", i)) +
+        scale_y_log10(breaks = ticks, labels = ticks) 
   } else if(result$network$response %in% c("normal")){
     p <- p + labs(x = "Treatment comparison", y = "Continuous Scale", title = "Network Meta-analysis Forest plot") +
          scale_y_continuous(breaks = ticks, labels = ticks) 
@@ -992,7 +994,8 @@ network.forest.plot <- function(result, level = 0.95, ticks.position = NULL, lab
   
   p <- p + geom_text(aes(label = paste0(sprintf("%0.2f", round(OR, digits = 2)), " [", sprintf("%0.2f", round(lower, digits = 2)) , ", ", sprintf("%0.2f", round(upper, digits = 2)), "]")), y = xlim.range[2] + diff(xlim.range)*label.multiplier, x = 1:length(comps[1,]))   # hjust = -1, vjust = 2)
   
-  p <- p + geom_text(aes(label = "Median [lower, upper]"), y = xlim.range[2] + diff(xlim.range)*label.multiplier, x = length(comps[1,]) + 1)
+  median_name_location <- ifelse(length(odds[,1]) <= 3, length(comps[1,]) + 0.5, length(comps[1,]) + 1)
+  p <- p + geom_text(aes(label = "Median [lower, upper]"), y = xlim.range[2] + diff(xlim.range)*label.multiplier, x = median_name_location)
   
   gt <- ggplot_gtable(ggplot_build(p))
   gt$layout$clip[gt$layout$name == "panel"] <- "off"
