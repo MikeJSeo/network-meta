@@ -928,7 +928,7 @@ variance.tx.effects = function(result)
 #' @references W. Viechtbauer (2010), \emph{Conducting meta-analyses in R with the metafor package}, Journal of Statistical Software, 36(3):1-48. [\url{https://doi.org/10.18637/jss.v036.i03}]
 #' @export
 
-network.forest.plot2 <- function(result, level = 0.95){
+network.forest.plot <- function(result, level = 0.95){
   
   mean_store <- relative.effects.table(result)
   y <- mean_store[result$network$Treat.order[1],]
@@ -964,124 +964,26 @@ network.forest.plot2 <- function(result, level = 0.95){
   odds$name <- name
   
   ticks <- c(0.1, 0.2, 0.5, 1, 2, 5, 10)
-  ggplot(odds, aes(y = OR, x = factor(name))) + 
+  p <- ggplot(odds, aes(y = OR, x = name)) + 
     geom_point() +
     geom_errorbar(aes(ymin = lower, ymax = upper), width = .2) +
     scale_y_log10(breaks = ticks, labels = ticks) +
+    scale_x_discrete(limits = name) +
     geom_hline(yintercept = 1, linetype = 2) +
     coord_flip() +
-    labs(x = "Treatment comparison", y = "Odds Ratio", title = "Forest plot") +
-    theme_bw()  
+    labs(x = "Treatment comparison", y = "Odds Ratio", title = "Network Meta-analysis Forest plot") +
+    theme_bw() +
+    theme(plot.margin = unit(c(1,10,1,1), "lines")) 
+    
+  xlim.range <- ggplot_build(p)$layout$panel_ranges[[1]]$x.range
+  
+  p <- p + geom_text(aes(label = paste0(sprintf("%0.2f", round(OR, digits = 4)), " [", sprintf("%0.2f", round(lower, digits = 4)) , ", ", sprintf("%0.2f", round(upper, digits = 4)), "]")), y = xlim.range[2] + diff(xlim.range)/5, x = 1:length(comps[1,]))   # hjust = -1, vjust = 2)
+  
+  p <- p + geom_text(aes(label = "OR [lower, upper]"), y = xlim.range[2] + diff(xlim.range)/5, x = length(comps[1,]) + 1)
+  
+  gt <- ggplot_gtable(ggplot_build(p))
+  gt$layout$clip[gt$layout$name == "panel"] <- "off"
+  grid.draw(gt)
 }
 
 
-
-
-#' Draws forest plot
-#' 
-#' Draws forest plot of pooled treatment effect. Reports odds ratio for binomial and multinomial outcomes and continuous scale for normal outcomes.
-#' @param result object created by \code{network.run} function
-#' @level numerical value between 0 and 1 specifying the confidence level percentage (default is at 0.95)
-#' @xlim horizontal limits of the plot region
-#' @alim x-axis limit on the forest plot
-#' @ylim vertical limits of the plot region. 
-#' @at position of the x-axis tick marks. If left unspecified, the function tries to set it at sensible values
-#' @steps the number of tick marks for the x-axis (the default is 5). Ignored when the user specifies the positions via the at argument.
-#' @refline value at which a vertical 'refrence' line should be drawn (the default is 0). The line can be suppressed by setting this argument to NA
-#' @treat_lab optional vector with labels for the k studies. If unspecified, simple labels are created within the function. To suppress labels, set this argument to NA.
-#' @references W. Viechtbauer (2010), \emph{Conducting meta-analyses in R with the metafor package}, Journal of Statistical Software, 36(3):1-48. [\url{https://doi.org/10.18637/jss.v036.i03}]
-#' @export
-
-network.forest.plot <- function(result, level = 0.95, xlim = NULL, alim = NULL, ylim = NULL, at = NULL, steps = 5, refline = 0, treat_lab = NULL){
-  
-  mean_store <- relative.effects.table(result)
-  y <- mean_store[result$network$Treat.order[1],]
-  y <- y[!is.na(y)]
-  
-  se_store <- relative.effects.table(result, summary_stat = "sd")
-  se <- se_store[result$network$Treat.order[1],]
-  se <- se[!is.na(se)]
-  variance <- se^2
-    
-  if(result$network$response %in% c("binomial", "multinomial")){
-    y <- exp(y)
-    se <- exp(se)
-    variance <- exp(variance)
-  } 
-  
-  ci.lb <- y - qnorm((1 - level)/2, lower.tail = FALSE) * se
-  ci.ub <- y + qnorm((1 - level)/2, lower.tail = FALSE) * se
-  
-  if(is.null(treat_lab)){
-    treat_lab <- paste("Treatment", names(y))
-  }
-  
-  k <- length(y)
-  
-  if(k != length(treat_lab)){
-    stop("Number of treatment label does not match the number of outcomes")
-  }
-  
-  rng <- max(ci.ub, na.rm = TRUE) - min(ci.lb, na.rm = TRUE)
-  if(is.null(xlim)){
-    xlim <- c(min(y, na.rm = TRUE) - rng, max(y, na.rm = TRUE) + rng)
-  }
-  
-  if(is.null(ylim)){
-    ylim <- c(0.5, k + 3)
-  }
-  
-  if(is.null(alim)){
-    alim <- range(pretty(x = c(min(ci.lb, na.rm = TRUE), max(ci.ub, na.rm = TRUE)), n = steps - 1))
-  }
-  
-  if(is.null(at)){
-    at <- pretty(x = c(min(ci.lb, na.rm = TRUE), max(ci.ub, na.rm = TRUE)), n = steps - 1)
-  }
-  
-  # par.mar <- par("mar")
-  # par.mar.adj <- par.mar - c(0,3,1,1)
-  # par.mar.adj[par.mar.adj < 0] <- 0
-  # par(mar = par.mar.adj)
-  # on.exit(par(mar = par.mar))
-    
-  plot(NA, NA, xlim = xlim, ylim = ylim, xlab = "", ylab = "", yaxt = "n", xaxt = "n", xaxs = "i", bty = "n")
-  abline(h = ylim[2] -2)
-  
-  if(is.numeric(refline)){
-    segments(refline, ylim[1] - 5, refline, ylim[2] - 2, lty = "dotted", col = "black")
-  }
-  
-  axis(side = 1, at = at)
-  
-  if(is.null(xlab)){
-    if(result$network$response %in% c("binomial", "multinomial")){
-      xlab <- "Odds Ratio"
-    } else{
-      xlab <- "Observed Outcome"
-    }
-  }
-  mtext(xlab, side = 1, at = min(at) + (max(at) - min(at))/2, line = par("mgp")[1] - 0.5)
-  
-  weight <- 1/sqrt(variance)
-  psize <- weight/ sum(weight, na.rm = TRUE)
-  psize <- (psize - min(psize, na.rm = TRUE)) / (max(psize, na.rm = TRUE) - min(psize, na.rm = TRUE))
-  psize <- psize + 0.5
-  
-  rows <- k:1
-  for(i in 1:k){
-    if(!is.na(y[i])){
-      segments(ci.lb[i], rows[i], ci.ub[i], rows[i])
-      points(y[i], rows[i], cex = psize[i], pch = 0)
-    }
-  }
-  text(xlim[1], rows, treat_lab, pos = 4)
-  
-  annotext <- cbind(y, ci.lb, ci.ub)
-  annotext <- formatC(annotext, format = "f", digits = 2)
-  annotext <- cbind(annotext[,1], " [", annotext[,2], ", ", annotext[,3], "]")
-  annotext <- apply(annotext, 1, paste, collapse = "")
-  text(x = xlim[2], rows, labels = annotext, pos = 2)
-  
-  text(x = alim[1], ylim[2]-1, pos = 4, "Comparison: other vs 'placebo'", cex = 1.5)
-}
