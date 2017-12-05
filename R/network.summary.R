@@ -986,5 +986,3 @@ network.forest.plot <- function(result, level = 0.95, ticks = NULL, label.multip
   gt$layout$clip[gt$layout$name == "panel"] <- "off"
   grid.draw(gt)
 }
-
-
