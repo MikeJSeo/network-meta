@@ -975,7 +975,7 @@ network.forest.plot <- function(result, level = 0.95){
   
   p <- p + geom_text(aes(label = paste0(sprintf("%0.2f", round(OR, digits = 4)), " [", sprintf("%0.2f", round(lower, digits = 4)) , ", ", sprintf("%0.2f", round(upper, digits = 4)), "]")), y = xlim.range[2] + diff(xlim.range)/5, x = 1:length(comps[1,]))   # hjust = -1, vjust = 2)
   
-  p <- p + geom_text(aes(label = "OR [lower, upper]"), y = xlim.range[2] + diff(xlim.range)/5, x = length(comps[1,]) + 1, color = "Red")
+  p <- p + geom_text(aes(label = "OR [lower, upper]"), y = xlim.range[2] + diff(xlim.range)/5, x = length(comps[1,]) + 1)
   
   gt <- ggplot_gtable(ggplot_build(p))
   gt$layout$clip[gt$layout$name == "panel"] <- "off"
