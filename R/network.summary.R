@@ -912,27 +912,17 @@ variance.tx.effects = function(result)
   return(list(sigma_matrix = sigma_matrix, cor_matrix = cor_matrix))
 }
 
-
 #' Draws forest plot
 #'
 #' Draws forest plot of pooled treatment effect. Reports odds ratio for binomial and multinomial outcomes and continuous scale for normal outcomes.
 #' @param result object created by \code{network.run} function
-#' @param level confidence interval level (default is 0.95)
-#' @param xlim horizontal limits of the plot region
-#' @param alim x-axis limit on the forest plot
-#' @param ylim vertical limits of the plot region. 
-#' @param at position of the x-axis tick marks. If left unspecified, the function tries to set it at sensible values
-#' @param steps the number of tick marks for the x-axis (the default is 5). Ignored when the user specifies the positions via the at argument.
-#' @param refline value at which a vertical 'refrence' line should be drawn (the default is 0). The line can be suppressed by setting this argument to NA
-#' @param treat_lab optional vector with labels for the k studies. If unspecified, simple labels are created within the function. To suppress labels, set this argument to NA.
+#' @param level
+#' @param label.multiplier This is a multiplying factor to move the position of the text associated with median[lower, upper] values. This number is multiplied by the range of x-axis and added to the x-axis limit.
+#' @param ticks position of the x-axis tick marks. If left unspecified, the function tries to set it at sensible values
 #' @references W. Viechtbauer (2010), \emph{Conducting meta-analyses in R with the metafor package}, Journal of Statistical Software, 36(3):1-48. [\url{https://doi.org/10.18637/jss.v036.i03}]
 #' @export
 
-network.forest.plot <- function(result, level = 0.95){
-  
-  mean_store <- relative.effects.table(result)
-  y <- mean_store[result$network$Treat.order[1],]
-  y <- y[!is.na(y)]
+network.forest.plot <- function(result, level = 0.95, ticks = NULL, label.factor = 0.2){
   
   lower <- relative.effects.table(result, summary_stat = "quantile", probs = 0.025)
   lower <- lower[upper.tri(lower)]
@@ -959,23 +949,38 @@ network.forest.plot <- function(result, level = 0.95){
   }
   odds$name <- name
   
-  ticks <- c(0.1, 0.2, 0.5, 1, 2, 5, 10)
+  if(is.null(ticks)){
+    if(result$network$response %in% c("binomial", "multinomial")){
+      ticks <- c(0.1, 0.2, 0.5, 1, 2, 5, 10)  
+    } else if(result$network$response == "normal"){
+      ticks <- pretty(c(min(odds$lower, na.rm =TRUE), max(odds$upper, na.rm = TRUE)))
+    }
+     
+  }
+  
   p <- ggplot(odds, aes(y = OR, x = name)) + 
     geom_point() +
     geom_errorbar(aes(ymin = lower, ymax = upper), width = .2) +
-    scale_y_log10(breaks = ticks, labels = ticks) +
     scale_x_discrete(limits = name) +
     geom_hline(yintercept = 1, linetype = 2) +
     coord_flip() +
-    labs(x = "Treatment comparison", y = "Odds Ratio", title = "Network Meta-analysis Forest plot") +
     theme_bw() +
     theme(plot.margin = unit(c(1,10,1,1), "lines")) 
     
+  if(result$network$response %in% c("binomial", "multinomial")){
+    p <- p + labs(x = "Treatment comparison", y = "Odds Ratio", title = "Network Meta-analysis Forest plot") +
+         scale_y_log10(breaks = ticks, labels = ticks) 
+    
+  } else if(result$network$response %in% c("normal")){
+    p <- p + labs(x = "Treatment comparison", y = "Continuous Scale", title = "Network Meta-analysis Forest plot") +
+         scale_y_continuous(breaks = ticks, labels = ticks) 
+  }
+  
   xlim.range <- ggplot_build(p)$layout$panel_ranges[[1]]$x.range
   
-  p <- p + geom_text(aes(label = paste0(sprintf("%0.2f", round(OR, digits = 4)), " [", sprintf("%0.2f", round(lower, digits = 4)) , ", ", sprintf("%0.2f", round(upper, digits = 4)), "]")), y = xlim.range[2] + diff(xlim.range)/5, x = 1:length(comps[1,]))   # hjust = -1, vjust = 2)
+  p <- p + geom_text(aes(label = paste0(sprintf("%0.2f", round(OR, digits = 2)), " [", sprintf("%0.2f", round(lower, digits = 2)) , ", ", sprintf("%0.2f", round(upper, digits = 2)), "]")), y = xlim.range[2] + diff(xlim.range)*label.factor, x = 1:length(comps[1,]))   # hjust = -1, vjust = 2)
   
-  p <- p + geom_text(aes(label = "OR [lower, upper]"), y = xlim.range[2] + diff(xlim.range)/5, x = length(comps[1,]) + 1)
+  p <- p + geom_text(aes(label = "Median [lower, upper]"), y = xlim.range[2] + diff(xlim.range)*label.factor, x = length(comps[1,]) + 1)
   
   gt <- ggplot_gtable(ggplot_build(p))
   gt$layout$clip[gt$layout$name == "panel"] <- "off"
