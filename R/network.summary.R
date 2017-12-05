@@ -917,7 +917,7 @@ variance.tx.effects = function(result)
 #' Draws forest plot of pooled treatment effect. Reports odds ratio for binomial and multinomial outcomes and continuous scale for normal outcomes.
 #'
 #' @param result object created by \code{network.run} function
-#' @param level confidence level. default is 95 percent C.I.
+#' @param level confidence level. default is 0.95 denoting 95 percent C.I.
 #' @param ticks position of the x-axis tick marks. If left unspecified, the function tries to set it at sensible values
 #' @param label.multiplier This is a multiplying factor to move the position of the text associated with median[lower, upper] values. This number is multiplied by the range of x-axis and added to the x-axis limit.
 #' @param label.margin This is how much margin space you specify to assign space for the median[lower, upper] values
@@ -926,13 +926,17 @@ variance.tx.effects = function(result)
 
 network.forest.plot <- function(result, level = 0.95, ticks = NULL, label.multiplier = 0.2, label.margin = 10){
   
-  lower <- relative.effects.table(result, summary_stat = "quantile", probs = 0.025)
+  if(result$network$response == "multinomial"){
+    return(network.forest.plot.multinomial(result, level, ticks, label.multiplier, label.margin))
+  }
+  
+  lower <- relative.effects.table(result, summary_stat = "quantile", probs = (1- level)/2)
   lower <- lower[upper.tri(lower)]
 
   OR <- relative.effects.table(result, summary_stat = "quantile", probs = 0.5)
   OR <- OR[upper.tri(OR)]
 
-  upper <- relative.effects.table(result, summary_stat = "quantile", probs = 0.975)
+  upper <- relative.effects.table(result, summary_stat = "quantile", probs = level + (1- level)/2)
   upper <- upper[upper.tri(upper)]
   
   odds <- data.frame(lower = lower, OR = OR, upper = upper)  
@@ -952,7 +956,7 @@ network.forest.plot <- function(result, level = 0.95, ticks = NULL, label.multip
   odds$name <- name
   
   if(is.null(ticks)){
-    if(result$network$response %in% c("binomial", "multinomial")){
+    if(result$network$response %in% c("binomial")){
       ticks <- c(0.1, 0.2, 0.5, 1, 2, 5, 10)  
     } else if(result$network$response == "normal"){
       ticks <- pretty(c(min(odds$lower, na.rm =TRUE), max(odds$upper, na.rm = TRUE)))
@@ -969,7 +973,7 @@ network.forest.plot <- function(result, level = 0.95, ticks = NULL, label.multip
     theme_bw() +
     theme(plot.margin = unit(c(1,label.margin,1,1), "lines")) 
     
-  if(result$network$response %in% c("binomial", "multinomial")){
+  if(result$network$response %in% c("binomial")){
     p <- p + labs(x = "Treatment comparison", y = "Odds Ratio", title = "Network Meta-analysis Forest plot") +
          scale_y_log10(breaks = ticks, labels = ticks) 
     
