@@ -965,8 +965,8 @@ network.forest.plot <- function(result, level = 0.95, ticks = NULL, label.multip
     scale_x_discrete(limits = name) +
     geom_hline(yintercept = 1, linetype = 2) +
     coord_flip() +
-    theme_bw() +
-    theme(plot.margin = unit(c(1,10,1,1), "lines")) 
+    theme_bw() 
+  #  theme(plot.margin = unit(c(1,,1,1), "lines")) 
     
   if(result$network$response %in% c("binomial", "multinomial")){
     p <- p + labs(x = "Treatment comparison", y = "Odds Ratio", title = "Network Meta-analysis Forest plot") +
