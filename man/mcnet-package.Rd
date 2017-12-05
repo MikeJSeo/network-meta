@@ -34,6 +34,8 @@ G. Salanti, A.E. Ades, J.P.A. Ioannidisa (2011), \emph{Graphical methods and num
 G. van Valkenhoef, G. Lu, B. de Brock, H. Hillege, A.E. Ades, and N.J. Welton (2012), \emph{Automating network meta-analysis}, Research Synthesis Methods 3(4):285-299. [\url{https://doi.org/10.1002/jrsm.1054}]
 
 N.J. Cooper, A.J. Sutton, D. Morris, A.E. Ades, N.J. Welton (2009), \emph{Addressing between-study heterogeneity and inconsistency in mixed treatment comparisons: Application to stroke prevention treatments in individuals with non-rheumatic atrial fibrillation}, Statistics in Medicine 28:1861-1881. [\url{https://doi.org/10.1002/sim.3594}]
+
+W. Viechtbauer (2010), \emph{Conducting meta-analyses in R with the metafor package}, Journal of Statistical Software, 36(3):1-48. [\url{https://doi.org/10.18637/jss.v036.i03}]
 }
 \seealso{
 \code{\link{network.data}}, \code{\link{network.run}}

@@ -4,13 +4,15 @@
 \alias{relative.effects.table}
 \title{Make a summary table for relative effects}
 \usage{
-relative.effects.table(result, summary_stat = "mean", base.category = NULL)
+relative.effects.table(result, summary_stat = "mean", probs = NULL,
+  base.category = NULL)
 }
 \arguments{
 \item{result}{object created by \code{network.run} function}
 
-\item{summary_stat}{specifies what type of statistics user wants. Options are: "mean", "quantile", "sd", "p-value".
-Quantile use c(0.025, 0.5, 0.975). P-value is the probability relative effect is less than 0.}
+\item{summary_stat}{specifies what type of statistics user wants. Options are: "mean", "ci", "quantile", "sd", "p-value".
+"ci" gives 95% confidence interval (0.025, 0.5, 0.975) and "quantile" gives specific quantile specified in probs parameter. 
+"p-value" is the probability relative effect (in binomial, log odds ratio) is less than 0.}
 
 \item{base.category}{specifies for which base category user wants for the summary. Used only for multinoimal.}
 }

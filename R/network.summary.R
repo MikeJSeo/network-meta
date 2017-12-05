@@ -922,7 +922,7 @@ variance.tx.effects = function(result)
 #' @references W. Viechtbauer (2010), \emph{Conducting meta-analyses in R with the metafor package}, Journal of Statistical Software, 36(3):1-48. [\url{https://doi.org/10.18637/jss.v036.i03}]
 #' @export
 
-network.forest.plot <- function(result, level = 0.95, ticks = NULL, label.factor = 0.2){
+network.forest.plot <- function(result, level = 0.95, ticks = NULL, label.multiplier = 0.2){
   
   lower <- relative.effects.table(result, summary_stat = "quantile", probs = 0.025)
   lower <- lower[upper.tri(lower)]
@@ -978,9 +978,9 @@ network.forest.plot <- function(result, level = 0.95, ticks = NULL, label.factor
   
   xlim.range <- ggplot_build(p)$layout$panel_ranges[[1]]$x.range
   
-  p <- p + geom_text(aes(label = paste0(sprintf("%0.2f", round(OR, digits = 2)), " [", sprintf("%0.2f", round(lower, digits = 2)) , ", ", sprintf("%0.2f", round(upper, digits = 2)), "]")), y = xlim.range[2] + diff(xlim.range)*label.factor, x = 1:length(comps[1,]))   # hjust = -1, vjust = 2)
+  p <- p + geom_text(aes(label = paste0(sprintf("%0.2f", round(OR, digits = 2)), " [", sprintf("%0.2f", round(lower, digits = 2)) , ", ", sprintf("%0.2f", round(upper, digits = 2)), "]")), y = xlim.range[2] + diff(xlim.range)*label.multiplier, x = 1:length(comps[1,]))   # hjust = -1, vjust = 2)
   
-  p <- p + geom_text(aes(label = "Median [lower, upper]"), y = xlim.range[2] + diff(xlim.range)*label.factor, x = length(comps[1,]) + 1)
+  p <- p + geom_text(aes(label = "Median [lower, upper]"), y = xlim.range[2] + diff(xlim.range)*label.multiplier, x = length(comps[1,]) + 1)
   
   gt <- ggplot_gtable(ggplot_build(p))
   gt$layout$clip[gt$layout$name == "panel"] <- "off"

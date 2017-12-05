@@ -84,3 +84,6 @@ NULL
 
 #' @import coda
 NULL
+
+#' @import ggplot2
+NULL
