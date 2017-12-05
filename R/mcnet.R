@@ -82,5 +82,11 @@ NULL
 #' @importFrom utils combn
 NULL
 
-#' @import coda ggplot2 grid
+#' @import coda
+NULL
+
+#' @import ggplot2
+NULL
+
+#' @import grid
 NULL
