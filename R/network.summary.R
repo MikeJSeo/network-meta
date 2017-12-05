@@ -915,6 +915,7 @@ variance.tx.effects = function(result)
 #' Draws forest plot
 #'
 #' Draws forest plot of pooled treatment effect. Reports odds ratio for binomial and multinomial outcomes and continuous scale for normal outcomes.
+#'
 #' @param result object created by \code{network.run} function
 #' @param level confidence level. default is 95% C.I.
 #' @param label.multiplier This is a multiplying factor to move the position of the text associated with median[lower, upper] values. This number is multiplied by the range of x-axis and added to the x-axis limit.
