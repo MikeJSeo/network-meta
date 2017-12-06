@@ -14,6 +14,8 @@ relative.effects.table(result, summary_stat = "mean", probs = NULL,
 "ci" gives 95% confidence interval (0.025, 0.5, 0.975) and "quantile" gives specific quantile specified in probs parameter. 
 "p-value" is the probability relative effect (in binomial, log odds ratio) is less than 0.}
 
+\item{probs}{used only for the quantile summary. Specifies which quantile user wants the summary of (should be one numeric value between 0 to 1)}
+
 \item{base.category}{specifies for which base category user wants for the summary. Used only for multinoimal.}
 }
 \description{
