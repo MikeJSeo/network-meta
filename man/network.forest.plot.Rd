@@ -4,17 +4,19 @@
 \alias{network.forest.plot}
 \title{Draws forest plot}
 \usage{
-network.forest.plot(result, level = 0.95, ticks = NULL,
-  label.multiplier = 0.2)
+network.forest.plot(result, level = 0.95, ticks.position = NULL,
+  label.multiplier = 0.2, label.margin = 10)
 }
 \arguments{
 \item{result}{object created by \code{network.run} function}
 
-\item{level}{confidence level. default is 95 percent C.I.}
+\item{level}{confidence level. default is 0.95 denoting 95 percent C.I.}
 
-\item{ticks}{position of the x-axis tick marks. If left unspecified, the function tries to set it at sensible values}
+\item{ticks.position}{position of the x-axis tick marks. If left unspecified, the function tries to set it at sensible values}
 
 \item{label.multiplier}{This is a multiplying factor to move the position of the text associated with median[lower, upper] values. This number is multiplied by the range of x-axis and added to the x-axis limit.}
+
+\item{label.margin}{This is how much margin space you specify to assign space for the median[lower, upper] values}
 }
 \description{
 Draws forest plot of pooled treatment effect. Reports odds ratio for binomial and multinomial outcomes and continuous scale for normal outcomes.
