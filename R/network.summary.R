@@ -985,7 +985,7 @@ network.forest.plot <- function(result, level = 0.95, ticks.position = NULL, lab
     p <- p + labs(x = "Treatment comparison", y = "Odds Ratio", title = "Network Meta-analysis Forest plot") +
          scale_y_log10(breaks = ticks, labels = ticks) 
   } else if(result$network$response %in% c("multinomial")){
-    p <- p + labs(x = "Treatment comparison", y = "Odds Ratio", title = paste0("Network Meta-analysis Forest plot", ": Multinomial Category ", (i+1), "vs. 1")) +
+    p <- p + labs(x = "Treatment comparison", y = "Odds Ratio", title = paste0("Network Meta-analysis Forest plot", ": Multinomial Category ", (i+1), " vs 1")) +
         scale_y_log10(breaks = ticks, labels = ticks) 
   } else if(result$network$response %in% c("normal")){
     p <- p + labs(x = "Treatment comparison", y = "Continuous Scale", title = "Network Meta-analysis Forest plot") +
