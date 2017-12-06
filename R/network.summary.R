@@ -334,6 +334,7 @@ relative.effects <- function(result, base.treatment = NULL, comparison.treatment
 #' @param summary_stat specifies what type of statistics user wants. Options are: "mean", "ci", "quantile", "sd", "p-value".
 #' "ci" gives 95% confidence interval (0.025, 0.5, 0.975) and "quantile" gives specific quantile specified in probs parameter. 
 #' "p-value" is the probability relative effect (in binomial, log odds ratio) is less than 0.
+#' @param probs used only for the quantile summary. Specifies which quantile user wants the summary of (should be one numeric value between 0 to 1)
 #' @param base.category specifies for which base category user wants for the summary. Used only for multinoimal.
 #' @examples
 #' #cardiovascular
