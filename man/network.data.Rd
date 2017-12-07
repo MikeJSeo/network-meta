@@ -87,7 +87,8 @@ Creates list of variables that are used to run the model.
 \item{code}{Rjags model file code that is generated using information provided by the user. To view model file inside R, use \code{cat(network$code)}}
 }
 \description{
-Make a network object containing data, priors, and a jags model file
+This is where the user enters the data and make a network object that is in a suitable format to be analyzed using \code{network.run}.
+At the very least, user needs to specify Outcomes, Study, Treat, N or SE, and response. Other parameters such as prior parameters are filled in accordingly based on the data type.
 }
 \examples{
 ###Blocker data example

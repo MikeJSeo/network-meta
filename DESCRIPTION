@@ -2,7 +2,7 @@ Package: mcnet
 Title: Bayesian Network Meta-Analysis
 Version: 0.5.0
 Depends: R (>= 2.10)
-Imports: rjags (>= 4-6), graphics, stats, utils, coda (>= 0.13), ggplot2
+Imports: rjags (>= 4-6), graphics, stats, utils, coda (>= 0.13), ggplot2, grid
 Authors@R: c( 
 	person("Michael", "Seo", email = "michael_seo@brown.edu", role = c("aut", "cre")),
 	person("Christopher", "Schmid", email = "christopher_schmid@brown.edu", role = "aut")) 

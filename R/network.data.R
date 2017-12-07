@@ -1,6 +1,10 @@
 #' Make a network object containing data, priors, and a jags model file
+#' 
+#' This is where the user enters the data and makes a network object that is in a format to be analyzed using \code{network.run}.
+#' At the very least, user needs to specify Outcomes, Study, Treat, N or SE, and response. Other parameters such as prior parameters are filled in accordingly based on the data type.
+#' The data is in arm-level, meaning we have one observation for each treatment in each study.
 #'
-#' @param Outcomes Arm-level outcomes. If it is multinomial response, the matrix would have arms for the row and categories for the column. Otherwise, it would be a vector.
+#' @param Outcomes Arm-level outcomes. If it is a multinomial response, the matrix would be arms (row) by multinomial categories (column). If it is binomial or normal, it would be a vector.
 #' @param Study A vector of study indicator for each arm
 #' @param Treat A vector of treatment indicator for each arm
 #' @param N A vector of total number of observations in each arm. Used for binomial and multinomial responses

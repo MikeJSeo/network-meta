@@ -2,7 +2,7 @@
 % Please edit documentation in R/network.summary.R
 \name{network.autocorr.plot}
 \alias{network.autocorr.plot}
-\title{Use coda package to plot autocorrelation plot}
+\title{Generate autocorrelation plot using coda package}
 \usage{
 network.autocorr.plot(result, extra.pars = NULL, only.pars = NULL)
 }
@@ -14,7 +14,7 @@ network.autocorr.plot(result, extra.pars = NULL, only.pars = NULL)
 \item{only.pars}{parameters that user wants to plot only}
 }
 \description{
-Use coda package to plot autocorrelation plot
+This function plots autocorrelation using coda package.
 }
 \examples{
 #cardiovascular
@@ -22,9 +22,7 @@ Study <- cardiovascular[["Study"]]
 Treat <- cardiovascular[["Treat"]]
 Outcomes <- cardiovascular[["Outcomes"]]
 N <- cardiovascular[["N"]]
-network <- with(cardiovascular, {
- network.data(Outcomes, Study, Treat, N, response = "multinomial")
-})
+network <- network.data(Outcomes, Study, Treat, N, response = "multinomial")
 result <- network.run(network)
 network.autocorr.plot(result, only.pars = "d")
 }

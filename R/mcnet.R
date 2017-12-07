@@ -64,9 +64,9 @@ NULL
 #' Trials of low dose and high dose statins for cardiovascular disease vs. placebo
 #'
 #' A dataset of 17 studies investigating dosage of statin affects cardiovascular disease.
-#' There are two treatments and a placebo. High dose statin is coded as 3, low dose statin as 2, and placebo is coded as 1 and treated as baseline treatment.
+#' There are two treatments and a placebo. High dose statin is coded as 3, low dose statin as 2, and placebo is coded as 1 and treated as a baseline treatment.
 #' Outcomes are reported as three mutually exclusive unordered outcomes.
-#' First column of the outcome is the patients who are still alive. Second column is fatal non-cardiovascular disease (FnCVD).
+#' First column of the outcome is the patients who are still alive (ALIVE). Second column is fatal non-cardiovascular disease (FnCVD).
 #' And, the last column is fatal cardiovascular disease (FCVD).
 #'
 #' @references C.H. Schmid, T.A. Trikalinos, I. Olkin (2014), \emph{Bayesian network meta-analysis for unordered categorical outcomes with incomplete data}, Research Synthesis Methods 5(2):162-185. [\url{https://doi.org/10.1002/jrsm.1103}]

@@ -75,7 +75,6 @@ plot.network.result <- function(x, ...) {
   plot(summary.samples)
 }
 
-
 #' Use coda package to plot gelman-diagnostic plot
 #'
 #' @param result object created by \code{network.run} function
@@ -120,17 +119,19 @@ network.gelman.diag <- function(result, extra.pars = NULL, only.pars = NULL){
   gelman.diag(summary.samples, multivariate = FALSE)
 }
 
-#' Use coda package to find autocorrelation diagnostics
+#' Generate autocorrelation diagnostics using coda package
+#' 
+#' Using the coda package, generate autocorrelation diagnostics. User can specify lags and parameters to display. 
+#' Note that to display extra parameters, need to specify extra parameters in extra.pars.save parameter in \code{network.run} function 
 #'
 #' @param result object created by \code{network.run} function
 #' @param lags a vector of lags at which to calculate the autocorrelation
-#' @param extra.pars extra parameters that the user wants to plot other than the default parameters.
-#' @param only.pars parameters that user wants to plot only
+#' @param extra.pars extra parameters that the user wants to display other than the default parameters.
+#' @param only.pars parameters that user wants to display only
 #' @examples
 #' network <- with(blocker, {
 #'  network.data(Outcomes, Study, Treat, N = N, response = "binomial")
 #' })
-#' 
 #' result <- network.run(network)
 #' network.autocorr.diag(result, only.pars = "d")
 #' @export
@@ -142,7 +143,9 @@ network.autocorr.diag <- function(result, lags = c(0,1,5,10,50), extra.pars = NU
   autocorr.diag(summary.samples, lags = lags)
 }
 
-#' Use coda package to plot autocorrelation plot
+#' Generate autocorrelation plot using coda package 
+#' 
+#' This function plots autocorrelation using coda package.
 #'
 #' @param result object created by \code{network.run} function
 #' @param extra.pars extra parameters that the user wants to plot other than the default parameters.
@@ -153,9 +156,7 @@ network.autocorr.diag <- function(result, lags = c(0,1,5,10,50), extra.pars = NU
 #' Treat <- cardiovascular[["Treat"]]
 #' Outcomes <- cardiovascular[["Outcomes"]]
 #' N <- cardiovascular[["N"]]
-#' network <- with(cardiovascular, {
-#'  network.data(Outcomes, Study, Treat, N, response = "multinomial")
-#' })
+#' network <- network.data(Outcomes, Study, Treat, N, response = "multinomial")
 #' result <- network.run(network)
 #' network.autocorr.plot(result, only.pars = "d")
 #' @export
@@ -814,7 +815,7 @@ network.leverage.plot <- function(result){
 #' @param result object created by \code{network.run} function
 #' @param base.treatment base treatment for relative effect
 #' @param comparison.treatment treatment comparing against base treatment
-#' @param base.category base category for multinomial data
+#' @param base.category base category for multinomial data. Note that category in multinomial denotes which column it is in the Outcomes matrix. Thus, this should be a numeric value.
 #' @param comparison.category comparison category for multinomial data
 #' @param covariate.name A vector of covariate names naming of the covariate that goes into x axis label
 #' @examples

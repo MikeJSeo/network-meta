@@ -2,7 +2,7 @@
 % Please edit documentation in R/network.summary.R
 \name{network.autocorr.diag}
 \alias{network.autocorr.diag}
-\title{Use coda package to find autocorrelation diagnostics}
+\title{Generate autocorrelation diagnostics using coda package}
 \usage{
 network.autocorr.diag(result, lags = c(0, 1, 5, 10, 50), extra.pars = NULL,
   only.pars = NULL)
@@ -12,18 +12,18 @@ network.autocorr.diag(result, lags = c(0, 1, 5, 10, 50), extra.pars = NULL,
 
 \item{lags}{a vector of lags at which to calculate the autocorrelation}
 
-\item{extra.pars}{extra parameters that the user wants to plot other than the default parameters.}
+\item{extra.pars}{extra parameters that the user wants to display other than the default parameters.}
 
-\item{only.pars}{parameters that user wants to plot only}
+\item{only.pars}{parameters that user wants to display only}
 }
 \description{
-Use coda package to find autocorrelation diagnostics
+Using the coda package, generate autocorrelation diagnostics. User can specify lags and parameters to display. 
+Note that to display extra parameters, need to specify extra parameters in extra.pars.save parameter in \code{network.run} function
 }
 \examples{
 network <- with(blocker, {
  network.data(Outcomes, Study, Treat, N = N, response = "binomial")
 })
-
 result <- network.run(network)
 network.autocorr.diag(result, only.pars = "d")
 }

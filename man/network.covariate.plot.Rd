@@ -15,7 +15,7 @@ network.covariate.plot(result, base.treatment = NULL,
 
 \item{comparison.treatment}{treatment comparing against base treatment}
 
-\item{base.category}{base category for multinomial data}
+\item{base.category}{base category for multinomial data. Note that category in multinomial denotes which column it is in the Outcomes matrix. Thus, this should be a numeric value.}
 
 \item{comparison.category}{comparison category for multinomial data}
 
