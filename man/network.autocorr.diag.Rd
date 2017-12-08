@@ -8,17 +8,17 @@ network.autocorr.diag(result, lags = c(0, 1, 5, 10, 50), extra.pars = NULL,
   only.pars = NULL)
 }
 \arguments{
-\item{result}{object created by \code{network.run} function}
+\item{result}{object created by \code{\link{network.run}} function}
 
 \item{lags}{a vector of lags at which to calculate the autocorrelation}
 
 \item{extra.pars}{extra parameters that the user wants to display other than the default parameters.}
 
-\item{only.pars}{parameters that user wants to display only}
+\item{only.pars}{parameters that user wants to display. This gets rids of other default parameters user doesn't want to show.}
 }
 \description{
 Using the coda package, generate autocorrelation diagnostics. User can specify lags and parameters to display. 
-Note that to display extra parameters, need to specify extra parameters in extra.pars.save parameter in \code{network.run} function
+Note that to display extra parameters, user needs to first specify parameters in extra.pars.save parameter in \code{\link{network.run}} function so the model saves those parameters of interest.
 }
 \examples{
 network <- with(blocker, {

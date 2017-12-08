@@ -9,9 +9,9 @@ relative.effects(result, base.treatment = NULL,
   comparison.categories = NULL, covariate = NULL)
 }
 \arguments{
-\item{result}{object created by \code{network.run} function}
+\item{result}{object created by \code{\link{network.run}} function}
 
-\item{base.treatment}{base treatment user wants for the relative effects. Base treatment is initially set by \code{Treat.order} parameter in \code{network.data} (first one in the list). If set to null, default is to use base treatment.}
+\item{base.treatment}{base treatment user wants for the relative effects. Base treatment is initially set by \code{\link{Treat.order}} parameter in \code{\link{network.data}} (first one in the list). If set to null, default is to use base treatment.}
 
 \item{comparison.treatments}{treatments that user wants to compare against base treatment. If set to null, all the treatments besides base treatment is considered as comparison treatments.}
 

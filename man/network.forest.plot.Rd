@@ -8,7 +8,7 @@ network.forest.plot(result, level = 0.95, ticks.position = NULL,
   label.multiplier = 0.2, label.margin = 10)
 }
 \arguments{
-\item{result}{object created by \code{network.run} function}
+\item{result}{object created by \code{\link{network.run}} function}
 
 \item{level}{confidence level. default is 0.95 denoting 95 percent C.I.}
 

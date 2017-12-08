@@ -8,7 +8,7 @@ relative.effects.table(result, summary_stat = "mean", probs = NULL,
   base.category = NULL)
 }
 \arguments{
-\item{result}{object created by \code{network.run} function}
+\item{result}{object created by \code{\link{network.run}} function}
 
 \item{summary_stat}{specifies what type of statistics user wants. Options are: "mean", "ci", "quantile", "sd", "p-value".
 "ci" gives 95% confidence interval (0.025, 0.5, 0.975) and "quantile" gives specific quantile specified in probs parameter. 

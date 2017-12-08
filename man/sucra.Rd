@@ -7,7 +7,7 @@
 sucra(result, txnames = NULL, catnames = NULL)
 }
 \arguments{
-\item{result}{object created by \code{network.run} function}
+\item{result}{object created by \code{\link{network.run}} function}
 
 \item{txnames}{treatment names used in creating legend}
 

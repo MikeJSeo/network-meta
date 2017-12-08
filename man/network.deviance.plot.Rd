@@ -7,7 +7,7 @@
 network.deviance.plot(result)
 }
 \arguments{
-\item{result}{object created by \code{network.run} function}
+\item{result}{object created by \code{\link{network.run}} function}
 }
 \description{
 This makes a deviance plot which plots residual deviance (dev_arm) vs. all the arms for each study.

@@ -7,7 +7,7 @@
 variance.tx.effects(result)
 }
 \arguments{
-\item{result}{object created by \code{network.run} function}
+\item{result}{object created by \code{\link{network.run}} function}
 }
 \description{
 Calculates correlation matrix from the variance matrix for heterogeneity parameter. Only used for multinomial.

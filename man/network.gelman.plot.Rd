@@ -7,7 +7,7 @@
 network.gelman.plot(result, extra.pars = NULL, only.pars = NULL)
 }
 \arguments{
-\item{result}{object created by \code{network.run} function}
+\item{result}{object created by \code{\link{network.run}} function}
 
 \item{extra.pars}{extra parameters that the user wants to plot other than the default parameters.}
 

@@ -8,7 +8,7 @@ network.cumrank.tx.plot(result, txnames = NULL, catnames = NULL,
   legend.position = c(1, 1))
 }
 \arguments{
-\item{result}{object created by \code{network.run} function}
+\item{result}{object created by \code{\link{network.run}} function}
 
 \item{txnames}{treatment names used in creating legend}
 
@@ -17,7 +17,7 @@ network.cumrank.tx.plot(result, txnames = NULL, catnames = NULL,
 \item{legend.position}{x,y position of the legend}
 }
 \description{
-Creates a treatment cumulative rank plot
+This function creates a treatment cumulative rank plot. Rank preference can be specified by the rank.preference parameter in \code{\link{network.data}}
 }
 \examples{
 network <- with(blocker, {

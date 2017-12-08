@@ -7,7 +7,7 @@
 network.leverage.plot(result)
 }
 \arguments{
-\item{result}{object created by \code{network.run} function}
+\item{result}{object created by \code{\link{network.run}} function}
 }
 \description{
 Make a leverage vs. square root of residual deviance plot

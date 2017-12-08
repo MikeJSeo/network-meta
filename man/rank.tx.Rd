@@ -7,11 +7,11 @@
 rank.tx(result)
 }
 \arguments{
-\item{result}{object created by \code{network.run} function}
+\item{result}{object created by \code{\link{network.run}} function}
 }
 \value{
 This makes a table of ranking for each treament. Each number in the cell represents a probability certain treatment was in such rank.
-This table is also stored as an output from \code{network.run}.
+This table is also stored as an output from \code{\link{network.run}}.
 }
 \description{
 Creates a treatment rank table

@@ -2,7 +2,7 @@
 % Please edit documentation in R/network.data.R
 \name{network.data}
 \alias{network.data}
-\title{Make a network object containing data, priors, and a jags model file}
+\title{Make a network object containing data, priors, and a JAGS model file}
 \usage{
 network.data(Outcomes, Study, Treat, N = NULL, SE = NULL,
   response = "multinomial", Treat.order = NULL, type = "random",
@@ -14,37 +14,37 @@ network.data(Outcomes, Study, Treat, N = NULL, SE = NULL,
   hy.prior.cov = NULL, hy.prior = NULL)
 }
 \arguments{
-\item{Outcomes}{Arm-level outcomes. If it is multinomial response, the matrix would have arms for the row and categories for the column. Otherwise, it would be a vector.}
+\item{Outcomes}{Arm-level outcomes. If it is a multinomial response, the matrix would be arms (row) by multinomial categories (column). If it is binomial or normal, it would be a vector.}
 
 \item{Study}{A vector of study indicator for each arm}
 
 \item{Treat}{A vector of treatment indicator for each arm}
 
-\item{N}{A vector of total number of observations in each arm. Used for binomial and multinomial responses}
+\item{N}{A vector of total number of observations in each arm. Used for binomial or multinomial response}
 
 \item{SE}{A vector of standard error for each arm. Used only for normal response.}
 
-\item{response}{Specification for Outcomes type. Must specify one of the following: "normal", "binomial", or "multinomial".}
+\item{response}{Specification for outcomes type. Must specify one of the following: "normal", "binomial", or "multinomial".}
 
-\item{Treat.order}{This specifies the treatment order and therefore how treatments are compared. The first treatment that is specified is considered as a base treatment. Default order would be alphabetical. This would hold true for numbers. If the treatments are coded 1,2,etc, then treatment with a value of 1 would be assigned as baseline treatment.}
+\item{Treat.order}{This specifies the treatment order and therefore how treatments are compared. The first treatment that is specified is considered as a base treatment. Default order would be alphabetical. This would hold true for numbers. If the treatments are coded 1, 2, etc, then the treatment with a value of 1 would be assigned as a baseline treatment.}
 
-\item{type}{Type of model fitted: either "random" for random effects model or "fixed" for fixed effects model. The default is "random".}
+\item{type}{Type of model fitted: either "random" for random effects model or "fixed" for fixed effects model. Default is "random".}
 
-\item{rank.preference}{Set it equal to "higher" if higher values are preferred (i.e. assumes events are good). Set it equal to "lower if lower values are preferred (i.e. assumes events are bad).}
+\item{rank.preference}{Set it equal to "higher" if higher values are preferred (i.e. assumes events are good). Set it equal to "lower" if lower values are preferred (i.e. assumes events are bad).}
 
-\item{miss.matrix}{This is parameter for running incomplete multinomial. Still under revision.}
+\item{miss.matrix}{This is a parameter for running incomplete multinomial. Still under revision.}
 
-\item{baseline}{Three different assumptions for treatment x covariate interactions (slopes): "independent", "common", or "exchangeable". Default is "none" which doesn't incorporate baseline risk.}
+\item{baseline}{Three different assumptions for treatment x baseline risk interactions (slopes): "independent", "common", or "exchangeable". Default is "none" which doesn't incorporate baseline risk.}
 
-\item{baseline.risk}{Two different assumptions for baseline risk: "independent" or "exchangeable".}
+\item{baseline.risk}{Two different assumptions for baseline risk: "independent" or "exchangeable". See Achana et al. (2012) for more information about baseline risk.}
 
-\item{covariate}{A covariate matrix with each row representing each trial and column representing each covariate. Covariate information is needed for each study, and so the user doesn't need to repeatedly specify covariates for each arm.}
+\item{covariate}{A covariate matrix with each row representing each trial and column representing each covariate. This is a study-level data, meaning that the user doesn't need to repeatedly specify covariates for each arm.}
 
 \item{covariate.type}{Should be a vector indicating the type of the covariate. Covariate can be either "continuous" or "discrete". If it continuous, covariates are centered. If the covariate is discrete it is not centered and it has to be in a dummy integer format (i.e. 0,1,2,...). The code doesn't factor the covariates for the user, so user needs to specify dummy variables if factor is needed.}
 
-\item{covariate.model}{"independent" allows covariate effects for each treatment. "common" restricts same covariate effect for all treatment. Lastly, "exchangeable"  assumes that the covariate effects are different but related and strength is borrowed across them. We set "common" to be default.}
+\item{covariate.model}{"independent" allows covariate effects for each treatment. "common" restricts same covariate effect for all treatment. Lastly, "exchangeable"  assumes that the covariate effects are different but related and strength is borrowed across them. We set "common" to be default. See Cooper et al. (2009) for more details on covariates.}
 
-\item{dic}{This is an indicator for whether you want to calculate DIC. It stores less information if you set it to FALSE.}
+\item{dic}{This is an indicator for whether user wants to calculate DIC. Model stores less information if you set it to FALSE.}
 
 \item{mean.d}{Prior mean for the relative effect}
 
@@ -71,8 +71,8 @@ network.data(Outcomes, Study, Treat, N = NULL, SE = NULL,
 \item{hy.prior}{Prior for the heterogeneity parameter. Supports uniform, gamma, and half normal for normal and binomial response and wishart for multinomial response. It should be a list of length 3, where first element should be the distribution (one of dunif, dgamma, dhnorm, dwish) and the next two are the parameters associated with the distribution. For example, list("dunif", 0, 5) give uniform prior with lower bound 0 and upper bound 5 for the heterogeneity parameter. For wishart distribution, the last two parameter would be the scale matrix and the degrees of freedom.}
 }
 \value{
-Creates list of variables that are used to run the model.
-\item{data}{Data combining all the input data. User can check this to insure the data is correctly specified. For modelling purposes, any character valued study or treatment variable is changed to numeric values based on alphabetical order}
+Creates list of variables that are used to run the model using \code{\link{network.run}}
+\item{data}{Data combining all the input data. User can check this to insure the data is correctly specified. For modelling purposes, character valued studies or treatment variables are changed to numeric values based on alphabetical order.}
 \item{nrow}{Total number of arms in the meta-analysis}
 \item{ncol}{Number of columns in the Outcomes. Will equal 1 for binary and normal and number of categories for multinomial}
 \item{nstudy}{Number of study}
@@ -81,14 +81,15 @@ Creates list of variables that are used to run the model.
 \item{b.id}{Indicator in sequence of all treatments for which treatment is base treatment in Study}
 \item{t}{Treat made into a matrix which has dimensions number of study by max number of arms in studies}
 \item{r}{Outcomes made into array that is suitable for use in our rjags code. For multinomial, it has 3 dimensions: number of study by max number of arms in studies by number of categories.}
-\item{mx}{If the continuous covariate is included, it calculates the mean of the covariates which is used to center the covariates. The numeric indicator after mx refers to column number of the covariates if there is more than one covariates included. For discrete covariate, covariates are not centered.}
-\item{mx_bl}{If the baseline effect is specified, it also calculates the mean baseline risk}
+\item{mx}{If the continuous covariate is included, it calculates the mean of the covariates which is used to center the covariates. The numeric indicator after mx refers to column number of the covariates if there are more than one covariates included. For discrete covariates, covariates are not centered.}
+\item{mx_bl}{If the baseline effect is specified, it also calculates the mean baseline risk.}
 \item{prior.data}{Prior data created using the user inputs or default values. If no user input is specifies for the prior, it uses default values}
-\item{code}{Rjags model file code that is generated using information provided by the user. To view model file inside R, use \code{cat(network$code)}}
+\item{code}{Rjags model file code that is generated using information provided by the user. To view model file inside R, use \code{cat(network$code).}}
 }
 \description{
-This is where the user enters the data and make a network object that is in a suitable format to be analyzed using \code{network.run}.
-At the very least, user needs to specify Outcomes, Study, Treat, N or SE, and response. Other parameters such as prior parameters are filled in accordingly based on the data type.
+This is where the user enters the data and makes a network object that is in a format that can be analyzed using \code{\link{network.run}}.
+At the very least, user needs to specify Outcomes, Study, Treat, N or SE, and response. Other parameters such as prior parameters are filled in automatically based on the data type if not specified.
+The input data is in arm-level, meaning we have observations for each treatment in each study.
 }
 \examples{
 ###Blocker data example
@@ -99,4 +100,8 @@ network <- with(blocker, {
 }
 \references{
 S. Dias, A.J. Sutton, A.E. Ades, and N.J. Welton (2013a), \emph{A Generalized Linear Modeling Framework for Pairwise and Network Meta-analysis of Randomized Controlled Trials}, Medical Decision Making 33(5):607-617. [\url{https://doi.org/10.1177/0272989X12458724}]
+
+F.A. Achana, N.J. Cooper, S. Dias, G. Lu, S.J.C. Rice, D. Kendrick, A.J. Sutton (2012), \emph{Extending methods for investigating the relationship between treatment effect and baseline risk from pairwise meta-analysis to network meta-analysis}, Statistics in Medicine 32(5):752-771. [\url{https://doi.org/10.1002/sim.5539}]
+
+N.J. Cooper, A.J. Sutton, D. Morris, A.E. Ades, N.J. Welton (2009), \emph{Addressing between-study heterogeneity and inconsistency in mixed treatment comparisons: Application to stroke prevention treatments in individuals with non-rheumatic atrial fibrillation}, Statistics in Medicine 28:1861-1881. [\url{https://doi.org/10.1002/sim.3594}]
 }

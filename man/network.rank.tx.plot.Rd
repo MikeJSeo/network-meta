@@ -8,7 +8,7 @@ network.rank.tx.plot(result, txnames = NULL, catnames = NULL,
   legend.position = c(1, 1))
 }
 \arguments{
-\item{result}{object created by \code{network.run} function}
+\item{result}{object created by \code{\link{network.run}} function}
 
 \item{txnames}{treatment names used in creating legend}
 

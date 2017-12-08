@@ -7,7 +7,7 @@
 calculate.deviance(result)
 }
 \arguments{
-\item{result}{object created by \code{network.run} function}
+\item{result}{object created by \code{\link{network.run}} function}
 }
 \value{
 \item{Dbar}{overall residual deviance}
@@ -21,7 +21,7 @@ calculate.deviance(result)
 \item{ybar_arm}{posterior mean of the fitted value for normal}
 }
 \description{
-Calculates deviance statistics. This function is automatically called in \code{network.run} and the deviance statistics are stored after sampling is finished.
+Calculates deviance statistics. This function is automatically called in \code{\link{network.run}} and the deviance statistics are stored after sampling is finished.
 }
 \examples{
 #parkinsons

@@ -9,7 +9,7 @@ network.covariate.plot(result, base.treatment = NULL,
   comparison.category = NULL, covariate.name = NULL)
 }
 \arguments{
-\item{result}{object created by \code{network.run} function}
+\item{result}{object created by \code{\link{network.run}} function}
 
 \item{base.treatment}{base treatment for relative effect}
 
@@ -22,10 +22,9 @@ network.covariate.plot(result, base.treatment = NULL,
 \item{covariate.name}{A vector of covariate names naming of the covariate that goes into x axis label}
 }
 \description{
-Make a covariate plot of how the relative effect changes as the covariate value changes. Plot is created for each one of the covariate.
-User needs to specify one base treatment and one comparison treatment to make this plot (base category and comparison category is needed for multinomial).
-It then uses the \code{\link{relative.effects}} to calculate the correct relative effect.
-2.5\% and 97.5\% C.I. are drawn along with the median value.
+Make a covariate plot of how the relative effect changes as the covariate value changes.
+User needs to specify one base treatment and one comparison treatment to make this plot (base category and comparison category is also needed for multinomial).
+The function uses the \code{\link{relative.effects}} to calculate the correct relative effect. 2.5\%, median, and 97.5\% C.I. are drawn.
 }
 \examples{
 ########### certolizumab (with covariate)

@@ -25,11 +25,11 @@ pick.summary.variables <- function(result, extra.pars = NULL, only.pars = NULL){
   summary.samples
 }
 
-#' summarize result run by \code{network.run}
+#' summarize result run by \code{\link{network.run}}
 #'
-#' Use summary function in \code{coda} to summarize mcmc.list object
+#' Use summary function in coda package to summarize mcmc.list object
 #'
-#' @param object result object created by \code{network.run} function
+#' @param object result object created by \code{\link{network.run}} function
 #' @param ... additional arguments affecting the summary produced
 #' #' @examples
 #' network <- with(statins, {
@@ -57,9 +57,9 @@ summary.network.result <- function(object, ...){
 
 #' plot traceplot and posterior density of the result
 #'
-#' Use plotting function in \code{coda} to plot mcmc.list object
+#' Use plotting function in coda package to plot mcmc.list object
 #'
-#' @param x result object created by \code{network.run} function
+#' @param x result object created by \code{\link{network.run}} function
 #' @param ... additional arguments affecting the plot produced
 #' @examples
 #' network <- with(statins, {
@@ -77,9 +77,9 @@ plot.network.result <- function(x, ...) {
 
 #' Use coda package to plot gelman-diagnostic plot
 #'
-#' @param result object created by \code{network.run} function
+#' @param result object created by \code{\link{network.run}} function
 #' @param extra.pars extra parameters that the user wants to plot other than the default parameters.
-#' @param only.pars parameters that user wants to plot only
+#' @param only.pars parameters that user wants to display. This gets rids of other default parameters user doesn't want to show.
 #' @examples
 #' #blocker
 #' network <- with(blocker,{
@@ -100,9 +100,9 @@ network.gelman.plot <- function(result, extra.pars = NULL, only.pars = NULL){
 
 #' Use coda package to find gelman-diagnostic diagnostics
 #'
-#' @param result object created by \code{network.run} function
+#' @param result object created by \code{\link{network.run}} function
 #' @param extra.pars extra parameters that the user wants to plot other than the default parameters.
-#' @param only.pars parameters that user wants to plot only
+#' @param only.pars parameters that user wants to display. This gets rids of other default parameters user doesn't want to show.
 #' @examples
 #' network <- with(statins, {
 #'  network.data(Outcomes, Study, Treat, N = N, response = "binomial",
@@ -122,12 +122,12 @@ network.gelman.diag <- function(result, extra.pars = NULL, only.pars = NULL){
 #' Generate autocorrelation diagnostics using coda package
 #' 
 #' Using the coda package, generate autocorrelation diagnostics. User can specify lags and parameters to display. 
-#' Note that to display extra parameters, need to specify extra parameters in extra.pars.save parameter in \code{network.run} function 
+#' Note that to display extra parameters that are not saved, user needs to first specify parameters in extra.pars.save parameter in \code{\link{network.run}} function.
 #'
-#' @param result object created by \code{network.run} function
+#' @param result object created by \code{\link{network.run}} function
 #' @param lags a vector of lags at which to calculate the autocorrelation
 #' @param extra.pars extra parameters that the user wants to display other than the default parameters.
-#' @param only.pars parameters that user wants to display only
+#' @param only.pars parameters that user wants to display. This gets rids of other default parameters user doesn't want to show.
 #' @examples
 #' network <- with(blocker, {
 #'  network.data(Outcomes, Study, Treat, N = N, response = "binomial")
@@ -147,9 +147,9 @@ network.autocorr.diag <- function(result, lags = c(0,1,5,10,50), extra.pars = NU
 #' 
 #' This function plots autocorrelation using coda package.
 #'
-#' @param result object created by \code{network.run} function
+#' @param result object created by \code{\link{network.run}} function
 #' @param extra.pars extra parameters that the user wants to plot other than the default parameters.
-#' @param only.pars parameters that user wants to plot only
+#' @param only.pars parameters that user wants to plot only. This gets rids of other default parameters user doesn't want to show
 #' @examples
 #' #cardiovascular
 #' Study <- cardiovascular[["Study"]]
@@ -169,8 +169,8 @@ network.autocorr.plot <- function(result, extra.pars = NULL, only.pars = NULL){
 
 #' Find relative effects for different base treatment and comparison treatments
 #'
-#' @param result object created by \code{network.run} function
-#' @param base.treatment base treatment user wants for the relative effects. Base treatment is initially set by \code{Treat.order} parameter in \code{network.data} (first one in the list). If set to null, default is to use base treatment.
+#' @param result object created by \code{\link{network.run}} function
+#' @param base.treatment base treatment user wants for the relative effects. Base treatment is initially set by \code{\link{Treat.order}} parameter in \code{\link{network.data}} (first one in the list). If set to null, default is to use base treatment.
 #' @param comparison.treatments treatments that user wants to compare against base treatment. If set to null, all the treatments besides base treatment is considered as comparison treatments.
 #' @param base.category base category user wants for the relative effects. This is only used for multinomial data.
 #' @param comparison.categories category that user wants to compare against base.category
@@ -331,7 +331,7 @@ relative.effects <- function(result, base.treatment = NULL, comparison.treatment
 #' 
 #' Relative effects in units of log odds ratio for binomial and multinomial data and real number scale for normal data.
 #'
-#' @param result object created by \code{network.run} function
+#' @param result object created by \code{\link{network.run}} function
 #' @param summary_stat specifies what type of statistics user wants. Options are: "mean", "ci", "quantile", "sd", "p-value".
 #' "ci" gives 95% confidence interval (0.025, 0.5, 0.975) and "quantile" gives specific quantile specified in probs parameter. 
 #' "p-value" is the probability relative effect (in binomial, log odds ratio) is less than 0.
@@ -419,10 +419,10 @@ relative.effects.table <- function(result, summary_stat = "mean", probs = NULL, 
 
 #' Creates a treatment rank table
 #'
-#' @param result object created by \code{network.run} function
+#' @param result object created by \code{\link{network.run}} function
 #' @return
 #' This makes a table of ranking for each treament. Each number in the cell represents a probability certain treatment was in such rank.
-#' This table is also stored as an output from \code{network.run}.
+#' This table is also stored as an output from \code{\link{network.run}}.
 #' @examples
 #' network <- with(blocker, {
 #'  network.data(Outcomes, Study, Treat, N = N, response = "binomial")
@@ -466,7 +466,7 @@ rank.tx <- function(result){
 
 #' Creates a treatment rank plot
 #'
-#' @param result object created by \code{network.run} function
+#' @param result object created by \code{\link{network.run}} function
 #' @param txnames treatment names used in creating legend
 #' @param catnames category names. Only used in multinomial.
 #' @param legend.position x,y position of the legend
@@ -511,7 +511,9 @@ network.rank.tx.plot <- function(result, txnames = NULL, catnames = NULL, legend
 
 #' Creates a treatment cumulative rank plot
 #'
-#' @param result object created by \code{network.run} function
+#' This function creates a treatment cumulative rank plot. Rank preference can be specified by the rank.preference parameter in \code{\link{network.data}}
+#'
+#' @param result object created by \code{\link{network.run}} function
 #' @param txnames treatment names used in creating legend
 #' @param catnames category names. Only used in multinomial.
 #' @param legend.position x,y position of the legend
@@ -558,7 +560,7 @@ network.cumrank.tx.plot <- function(result, txnames = NULL, catnames = NULL, leg
 #'
 #' SUCRA is the surface under the cumulative ranking distribution defined in Salanti et al. (2011)
 #'
-#' @param result object created by \code{network.run} function
+#' @param result object created by \code{\link{network.run}} function
 #' @param txnames treatment names used in creating legend
 #' @param catnames category names. Only used in multinomial.
 #' @examples
@@ -606,9 +608,9 @@ sucra = function(result, txnames = NULL, catnames = NULL)
 
 #' Find deviance statistics such as DIC and pD.
 #'
-#' Calculates deviance statistics. This function is automatically called in \code{network.run} and the deviance statistics are stored after sampling is finished.
+#' Calculates deviance statistics. This function is automatically called in \code{\link{network.run}} and the deviance statistics are stored after sampling is finished.
 #'
-#' @param result object created by \code{network.run} function
+#' @param result object created by \code{\link{network.run}} function
 #' @return
 #' \item{Dbar}{overall residual deviance}
 #' \item{pD}{sum of leverage_arm (i.e. total leverage)}
@@ -774,7 +776,7 @@ calculate.deviance <- function(result){
 #' make a deviance plot
 #'
 #' This makes a deviance plot which plots residual deviance (dev_arm) vs. all the arms for each study.
-#' @param result object created by \code{network.run} function
+#' @param result object created by \code{\link{network.run}} function
 #' @examples
 #' network <- with(blocker, {
 #'  network.data(Outcomes, Study, Treat, N = N, response = "binomial")
@@ -793,7 +795,7 @@ network.deviance.plot <- function(result){
 #' make a leverage plot
 #'
 #' Make a leverage vs. square root of residual deviance plot
-#' @param result object created by \code{network.run} function
+#' @param result object created by \code{\link{network.run}} function
 #' @export
 
 network.leverage.plot <- function(result){
@@ -807,12 +809,11 @@ network.leverage.plot <- function(result){
 
 #' Make a covariate plot
 #'
-#' Make a covariate plot of how the relative effect changes as the covariate value changes. Plot is created for each one of the covariate.
-#' User needs to specify one base treatment and one comparison treatment to make this plot (base category and comparison category is needed for multinomial).
-#' It then uses the \code{\link{relative.effects}} to calculate the correct relative effect.
-#' 2.5\% and 97.5\% C.I. are drawn along with the median value.
+#' Make a covariate plot of how the relative effect changes as the covariate value changes.
+#' User needs to specify one base treatment and one comparison treatment to make this plot (base category and comparison category is also needed for multinomial).
+#' The function uses the \code{\link{relative.effects}} to calculate the correct relative effect. 2.5\%, median, and 97.5\% C.I. are drawn.
 #'
-#' @param result object created by \code{network.run} function
+#' @param result object created by \code{\link{network.run}} function
 #' @param base.treatment base treatment for relative effect
 #' @param comparison.treatment treatment comparing against base treatment
 #' @param base.category base category for multinomial data. Note that category in multinomial denotes which column it is in the Outcomes matrix. Thus, this should be a numeric value.
@@ -889,7 +890,7 @@ network.covariate.plot <- function(result, base.treatment = NULL, comparison.tre
 #' Calculates correlation matrix for multinomial heterogeneity parameter.
 #'
 #' Calculates correlation matrix from the variance matrix for heterogeneity parameter. Only used for multinomial.
-#' @param result object created by \code{network.run} function
+#' @param result object created by \code{\link{network.run}} function
 #' @examples
 #' #cardiovascular
 #' network <- with(cardiovascular, {
@@ -918,11 +919,11 @@ variance.tx.effects = function(result)
 #'
 #' Draws forest plot of pooled treatment effect. Reports odds ratio for binomial and multinomial outcomes and continuous scale for normal outcomes.
 #'
-#' @param result object created by \code{network.run} function
+#' @param result object created by \code{\link{network.run}} function
 #' @param level confidence level. default is 0.95 denoting 95 percent C.I.
 #' @param ticks.position position of the x-axis tick marks. If left unspecified, the function tries to set it at sensible values
-#' @param label.multiplier This is a multiplying factor to move the position of the text associated with median[lower, upper] values. This number is multiplied by the range of x-axis and added to the x-axis limit.
-#' @param label.margin This is how much margin space you specify to assign space for the median[lower, upper] values
+#' @param label.multiplier This is a multiplying factor to move the position of the text associated with median[lower, upper] values. This number is multiplied by the range of x-axis and added to the x-axis limit. Default multiplier is set to 0.2.
+#' @param label.margin This is how much margin space you specify to assign space for the median[lower, upper] values. Default margin is set to 10. 
 #' @references W. Viechtbauer (2010), \emph{Conducting meta-analyses in R with the metafor package}, Journal of Statistical Software, 36(3):1-48. [\url{https://doi.org/10.18637/jss.v036.i03}]
 #' @export
 
