@@ -942,7 +942,7 @@ network.forest.plot <- function(result, level = 0.95, ticks.position = NULL, lab
   
   for(i in 1:(ncat-1)){
   
-  if(i != 1) grid.newpage()  
+  if(i != 1) grid::grid.newpage()  
     
   if(result$network$response == "multinomial"){
     lower <- relative.effects.table(result, summary_stat = "quantile", probs = (1- level)/2)[,,i]
@@ -1013,6 +1013,6 @@ network.forest.plot <- function(result, level = 0.95, ticks.position = NULL, lab
   
   gt <- ggplot_gtable(ggplot_build(p))
   gt$layout$clip[gt$layout$name == "panel"] <- "off"
-  grid.draw(gt)
+  grid::grid.draw(gt)
   }
 }
