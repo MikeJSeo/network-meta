@@ -1,6 +1,6 @@
 #' Make a network object containing data, priors, and a JAGS model file
 #' 
-#' This is where the user enters the data and makes a network object that is in a format that can be analyzed using \code{\link{network.run}}.
+#' This function is where the user enters the data and makes a network object that is in a format that can be analyzed using \code{\link{network.run}}.
 #' At the very least, user needs to specify Outcomes, Study, Treat, N or SE, and response. Other parameters such as prior parameters are filled in automatically based on the data type if not specified.
 #' The input data is in arm-level, meaning we have observations for each treatment in each study.
 #'
@@ -9,10 +9,10 @@
 #' @param Treat A vector of treatment indicator for each arm
 #' @param N A vector of total number of observations in each arm. Used for binomial and multinomial responses
 #' @param SE A vector of standard error for each arm. Used only for normal response.
-#' @param response Specification for outcomes type. Must specify one of the following: "normal", "binomial", or "multinomial".
-#' @param Treat.order This specifies the treatment order and therefore how treatments are compared. The first treatment that is specified is considered as a base treatment. Default order would be alphabetical. This would hold true for numbers. If the treatments are coded 1, 2, etc, then the treatment with a value of 1 would be assigned as a baseline treatment.
+#' @param response Specification of the outcomes type. Must specify one of the following: "normal", "binomial", or "multinomial".
+#' @param Treat.order This specifies the treatment order and therefore how treatments are compared. The first treatment that is specified is considered as a base treatment. Default order is alphabetical. This would hold true for numbers. If the treatments are coded 1, 2, etc, then the treatment with a value of 1 would be assigned as a baseline treatment.
 #' @param type Type of model fitted: either "random" for random effects model or "fixed" for fixed effects model. Default is "random".
-#' @param rank.preference Set it equal to "higher" if higher values are preferred (i.e. assumes events are good). Set it equal to "lower" if lower values are preferred (i.e. assumes events are bad).
+#' @param rank.preference Set it equal to "higher" if higher values are preferred (i.e. assumes events are good). Set it equal to "lower" if lower values are preferred (i.e. assumes events are bad). Default is "higher".
 #' @param miss.matrix This is a parameter for running incomplete multinomial. Still under revision.
 #' @param baseline Three different assumptions for treatment x baseline risk interactions (slopes): "independent", "common", or "exchangeable". Default is "none" which doesn't incorporate baseline risk. 
 #' @param baseline.risk Two different assumptions for baseline risk: "independent" or "exchangeable". See Achana et al. (2012) for more information about baseline risk.
@@ -40,11 +40,11 @@
 #' \item{na}{Number of arms for each study}
 #' \item{ntreat}{Number of treatment}
 #' \item{b.id}{Indicator in sequence of all treatments for which treatment is base treatment in Study}
-#' \item{t}{Treat made into a matrix which has dimensions number of study by max number of arms in studies}
-#' \item{r}{Outcomes made into array that is suitable for use in our rjags code. For multinomial, it has 3 dimensions: number of study by max number of arms in studies by number of categories.}
-#' \item{mx}{If the continuous covariate is included, it calculates the mean of the covariates which is used to center the covariates. The numeric indicator after mx refers to column number of the covariates if there are more than one covariates included. For discrete covariates, covariates are not centered.}
+#' \item{t}{\code{Treat} transformed into a matrix which has dimensions number of study by max number of arms in studies}
+#' \item{r}{\code{Outcomes} made into an array that is suitable for use in rjags code. For multinomial, it has 3 dimensions: number of study by max number of arms in studies by number of categories.}
+#' \item{mx}{If the continuous covariate is included, it calculates the mean of the covariates which is used to center the covariates. The numeric indicator after mx refers to column number of the covariates if there are more than one covariates included. Discrete covariates are not centered.}
 #' \item{mx_bl}{If the baseline effect is specified, it also calculates the mean baseline risk.}
-#' \item{prior.data}{Prior data created using the user inputs or default values. If no user input is specifies for the prior, it uses default values}
+#' \item{prior.data}{Prior data created using the user inputs or default values. If no user input is specifies for the prior, it uses default values.}
 #' \item{code}{Rjags model file code that is generated using information provided by the user. To view model file inside R, use \code{cat(network$code).}}
 #' @examples
 #' ###Blocker data example
@@ -52,6 +52,7 @@
 #' network <- with(blocker, {
 #'  network.data(Outcomes, Study, Treat, N = N, response = "binomial")
 #' })
+#' network
 #' @references S. Dias, A.J. Sutton, A.E. Ades, and N.J. Welton (2013a), \emph{A Generalized Linear Modeling Framework for Pairwise and Network Meta-analysis of Randomized Controlled Trials}, Medical Decision Making 33(5):607-617. [\url{https://doi.org/10.1177/0272989X12458724}]
 #' @references F.A. Achana, N.J. Cooper, S. Dias, G. Lu, S.J.C. Rice, D. Kendrick, A.J. Sutton (2012), \emph{Extending methods for investigating the relationship between treatment effect and baseline risk from pairwise meta-analysis to network meta-analysis}, Statistics in Medicine 32(5):752-771. [\url{https://doi.org/10.1002/sim.5539}]
 #' @references N.J. Cooper, A.J. Sutton, D. Morris, A.E. Ades, N.J. Welton (2009), \emph{Addressing between-study heterogeneity and inconsistency in mixed treatment comparisons: Application to stroke prevention treatments in individuals with non-rheumatic atrial fibrillation}, Statistics in Medicine 28:1861-1881. [\url{https://doi.org/10.1002/sim.3594}]

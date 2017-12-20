@@ -2,19 +2,16 @@
 % Please edit documentation in R/network.summary.R
 \name{rank.tx}
 \alias{rank.tx}
-\title{Creates a treatment rank table}
+\title{Create a treatment rank table}
 \usage{
 rank.tx(result)
 }
 \arguments{
-\item{result}{object created by \code{\link{network.run}} function}
-}
-\value{
-This makes a table of ranking for each treament. Each number in the cell represents a probability certain treatment was in such rank.
-This table is also stored as an output from \code{\link{network.run}}.
+\item{result}{Object created by \code{\link{network.run}} function}
 }
 \description{
-Creates a treatment rank table
+This function makes a table of ranking for each treament. Each number in the cell represents a probability certain treatment was in such rank.
+This table is also stored as an output from \code{\link{network.run}}.
 }
 \examples{
 network <- with(blocker, {

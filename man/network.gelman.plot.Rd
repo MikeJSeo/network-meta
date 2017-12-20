@@ -2,19 +2,19 @@
 % Please edit documentation in R/network.summary.R
 \name{network.gelman.plot}
 \alias{network.gelman.plot}
-\title{Use coda package to plot gelman-diagnostic plot}
+\title{Use coda package to plot Gelman-Rubin diagnostic plot}
 \usage{
 network.gelman.plot(result, extra.pars = NULL, only.pars = NULL)
 }
 \arguments{
-\item{result}{object created by \code{\link{network.run}} function}
+\item{result}{Object created by \code{\link{network.run}} function}
 
-\item{extra.pars}{extra parameters that the user wants to plot other than the default parameters.}
+\item{extra.pars}{Extra parameters that the user wants to plot other than the default parameters.}
 
-\item{only.pars}{parameters that user wants to plot only}
+\item{only.pars}{Parameters that user wants to display. This gets rids of other default parameters user doesn't want to show.}
 }
 \description{
-Use coda package to plot gelman-diagnostic plot
+This function plots Gelman-Rubin diagnostic using coda package.
 }
 \examples{
 #blocker

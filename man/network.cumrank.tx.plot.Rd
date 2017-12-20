@@ -2,22 +2,22 @@
 % Please edit documentation in R/network.summary.R
 \name{network.cumrank.tx.plot}
 \alias{network.cumrank.tx.plot}
-\title{Creates a treatment cumulative rank plot}
+\title{Create a treatment cumulative rank plot}
 \usage{
 network.cumrank.tx.plot(result, txnames = NULL, catnames = NULL,
   legend.position = c(1, 1))
 }
 \arguments{
-\item{result}{object created by \code{\link{network.run}} function}
+\item{result}{Object created by \code{\link{network.run}} function}
 
-\item{txnames}{treatment names used in creating legend}
+\item{txnames}{Treatment names used in creating legend}
 
-\item{catnames}{category names. Only used in multinomial.}
+\item{catnames}{Category names. Only used in multinomial.}
 
-\item{legend.position}{x,y position of the legend}
+\item{legend.position}{x, y position of the legend}
 }
 \description{
-This function creates a treatment cumulative rank plot. Rank preference can be specified by the rank.preference parameter in \code{\link{network.data}}
+This function creates a treatment cumulative rank plot. Rank preference can be specified by the \code{rank.preference} parameter in \code{\link{network.data}}
 }
 \examples{
 network <- with(blocker, {

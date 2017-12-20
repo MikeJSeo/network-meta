@@ -2,16 +2,16 @@
 % Please edit documentation in R/network.summary.R
 \name{sucra}
 \alias{sucra}
-\title{Creates a treatment rank plot}
+\title{Calculate SUCRA}
 \usage{
 sucra(result, txnames = NULL, catnames = NULL)
 }
 \arguments{
-\item{result}{object created by \code{\link{network.run}} function}
+\item{result}{Object created by \code{\link{network.run}} function}
 
-\item{txnames}{treatment names used in creating legend}
+\item{txnames}{Treatment names used in creating legend}
 
-\item{catnames}{category names. Only used in multinomial.}
+\item{catnames}{Category names. Only used in multinomial.}
 }
 \description{
 SUCRA is the surface under the cumulative ranking distribution defined in Salanti et al. (2011)

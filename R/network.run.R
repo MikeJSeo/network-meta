@@ -1,23 +1,25 @@
 #' Run the model using the network object
+#' 
+#' This is the core function that runs the model in our program. Before running this function, we need to specify data, prior, JAGS code, etc. using \code{\link{network.data}}.
 #'
-#' @param network network object created from \code{network.data} function
-#' @param inits initial values for the parameters being sampled. If left unspecified, program will generate reasonable initial values.
-#' @param n.chains number of chains to run
-#' @param max.run maximum number of iterations that user is willing to run. If the algorithm is not converging, it will run up to max.run iterations before printing a message that it did not converge
-#' @param setsize number of iterations that are run between convergence checks. If the algorithm converges fast, user wouldn't need a big setsize. The number that is printed between each convergence checks is the gelman-rubin diagnostics and we would want that to be below the conv.limit the user specifies.
-#' @param n.run final number of iterations that the user wants to store. If after the algorithm converges, user wants less number of iterations, we thin the sequence. If the user wants more iterations, we run extra iterations to reach the specified number of runs
-#' @param conv.limit convergence limit for Gelman and Rubin's convergence diagnostic. Point estimate is used to test convergence of parameters for study effect (eta), relative effect (d), and heterogeneity (log variance (logvar)).
-#' @param extra.pars.save parameters that user wants to save besides the default parameters saved.
+#' @param network Network object created from \code{\link{network.data}} function
+#' @param inits Initial values for the parameters being sampled. If left unspecified, program will generate reasonable initial values.
+#' @param n.chains Number of chains to run
+#' @param max.run Maximum number of iterations that user is willing to run. If the algorithm is not converging, it will run up to \code{max.run} iterations before printing a message that it did not converge
+#' @param setsize Number of iterations that are run between convergence checks. If the algorithm converges fast, user wouldn't need a big setsize. The number that is printed between each convergence checks is the gelman-rubin diagnostics and we would want that to be below the conv.limit the user specifies.
+#' @param n.run Final number of iterations that the user wants to store. If after the algorithm converges, user wants less number of iterations, we thin the sequence. If the user wants more iterations, we run extra iterations to reach the specified number of runs
+#' @param conv.limit Convergence limit for Gelman and Rubin's convergence diagnostic. Point estimate is used to test convergence of parameters for study effect (eta), relative effect (d), and heterogeneity (log variance (logvar)).
+#' @param extra.pars.save Parameters that user wants to save besides the default parameters saved. See code using \code{cat(network$code)} to see which parameters can be saved.
 #' @return
-#' \item{data_rjags}{data that is put into rjags function \code{jags.model}}
-#' \item{inits}{initial values that are either specified by the user or generated as a default}
-#' \item{pars.save}{parameters that are saved. Add more parameters in extra.pars.save if other variables are desired}
-#' \item{burnin}{half of the converged sequence is thrown out as a burnin}
+#' \item{data_rjags}{Data that is put into rjags function \code{\link{jags.model}}}
+#' \item{inits}{Initial values that are either specified by the user or generated as a default}
+#' \item{pars.save}{Parameters that are saved. Add more parameters in extra.pars.save if other variables are desired}
+#' \item{burnin}{Half of the converged sequence is thrown out as a burnin}
 #' \item{n.thin}{If the number of iterations user wants (n.run) is less than the number of converged sequence after burnin, we thin the sequence and store the thinning interval}
-#' \item{samples}{mcmc samples stored using jags. The returned samples have the form of mcmc.list and can be directly applied to coda functions}
-#' \item{max.gelman}{maximum Gelman and Rubin's convergence diagnostic calculated for the final sample}
-#' \item{deviance}{contains deviance statistics such as pD (effective number of parameters) and DIC (Deviance Information Criterion)}
-#' \item{rank.tx}{rank probability calculated for each treatments. Rank.preference parameter in \code{network.data} is used to define whether higher or lower value is preferred. The numbers are probabilities that a given treatment has been in certain rank in the sequence.}
+#' \item{samples}{MCMC samples stored using jags. The returned samples have the form of mcmc.list and can be directly applied to coda functions}
+#' \item{max.gelman}{Maximum Gelman and Rubin's convergence diagnostic calculated for the final sample}
+#' \item{deviance}{Contains deviance statistics such as pD (effective number of parameters) and DIC (Deviance Information Criterion)}
+#' \item{rank.tx}{Rank probability calculated for each treatments. \code{rank.preference} parameter in \code{\link{network.data}} is used to define whether higher or lower value is preferred. The numbers are probabilities that a given treatment has been in certain rank in the sequence.}
 #' @examples
 #' #parkinson's example (normal)
 #' parkinsons

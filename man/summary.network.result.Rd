@@ -2,22 +2,23 @@
 % Please edit documentation in R/network.summary.R
 \name{summary.network.result}
 \alias{summary.network.result}
-\title{summarize result run by \code{\link{network.run}}}
+\title{Summarize result run by \code{\link{network.run}}}
 \usage{
 \method{summary}{network.result}(object, ...)
 }
 \arguments{
-\item{object}{result object created by \code{\link{network.run}} function}
+\item{object}{Result object created by \code{\link{network.run}} function}
 
-\item{...}{additional arguments affecting the summary produced
-#' @examples
+\item{...}{Additional arguments affecting the summary produced}
+}
+\description{
+This function uses summary function in coda package to summarize mcmc.list object
+}
+\examples{
 network <- with(statins, {
  network.data(Outcomes, Study, Treat, N = N, response = "binomial",
  Treat.order = c("Placebo", "Statin"), covariate = covariate, covariate.type = "discrete")
 })
 result <- network.run(network)
-summary(result)}
-}
-\description{
-Use summary function in coda package to summarize mcmc.list object
+summary(result)
 }

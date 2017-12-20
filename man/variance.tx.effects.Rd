@@ -2,15 +2,15 @@
 % Please edit documentation in R/network.summary.R
 \name{variance.tx.effects}
 \alias{variance.tx.effects}
-\title{Calculates correlation matrix for multinomial heterogeneity parameter.}
+\title{Calculate correlation matrix for multinomial heterogeneity parameter.}
 \usage{
 variance.tx.effects(result)
 }
 \arguments{
-\item{result}{object created by \code{\link{network.run}} function}
+\item{result}{Object created by \code{\link{network.run}} function}
 }
 \description{
-Calculates correlation matrix from the variance matrix for heterogeneity parameter. Only used for multinomial.
+This function calculates correlation matrix from the variance matrix for heterogeneity parameter. Only used for multinomial.
 }
 \examples{
 #cardiovascular

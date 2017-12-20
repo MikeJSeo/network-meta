@@ -2,17 +2,17 @@
 % Please edit documentation in R/network.summary.R
 \name{plot.network.result}
 \alias{plot.network.result}
-\title{plot traceplot and posterior density of the result}
+\title{Plot traceplot and posterior density of the result}
 \usage{
 \method{plot}{network.result}(x, ...)
 }
 \arguments{
-\item{x}{result object created by \code{\link{network.run}} function}
+\item{x}{Result object created by \code{\link{network.run}} function}
 
-\item{...}{additional arguments affecting the plot produced}
+\item{...}{Additional arguments affecting the plot produced}
 }
 \description{
-Use plotting function in coda package to plot mcmc.list object
+This function uses plotting function in coda package to plot mcmc.list object
 }
 \examples{
 network <- with(statins, {

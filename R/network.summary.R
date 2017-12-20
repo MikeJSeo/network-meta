@@ -25,13 +25,13 @@ pick.summary.variables <- function(result, extra.pars = NULL, only.pars = NULL){
   summary.samples
 }
 
-#' summarize result run by \code{\link{network.run}}
+#' Summarize result run by \code{\link{network.run}}
 #'
-#' Use summary function in coda package to summarize mcmc.list object
+#' This function uses summary function in coda package to summarize mcmc.list object
 #'
-#' @param object result object created by \code{\link{network.run}} function
-#' @param ... additional arguments affecting the summary produced
-#' #' @examples
+#' @param object Result object created by \code{\link{network.run}} function
+#' @param ... Additional arguments affecting the summary produced
+#' @examples
 #' network <- with(statins, {
 #'  network.data(Outcomes, Study, Treat, N = N, response = "binomial",
 #'  Treat.order = c("Placebo", "Statin"), covariate = covariate, covariate.type = "discrete")
@@ -55,12 +55,12 @@ summary.network.result <- function(object, ...){
   rval
 }
 
-#' plot traceplot and posterior density of the result
+#' Plot traceplot and posterior density of the result
 #'
-#' Use plotting function in coda package to plot mcmc.list object
+#' This function uses plotting function in coda package to plot mcmc.list object
 #'
-#' @param x result object created by \code{\link{network.run}} function
-#' @param ... additional arguments affecting the plot produced
+#' @param x Result object created by \code{\link{network.run}} function
+#' @param ... Additional arguments affecting the plot produced
 #' @examples
 #' network <- with(statins, {
 #'  network.data(Outcomes, Study, Treat, N = N, response = "binomial",
@@ -75,11 +75,13 @@ plot.network.result <- function(x, ...) {
   plot(summary.samples)
 }
 
-#' Use coda package to plot gelman-diagnostic plot
+#' Use coda package to plot Gelman-Rubin diagnostic plot
+#' 
+#' This function plots Gelman-Rubin diagnostic using coda package.
 #'
-#' @param result object created by \code{\link{network.run}} function
-#' @param extra.pars extra parameters that the user wants to plot other than the default parameters.
-#' @param only.pars parameters that user wants to display. This gets rids of other default parameters user doesn't want to show.
+#' @param result Object created by \code{\link{network.run}} function
+#' @param extra.pars Extra parameters that the user wants to plot other than the default parameters.
+#' @param only.pars Parameters that user wants to display. This gets rids of other default parameters user doesn't want to show.
 #' @examples
 #' #blocker
 #' network <- with(blocker,{
@@ -98,11 +100,13 @@ network.gelman.plot <- function(result, extra.pars = NULL, only.pars = NULL){
   }
 }
 
-#' Use coda package to find gelman-diagnostic diagnostics
-#'
-#' @param result object created by \code{\link{network.run}} function
-#' @param extra.pars extra parameters that the user wants to plot other than the default parameters.
-#' @param only.pars parameters that user wants to display. This gets rids of other default parameters user doesn't want to show.
+#' Use coda package to find Gelman-Rubin diagnostics
+#' 
+#' This function uses coda package to find Gelman-Rubin diagnostics.
+#' 
+#' @param result Object created by \code{\link{network.run}} function
+#' @param extra.pars Extra parameters that the user wants to plot other than the default parameters.
+#' @param only.pars Parameters that user wants to display. This gets rids of other default parameters user doesn't want to show.
 #' @examples
 #' network <- with(statins, {
 #'  network.data(Outcomes, Study, Treat, N = N, response = "binomial",
@@ -121,13 +125,13 @@ network.gelman.diag <- function(result, extra.pars = NULL, only.pars = NULL){
 
 #' Generate autocorrelation diagnostics using coda package
 #' 
-#' Using the coda package, generate autocorrelation diagnostics. User can specify lags and parameters to display. 
-#' Note that to display extra parameters that are not saved, user needs to first specify parameters in extra.pars.save parameter in \code{\link{network.run}} function.
+#' This function generates autocorrelation diagnostics using coda package. User can specify lags and parameters to display. 
+#' Note that to display extra parameters that are not saved, user needs to first specify parameters in \code{extra.pars.save} parameter in \code{\link{network.run}} function.
 #'
-#' @param result object created by \code{\link{network.run}} function
-#' @param lags a vector of lags at which to calculate the autocorrelation
-#' @param extra.pars extra parameters that the user wants to display other than the default parameters.
-#' @param only.pars parameters that user wants to display. This gets rids of other default parameters user doesn't want to show.
+#' @param result Object created by \code{\link{network.run}} function
+#' @param lags A vector of lags at which to calculate the autocorrelation
+#' @param extra.pars Extra parameters that the user wants to display other than the default parameters.
+#' @param only.pars Parameters that user wants to display. This gets rids of other default parameters user doesn't want to show.
 #' @examples
 #' network <- with(blocker, {
 #'  network.data(Outcomes, Study, Treat, N = N, response = "binomial")
@@ -147,9 +151,9 @@ network.autocorr.diag <- function(result, lags = c(0,1,5,10,50), extra.pars = NU
 #' 
 #' This function plots autocorrelation using coda package.
 #'
-#' @param result object created by \code{\link{network.run}} function
-#' @param extra.pars extra parameters that the user wants to plot other than the default parameters.
-#' @param only.pars parameters that user wants to plot only. This gets rids of other default parameters user doesn't want to show
+#' @param result Object created by \code{\link{network.run}} function
+#' @param extra.pars Extra parameters that the user wants to plot other than the default parameters.
+#' @param only.pars Parameters that user wants to display. This gets rids of other default parameters user doesn't want to show
 #' @examples
 #' #cardiovascular
 #' Study <- cardiovascular[["Study"]]
@@ -167,17 +171,19 @@ network.autocorr.plot <- function(result, extra.pars = NULL, only.pars = NULL){
   autocorr.plot(summary.samples)
 }
 
-#' Find relative effects for different base treatment and comparison treatments
+#' Find relative effects for base treatment and comparison treatments
+#' 
+#' This function calculates relative effects for base treatment and comparison treatments.
 #'
-#' @param result object created by \code{\link{network.run}} function
-#' @param base.treatment base treatment user wants for the relative effects. Base treatment is initially set by \code{\link{Treat.order}} parameter in \code{\link{network.data}} (first one in the list). If set to null, default is to use base treatment.
-#' @param comparison.treatments treatments that user wants to compare against base treatment. If set to null, all the treatments besides base treatment is considered as comparison treatments.
-#' @param base.category base category user wants for the relative effects. This is only used for multinomial data.
-#' @param comparison.categories category that user wants to compare against base.category
-#' @param covariate covariate value at which to compute relative effects.
+#' @param result Object created by \code{\link{network.run}} function
+#' @param base.treatment Base treatment user wants for the relative effects. Base treatment is initially set by \code{Treat.order} parameter in \code{\link{network.data}} (first one in the list). If set to null, default is to use base treatment.
+#' @param comparison.treatments Treatments that user wants to compare against base treatment. If set to null, all the treatments besides base treatment is considered as comparison treatments.
+#' @param base.category Base category user wants for the relative effects. Only used for multinomial data.
+#' @param comparison.categories Category that user wants to compare against base.category. Only used for multinomial data.
+#' @param covariate Covariate value at which to compute relative effects. Only used if covariate value is specified in the model.
 #' @return
 #' This returns a mcmc.list sample of relative effects for the base treatment specified. This allows user to obtain relative effects of different base.treatment after the sampling has been done.
-#' For a simple summary use relative.effects.table.
+#' For a simple summary, use \code{\link{relative.effects.table}}. 
 #' @examples
 #' #We can fit two different models with different base treatment and we can
 #' #obtain same relative effects estimate using this function
@@ -329,14 +335,14 @@ relative.effects <- function(result, base.treatment = NULL, comparison.treatment
 
 #' Make a summary table for relative effects
 #' 
-#' Relative effects in units of log odds ratio for binomial and multinomial data and real number scale for normal data.
+#' This function creates a summary table of relative effects. Relative effects are in units of log odds ratio for binomial and multinomial data and real number scale for normal data.
 #'
-#' @param result object created by \code{\link{network.run}} function
-#' @param summary_stat specifies what type of statistics user wants. Options are: "mean", "ci", "quantile", "sd", "p-value".
+#' @param result Object created by \code{\link{network.run}} function
+#' @param summary_stat Specifies what type of statistics user wants. Options are: "mean", "ci", "quantile", "sd", "p-value".
 #' "ci" gives 95% confidence interval (0.025, 0.5, 0.975) and "quantile" gives specific quantile specified in probs parameter. 
 #' "p-value" is the probability relative effect (in binomial, log odds ratio) is less than 0.
-#' @param probs used only for the quantile summary. Specifies which quantile user wants the summary of (should be one numeric value between 0 to 1)
-#' @param base.category specifies for which base category user wants for the summary. Used only for multinoimal.
+#' @param probs Used only for the quantile summary. Specifies which quantile user wants the summary of (should be one numeric value between 0 to 1)
+#' @param base.category Specifies for which base category user wants for the summary. Used only for multinoimal.
 #' @examples
 #' #cardiovascular
 #' network <- with(cardiovascular,{
@@ -417,12 +423,12 @@ relative.effects.table <- function(result, summary_stat = "mean", probs = NULL, 
   tbl
 }
 
-#' Creates a treatment rank table
+#' Create a treatment rank table
 #'
-#' @param result object created by \code{\link{network.run}} function
-#' @return
-#' This makes a table of ranking for each treament. Each number in the cell represents a probability certain treatment was in such rank.
+#' This function makes a table of ranking for each treament. Each number in the cell represents a probability certain treatment was in such rank.
 #' This table is also stored as an output from \code{\link{network.run}}.
+#' 
+#' @param result Object created by \code{\link{network.run}} function
 #' @examples
 #' network <- with(blocker, {
 #'  network.data(Outcomes, Study, Treat, N = N, response = "binomial")
@@ -464,11 +470,13 @@ rank.tx <- function(result){
   return(prob.matrix)
 }
 
-#' Creates a treatment rank plot
+#' Create a treatment rank plot
+#' 
+#' This plot displays how each treatment is ranked. For each rank, we show how likely each treatment will be at that rank.
 #'
-#' @param result object created by \code{\link{network.run}} function
-#' @param txnames treatment names used in creating legend
-#' @param catnames category names. Only used in multinomial.
+#' @param result Object created by \code{\link{network.run}} function
+#' @param txnames Treatment names used in creating legend
+#' @param catnames Category names. Only used in multinomial.
 #' @param legend.position x,y position of the legend
 #' @examples
 #' network <-with(blocker, {
@@ -509,14 +517,14 @@ network.rank.tx.plot <- function(result, txnames = NULL, catnames = NULL, legend
   }
 }
 
-#' Creates a treatment cumulative rank plot
+#' Create a treatment cumulative rank plot
 #'
-#' This function creates a treatment cumulative rank plot. Rank preference can be specified by the rank.preference parameter in \code{\link{network.data}}
+#' This function creates a treatment cumulative rank plot. Rank preference can be specified by the \code{rank.preference} parameter in \code{\link{network.data}}
 #'
-#' @param result object created by \code{\link{network.run}} function
-#' @param txnames treatment names used in creating legend
-#' @param catnames category names. Only used in multinomial.
-#' @param legend.position x,y position of the legend
+#' @param result Object created by \code{\link{network.run}} function
+#' @param txnames Treatment names used in creating legend
+#' @param catnames Category names. Only used in multinomial.
+#' @param legend.position x, y position of the legend
 #' @examples
 #' network <- with(blocker, {
 #'  network.data(Outcomes, Study, Treat, N = N, response = "binomial")
@@ -556,13 +564,13 @@ network.cumrank.tx.plot <- function(result, txnames = NULL, catnames = NULL, leg
   }
 }
 
-#' Creates a treatment rank plot
+#' Calculate SUCRA
 #'
 #' SUCRA is the surface under the cumulative ranking distribution defined in Salanti et al. (2011)
 #'
-#' @param result object created by \code{\link{network.run}} function
-#' @param txnames treatment names used in creating legend
-#' @param catnames category names. Only used in multinomial.
+#' @param result Object created by \code{\link{network.run}} function
+#' @param txnames Treatment names used in creating legend
+#' @param catnames Category names. Only used in multinomial.
 #' @examples
 #' ########### certolizumab (with baseline risk)
 #' network <- with(certolizumab, {
@@ -608,19 +616,19 @@ sucra = function(result, txnames = NULL, catnames = NULL)
 
 #' Find deviance statistics such as DIC and pD.
 #'
-#' Calculates deviance statistics. This function is automatically called in \code{\link{network.run}} and the deviance statistics are stored after sampling is finished.
+#' Calculates deviance statistics. This function automatically called in \code{\link{network.run}} and the deviance statistics are stored after sampling is finished.
 #'
-#' @param result object created by \code{\link{network.run}} function
+#' @param result Object created by \code{\link{network.run}} function
 #' @return
-#' \item{Dbar}{overall residual deviance}
-#' \item{pD}{sum of leverage_arm (i.e. total leverage)}
-#' \item{DIC}{deviance information criteria (sum of Dbar and pD)}
-#' \item{data.points}{total number of arms in the meta analysis}
-#' \item{dev_arm}{posterior mean of the residual deviance in each trial arm}
-#' \item{devtilda_arm}{deviance at the posterior mean of the fitted values}
-#' \item{leverage_arm}{dev_arm - devtilda_arm for each trial}
-#' \item{rtilda_arm}{posterior mean of the fitted value for binomial and multinomial}
-#' \item{ybar_arm}{posterior mean of the fitted value for normal}
+#' \item{Dbar}{Overall residual deviance}
+#' \item{pD}{Sum of leverage_arm (i.e. total leverage)}
+#' \item{DIC}{Deviance information criteria (sum of Dbar and pD)}
+#' \item{data.points}{Total number of arms in the meta analysis}
+#' \item{dev_arm}{Posterior mean of the residual deviance in each trial arm}
+#' \item{devtilda_arm}{Deviance at the posterior mean of the fitted values}
+#' \item{leverage_arm}{Difference between dev_arm and devtilda_arm for each trial}
+#' \item{rtilda_arm}{Posterior mean of the fitted value for binomial and multinomial}
+#' \item{ybar_arm}{Posterior mean of the fitted value for normal}
 #' @examples
 #' #parkinsons
 #' network <- with(parkinsons, {
@@ -773,10 +781,10 @@ calculate.deviance <- function(result){
   return(out)
 }
 
-#' make a deviance plot
+#' Make a deviance plot
 #'
 #' This makes a deviance plot which plots residual deviance (dev_arm) vs. all the arms for each study.
-#' @param result object created by \code{\link{network.run}} function
+#' @param result Object created by \code{\link{network.run}} function
 #' @examples
 #' network <- with(blocker, {
 #'  network.data(Outcomes, Study, Treat, N = N, response = "binomial")
@@ -792,10 +800,11 @@ network.deviance.plot <- function(result){
   plot(seq(sum(result$network$na)), dev_vector, xlab = "Arm", ylab = "Residual Deviance", main = "Per-arm residual deviance")
 }
 
-#' make a leverage plot
+#' Make a leverage plot
 #'
-#' Make a leverage vs. square root of residual deviance plot
-#' @param result object created by \code{\link{network.run}} function
+#' This function makes a leverage vs. square root of residual deviance plot
+#' 
+#' @param result Object created by \code{\link{network.run}} function
 #' @export
 
 network.leverage.plot <- function(result){
@@ -809,16 +818,16 @@ network.leverage.plot <- function(result){
 
 #' Make a covariate plot
 #'
-#' Make a covariate plot of how the relative effect changes as the covariate value changes.
+#' This function makes a covariate plot of how the relative effect changes as the covariate value changes.
 #' User needs to specify one base treatment and one comparison treatment to make this plot (base category and comparison category is also needed for multinomial).
 #' The function uses the \code{\link{relative.effects}} to calculate the correct relative effect. 2.5\%, median, and 97.5\% C.I. are drawn.
 #'
-#' @param result object created by \code{\link{network.run}} function
-#' @param base.treatment base treatment for relative effect
-#' @param comparison.treatment treatment comparing against base treatment
-#' @param base.category base category for multinomial data. Note that category in multinomial denotes which column it is in the Outcomes matrix. Thus, this should be a numeric value.
-#' @param comparison.category comparison category for multinomial data
-#' @param covariate.name A vector of covariate names naming of the covariate that goes into x axis label
+#' @param result Object created by \code{\link{network.run}} function
+#' @param base.treatment Base treatment for relative effect
+#' @param comparison.treatment Treatment comparing against base treatment
+#' @param base.category Base category for multinomial data. Note that category in multinomial denotes which column it is in the Outcomes matrix. Thus, this should be a numeric value.
+#' @param comparison.category Comparison category for multinomial data
+#' @param covariate.name A vector of covariate names of the covariate that goes into x-axis label
 #' @examples
 #' ########### certolizumab (with covariate)
 #' network <- with(certolizumab, {
@@ -887,10 +896,10 @@ network.covariate.plot <- function(result, base.treatment = NULL, comparison.tre
   }
 }
 
-#' Calculates correlation matrix for multinomial heterogeneity parameter.
+#' Calculate correlation matrix for multinomial heterogeneity parameter.
 #'
-#' Calculates correlation matrix from the variance matrix for heterogeneity parameter. Only used for multinomial.
-#' @param result object created by \code{\link{network.run}} function
+#' This function calculates correlation matrix from the variance matrix for heterogeneity parameter. Only used for multinomial.
+#' @param result Object created by \code{\link{network.run}} function
 #' @examples
 #' #cardiovascular
 #' network <- with(cardiovascular, {
@@ -919,9 +928,9 @@ variance.tx.effects = function(result)
 #'
 #' Draws forest plot of pooled treatment effect. Reports odds ratio for binomial and multinomial outcomes and continuous scale for normal outcomes.
 #'
-#' @param result object created by \code{\link{network.run}} function
-#' @param level confidence level. default is 0.95 denoting 95 percent C.I.
-#' @param ticks.position position of the x-axis tick marks. If left unspecified, the function tries to set it at sensible values
+#' @param result Object created by \code{\link{network.run}} function
+#' @param level Confidence level. Default is 0.95 denoting 95 percent C.I.
+#' @param ticks.position Position of the x-axis tick marks. If left unspecified, the function tries to set it at sensible values
 #' @param label.multiplier This is a multiplying factor to move the position of the text associated with median[lower, upper] values. This number is multiplied by the range of x-axis and added to the x-axis limit. Default multiplier is set to 0.2.
 #' @param label.margin This is how much margin space you specify to assign space for the median[lower, upper] values. Default margin is set to 10. 
 #' @references W. Viechtbauer (2010), \emph{Conducting meta-analyses in R with the metafor package}, Journal of Statistical Software, 36(3):1-48. [\url{https://doi.org/10.18637/jss.v036.i03}]

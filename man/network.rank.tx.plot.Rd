@@ -2,22 +2,22 @@
 % Please edit documentation in R/network.summary.R
 \name{network.rank.tx.plot}
 \alias{network.rank.tx.plot}
-\title{Creates a treatment rank plot}
+\title{Create a treatment rank plot}
 \usage{
 network.rank.tx.plot(result, txnames = NULL, catnames = NULL,
   legend.position = c(1, 1))
 }
 \arguments{
-\item{result}{object created by \code{\link{network.run}} function}
+\item{result}{Object created by \code{\link{network.run}} function}
 
-\item{txnames}{treatment names used in creating legend}
+\item{txnames}{Treatment names used in creating legend}
 
-\item{catnames}{category names. Only used in multinomial.}
+\item{catnames}{Category names. Only used in multinomial.}
 
 \item{legend.position}{x,y position of the legend}
 }
 \description{
-Creates a treatment rank plot
+This plot displays how each treatment is ranked. For each rank, we show how likely each treatment will be at that rank.
 }
 \examples{
 network <-with(blocker, {

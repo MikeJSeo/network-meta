@@ -7,21 +7,21 @@
 calculate.deviance(result)
 }
 \arguments{
-\item{result}{object created by \code{\link{network.run}} function}
+\item{result}{Object created by \code{\link{network.run}} function}
 }
 \value{
-\item{Dbar}{overall residual deviance}
-\item{pD}{sum of leverage_arm (i.e. total leverage)}
-\item{DIC}{deviance information criteria (sum of Dbar and pD)}
-\item{data.points}{total number of arms in the meta analysis}
-\item{dev_arm}{posterior mean of the residual deviance in each trial arm}
-\item{devtilda_arm}{deviance at the posterior mean of the fitted values}
-\item{leverage_arm}{dev_arm - devtilda_arm for each trial}
-\item{rtilda_arm}{posterior mean of the fitted value for binomial and multinomial}
-\item{ybar_arm}{posterior mean of the fitted value for normal}
+\item{Dbar}{Overall residual deviance}
+\item{pD}{Sum of leverage_arm (i.e. total leverage)}
+\item{DIC}{Deviance information criteria (sum of Dbar and pD)}
+\item{data.points}{Total number of arms in the meta analysis}
+\item{dev_arm}{Posterior mean of the residual deviance in each trial arm}
+\item{devtilda_arm}{Deviance at the posterior mean of the fitted values}
+\item{leverage_arm}{Difference between dev_arm and devtilda_arm for each trial}
+\item{rtilda_arm}{Posterior mean of the fitted value for binomial and multinomial}
+\item{ybar_arm}{Posterior mean of the fitted value for normal}
 }
 \description{
-Calculates deviance statistics. This function is automatically called in \code{\link{network.run}} and the deviance statistics are stored after sampling is finished.
+Calculates deviance statistics. This function automatically called in \code{\link{network.run}} and the deviance statistics are stored after sampling is finished.
 }
 \examples{
 #parkinsons

@@ -2,13 +2,13 @@
 % Please edit documentation in R/network.summary.R
 \name{network.leverage.plot}
 \alias{network.leverage.plot}
-\title{make a leverage plot}
+\title{Make a leverage plot}
 \usage{
 network.leverage.plot(result)
 }
 \arguments{
-\item{result}{object created by \code{\link{network.run}} function}
+\item{result}{Object created by \code{\link{network.run}} function}
 }
 \description{
-Make a leverage vs. square root of residual deviance plot
+This function makes a leverage vs. square root of residual deviance plot
 }

@@ -2,31 +2,31 @@
 % Please edit documentation in R/network.summary.R
 \name{relative.effects}
 \alias{relative.effects}
-\title{Find relative effects for different base treatment and comparison treatments}
+\title{Find relative effects for base treatment and comparison treatments}
 \usage{
 relative.effects(result, base.treatment = NULL,
   comparison.treatments = NULL, base.category = NULL,
   comparison.categories = NULL, covariate = NULL)
 }
 \arguments{
-\item{result}{object created by \code{\link{network.run}} function}
+\item{result}{Object created by \code{\link{network.run}} function}
 
-\item{base.treatment}{base treatment user wants for the relative effects. Base treatment is initially set by \code{\link{Treat.order}} parameter in \code{\link{network.data}} (first one in the list). If set to null, default is to use base treatment.}
+\item{base.treatment}{Base treatment user wants for the relative effects. Base treatment is initially set by \code{Treat.order} parameter in \code{\link{network.data}} (first one in the list). If set to null, default is to use base treatment.}
 
-\item{comparison.treatments}{treatments that user wants to compare against base treatment. If set to null, all the treatments besides base treatment is considered as comparison treatments.}
+\item{comparison.treatments}{Treatments that user wants to compare against base treatment. If set to null, all the treatments besides base treatment is considered as comparison treatments.}
 
-\item{base.category}{base category user wants for the relative effects. This is only used for multinomial data.}
+\item{base.category}{Base category user wants for the relative effects. Only used for multinomial data.}
 
-\item{comparison.categories}{category that user wants to compare against base.category}
+\item{comparison.categories}{Category that user wants to compare against base.category. Only used for multinomial data.}
 
-\item{covariate}{covariate value at which to compute relative effects.}
+\item{covariate}{Covariate value at which to compute relative effects. Only used if covariate value is specified in the model.}
 }
 \value{
 This returns a mcmc.list sample of relative effects for the base treatment specified. This allows user to obtain relative effects of different base.treatment after the sampling has been done.
-For a simple summary use relative.effects.table.
+For a simple summary, use \code{\link{relative.effects.table}}.
 }
 \description{
-Find relative effects for different base treatment and comparison treatments
+This function calculates relative effects for base treatment and comparison treatments.
 }
 \examples{
 #We can fit two different models with different base treatment and we can

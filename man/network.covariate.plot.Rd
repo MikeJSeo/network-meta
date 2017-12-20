@@ -9,20 +9,20 @@ network.covariate.plot(result, base.treatment = NULL,
   comparison.category = NULL, covariate.name = NULL)
 }
 \arguments{
-\item{result}{object created by \code{\link{network.run}} function}
+\item{result}{Object created by \code{\link{network.run}} function}
 
-\item{base.treatment}{base treatment for relative effect}
+\item{base.treatment}{Base treatment for relative effect}
 
-\item{comparison.treatment}{treatment comparing against base treatment}
+\item{comparison.treatment}{Treatment comparing against base treatment}
 
-\item{base.category}{base category for multinomial data. Note that category in multinomial denotes which column it is in the Outcomes matrix. Thus, this should be a numeric value.}
+\item{base.category}{Base category for multinomial data. Note that category in multinomial denotes which column it is in the Outcomes matrix. Thus, this should be a numeric value.}
 
-\item{comparison.category}{comparison category for multinomial data}
+\item{comparison.category}{Comparison category for multinomial data}
 
-\item{covariate.name}{A vector of covariate names naming of the covariate that goes into x axis label}
+\item{covariate.name}{A vector of covariate names of the covariate that goes into x-axis label}
 }
 \description{
-Make a covariate plot of how the relative effect changes as the covariate value changes.
+This function makes a covariate plot of how the relative effect changes as the covariate value changes.
 User needs to specify one base treatment and one comparison treatment to make this plot (base category and comparison category is also needed for multinomial).
 The function uses the \code{\link{relative.effects}} to calculate the correct relative effect. 2.5\%, median, and 97.5\% C.I. are drawn.
 }

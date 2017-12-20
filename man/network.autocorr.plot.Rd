@@ -7,11 +7,11 @@
 network.autocorr.plot(result, extra.pars = NULL, only.pars = NULL)
 }
 \arguments{
-\item{result}{object created by \code{\link{network.run}} function}
+\item{result}{Object created by \code{\link{network.run}} function}
 
-\item{extra.pars}{extra parameters that the user wants to plot other than the default parameters.}
+\item{extra.pars}{Extra parameters that the user wants to plot other than the default parameters.}
 
-\item{only.pars}{parameters that user wants to plot only. This gets rids of other default parameters user doesn't want to show}
+\item{only.pars}{Parameters that user wants to display. This gets rids of other default parameters user doesn't want to show}
 }
 \description{
 This function plots autocorrelation using coda package.

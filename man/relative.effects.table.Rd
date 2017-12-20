@@ -8,18 +8,18 @@ relative.effects.table(result, summary_stat = "mean", probs = NULL,
   base.category = NULL)
 }
 \arguments{
-\item{result}{object created by \code{\link{network.run}} function}
+\item{result}{Object created by \code{\link{network.run}} function}
 
-\item{summary_stat}{specifies what type of statistics user wants. Options are: "mean", "ci", "quantile", "sd", "p-value".
+\item{summary_stat}{Specifies what type of statistics user wants. Options are: "mean", "ci", "quantile", "sd", "p-value".
 "ci" gives 95% confidence interval (0.025, 0.5, 0.975) and "quantile" gives specific quantile specified in probs parameter. 
 "p-value" is the probability relative effect (in binomial, log odds ratio) is less than 0.}
 
-\item{probs}{used only for the quantile summary. Specifies which quantile user wants the summary of (should be one numeric value between 0 to 1)}
+\item{probs}{Used only for the quantile summary. Specifies which quantile user wants the summary of (should be one numeric value between 0 to 1)}
 
-\item{base.category}{specifies for which base category user wants for the summary. Used only for multinoimal.}
+\item{base.category}{Specifies for which base category user wants for the summary. Used only for multinoimal.}
 }
 \description{
-Relative effects in units of log odds ratio for binomial and multinomial data and real number scale for normal data.
+This function creates a summary table of relative effects. Relative effects are in units of log odds ratio for binomial and multinomial data and real number scale for normal data.
 }
 \examples{
 #cardiovascular

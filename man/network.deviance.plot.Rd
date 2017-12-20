@@ -2,12 +2,12 @@
 % Please edit documentation in R/network.summary.R
 \name{network.deviance.plot}
 \alias{network.deviance.plot}
-\title{make a deviance plot}
+\title{Make a deviance plot}
 \usage{
 network.deviance.plot(result)
 }
 \arguments{
-\item{result}{object created by \code{\link{network.run}} function}
+\item{result}{Object created by \code{\link{network.run}} function}
 }
 \description{
 This makes a deviance plot which plots residual deviance (dev_arm) vs. all the arms for each study.
