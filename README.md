@@ -3,8 +3,8 @@
 
 # mcnet
 
-The goal of mcnet is to provide users to perform network meta-analyses
-under Bayesian framework.
+The goal of mcnet is to provide users a tool to perform network
+meta-analyses under Bayesian framework.
 
 ## Installation
 
