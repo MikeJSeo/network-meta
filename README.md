@@ -3,7 +3,8 @@
 
 # mcnet
 
-The goal of mcnet is to …
+The goal of mcnet is to provide users to perform network meta-analyses
+under Bayesian framework.
 
 ## Installation
 
@@ -16,8 +17,4 @@ devtools::install_github("MikeJSeo/network-meta")
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
-
-``` r
-## basic example code
-```
+Read the manual (pdf document) for more examples
