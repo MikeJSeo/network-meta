@@ -95,7 +95,7 @@ network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, response =
   
   if(!is.null(covariate)){
     if(!is.matrix(covariate) && !is.vector(covariate)){
-      stop("covariate has to be vector if there is only one and matrix if there is more than one")
+      stop("covariate has to be vector if there is only one and it is a matrix if there is more than one")
     }
     if(is.null(covariate.model)){
       covariate.model <- "common"

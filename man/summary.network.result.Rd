@@ -12,7 +12,7 @@
 \item{...}{Additional arguments affecting the summary produced}
 }
 \description{
-This function uses summary function in coda package to summarize mcmc.list object
+This function uses summary function in coda package to summarize mcmc.list object. Monte carlo error (Time-series SE) is also obtained using the coda package and is printed in the summary as a default.
 }
 \examples{
 network <- with(statins, {
