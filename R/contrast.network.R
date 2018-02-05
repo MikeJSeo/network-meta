@@ -14,7 +14,7 @@
 #' @references S. Dias, A.J. Sutton, A.E. Ades, and N.J. Welton (2013a), \emph{A Generalized Linear Modeling Framework for Pairwise and Network Meta-analysis of Randomized Controlled Trials}, Medical Decision Making 33(5):607-617. [\url{https://doi.org/10.1177/0272989X12458724}]
 #' @export
 
-contrast.network.data <- function(Outcomes, Treat, SE, na, V = NULL, type = "random", rank.preference = "higher",
+contrast.network.data <- function(Outcomes, Treat, SE, na, V = NULL, type = "random", rank.preference = "higher"
                                   
                                   ){
 
