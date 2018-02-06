@@ -39,14 +39,145 @@ contrast.network.data <- function(Outcomes, Treat, SE, na, V = NULL, type = "ran
   Outcomes <- cbind(NA, Outcomes)
   SE <- cbind(NA, SE)
   
-  network <- list(Outcomes = Outcomes, Treat = Treat, SE = SE, na = na)
+  na_count <- as.vector(table(na))
+  ntreat <- unique(as.vector(parkinsons_contrast$Treat))
+  ntreat <- length(ntreat[!is.na(ntreat)])
+  
+  network <- list(Outcomes = Outcomes, Treat = Treat, SE = SE, na = na, na_count = na_count, ntreat = ntreat)
   
   if(is.null(V)){
     network$V <- V
   }
   
+  code <- contrast.network.rjags(network)
+  network$code <- code
+  
   class(network) <- "contrast.network.data"
   return(network)
 
 }
+
+contrast.network.rjags <- function(network){
+  
+  with(network, {
+    
+    code <- paste0("model\n{",
+                   "\n\tfor(i in 1:", na_count[1], ") {",
+                   "\n\t\ty[i,2] ~ dnorm(delta[i,2], prec[i,2])",
+                   "\n\t}")
+    
+    if(length(na_count) > 1){
+    
+      for(i in 2:length(na_count)){
+        
+        code <- paste0(code, "\n\tfor(i in ", cumsum(na_count)[i-1] + 1, ":", cumsum(na_count)[i], ") {", 
+                       "\n\t\tfor(k in 1:(na[i]-1)) {",
+                       "\n\t\t\tfor(j in 1:(na[i]-1)) {",
+                       "\n\t\t\t\tSigma[i,j,k] <- V[i]*(1-equals(j,k)) + var[i,k+1] * equals(j,k)",
+                       "\n\t\t\t}",
+                       "\n\t\t}",
+                       "\n\t\tOmega[i,1:(na[i]-1),1:(na[i]-1)] <- inverse(Sigma[i,,])",
+                       "\n\t\ty[i,2:na[i]] ~ dmnorm(delta[i,2:na[i]], Omega[i, 1:(na[i]-1), 1:(na[i]-1)])",
+                       "\n\t}")
+      }  
+    }
+    
+    code <- paste0(code, "\n\tfor(i in 1:", sum(na_count), ") {",
+                   "\n\t\tw[i,1] <- 0",
+                   "\n\t\tdelta[i,1] <- 0",
+                   "\n\t\tfor(k in 2:na[i]) {",
+                   "\n\t\t\tvar[i,k] <- pow(se[i,k], 2)",
+                   "\n\t\t\tprec[i,k] <- 1/var[i,k]",
+                   "\n\t\t}",
+                   "\n\t\tfor(k in 2:na[i]) {",
+                   "\n\t\t\tdelta[i,k] ~ dnorm(md[i,k], taud[i,k])",
+                   "\n\t\t\tmd[i,k] <- d[t[i,k]] - d[t[i,1]] + sw[i,k]",
+                   "\n\t\t\ttaud[i,k] <- tau * 2 * (k-1)/k",
+                   "\n\t\t\tw[i,k] <- (delta[i,k] - d[t[i,k]] + d[t[i,1]])",
+                   "\n\t\t\tsw[i,k] <- sum(w[i,1:(k-1)])/ (k-1)",
+                   "\n\t\t}",
+                   "\n\t}",
+                   "\n\td[1] <- 0",
+                   "\n\tfor(k in 2:", ntreat, ") {",
+                   "\n\t\td[k] ~ dnorm(0,.0001)",
+                   "\n\t}",
+                   "\n\tsd ~ dunif(0,5)",
+                   "\n\ttau <- pow(sd,-2)",
+                   "\n}")
+    return(code)
+  })
+}
+
+#' Run the model using the network object
+#' 
+#' This is similar to the function \code{\link{network.data}}, except it uses contrast-level data instead of arms-level data.
+#'
+#' @param network contrast level network object created from \code{\link{contrast.network.data}} function
+#' @param inits Initial values for the parameters being sampled. If left unspecified, program will generate reasonable initial values.
+#' @param n.chains Number of chains to run
+#' @param max.run Maximum number of iterations that user is willing to run. If the algorithm is not converging, it will run up to \code{max.run} iterations before printing a message that it did not converge
+#' @param setsize Number of iterations that are run between convergence checks. If the algorithm converges fast, user wouldn't need a big setsize. The number that is printed between each convergence checks is the gelman-rubin diagnostics and we would want that to be below the conv.limit the user specifies.
+#' @param n.run Final number of iterations that the user wants to store. If after the algorithm converges, user wants less number of iterations, we thin the sequence. If the user wants more iterations, we run extra iterations to reach the specified number of runs
+#' @param conv.limit Convergence limit for Gelman and Rubin's convergence diagnostic. Point estimate is used to test convergence of parameters for study effect (eta), relative effect (d), and heterogeneity (log variance (logvar)).
+#' @param extra.pars.save Parameters that user wants to save besides the default parameters saved. See code using \code{cat(network$code)} to see which parameters can be saved.
+#' @return
+#' \item{data_rjags}{Data that is put into rjags function \code{\link{contrast.jags.model}}}
+#' \item{inits}{Initial values that are either specified by the user or generated as a default}
+#' \item{pars.save}{Parameters that are saved. Add more parameters in extra.pars.save if other variables are desired}
+#' \item{burnin}{Half of the converged sequence is thrown out as a burnin}
+#' \item{n.thin}{If the number of iterations user wants (n.run) is less than the number of converged sequence after burnin, we thin the sequence and store the thinning interval}
+#' \item{samples}{MCMC samples stored using jags. The returned samples have the form of mcmc.list and can be directly applied to coda functions}
+#' \item{max.gelman}{Maximum Gelman and Rubin's convergence diagnostic calculated for the final sample}
+#' \item{deviance}{Contains deviance statistics such as pD (effective number of parameters) and DIC (Deviance Information Criterion)}
+#' \item{rank.tx}{Rank probability calculated for each treatments. \code{rank.preference} parameter in \code{\link{network.data}} is used to define whether higher or lower value is preferred. The numbers are probabilities that a given treatment has been in certain rank in the sequence.}
+#' @examples
+#' #add
+#' @export
+
+contrast.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 100000, setsize = 10000, n.run = 50000,
+                        conv.limit = 1.05, extra.pars.save = NULL){
+  
+  if (!inherits(network, "contrast.network.data")) {
+    stop('Given network is not contrast.network.data. Run contrast.network.data function first')
+  }
+  
+  if(max.run < setsize){
+    stop("setsize should be smaller than max.run")
+  }
+  
+  with(network, {
+    
+    data <- list(y = Outcomes, t = Treat, se = SE, na = na)
+    
+    if(!is.null(V)){
+      data$V <- V
+    }
+    
+    pars.save <- c("d", "sd")
+    
+    pars.save <- c(pars.save, "totresdev")
+    
+    if(!is.null(extra.pars.save)) {
+      extra.pars.save.check(extra.pars.save)
+      pars.save <- c(pars.save, extra.pars.save)
+    }
+    
+    
+    if(is.null(inits)){
+      inits <- network.inits(network, n.chains)
+    }
+    samples <- jags.fit(network, data, pars.save, inits, n.chains, max.run, setsize, n.run, conv.limit)
+    result <- list(network = network, data.rjags = data, inits = inits, pars.save = pars.save)
+    result <- c(result, samples)
+    
+    # if(dic == TRUE){
+    #   result$deviance <- calculate.deviance(result)
+    # }
+    # result$rank.tx <- rank.tx(result)
+    class(result) <- "network.result"
+    return(result)
+  })
+}
+
+
 

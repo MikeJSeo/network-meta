@@ -156,14 +156,22 @@ jags.fit <- function(network, data, pars.save, inits, n.chains, max.run, setsize
     }
   }
   
-  conv.save <- if(network$response == "multinomial"){
-    c("d", "Eta", "sigma_transformed")
-  } else if(network$response == "binomial" || network$response == "normal"){
-    c("d", "Eta", "logvar")
+  if(class(network) == "network.data"){
+    
+    conv.save <- if(network$response == "multinomial"){
+      c("d", "Eta", "sigma_transformed")
+    } else if(network$response == "binomial" || network$response == "normal"){
+      c("d", "Eta", "logvar")
+    }
+    if(network$type == "fixed"){
+      conv.save <- conv.save[!conv.save %in% c("logvar", "sigma_transformed")]
+    }  
+  } else if(class(network) == "contrast.network.data"){
+    conv.save <- pars.save
   }
-  if(network$type == "fixed"){
-    conv.save <- conv.save[!conv.save %in% c("logvar", "sigma_transformed")]
-  }
+  
+  
+  
 
   samples <- rjags::coda.samples(model = mod, variable.names = pars.save, n.iter = setsize)
   varnames <- dimnames(samples[[1]])[[2]]
