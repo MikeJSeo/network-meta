@@ -45,7 +45,7 @@ contrast.network.data <- function(Outcomes, Treat, SE, na, V = NULL, type = "ran
   
   network <- list(Outcomes = Outcomes, Treat = Treat, SE = SE, na = na, na_count = na_count, ntreat = ntreat)
   
-  if(is.null(V)){
+  if(!is.null(V)){
     network$V <- V
   }
   
