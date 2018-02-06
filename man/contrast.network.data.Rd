@@ -4,21 +4,26 @@
 \alias{contrast.network.data}
 \title{Make a network object for contrast-level data containing data, priors, and a JAGS model file}
 \usage{
-contrast.network.data(Outcomes, Study, Treat, SE, V)
+contrast.network.data(Outcomes, Treat, SE, na, V = NULL, type = "random",
+  rank.preference = "higher")
 }
 \arguments{
-\item{Outcomes}{Contrast-level outcomes. Outcome is treated as normally distributed.}
+\item{Outcomes}{Contrast-level outcomes. Outcome is assumed to be normally distributed. Outcome should be a matrix with dimensions number of studies by maximum number of contrasts. If the maximum number of arms in a trial is three, then there should be two columns. See parkinsons_contrast data for an example. All the missing value in the matrix would be denoted as NA.}
 
-\item{Study}{A vector of study indicator for each contrasts. If there are only two arm trials, this will be a sequence from 1 to total number of studies.}
+\item{Treat}{A matrix of treatment for each arm. This will be a matrix with dimensions number of study by maximum number of arms. If the maximum arms in a trial is three, then the matrix should have three columns. All the missing value in the matrix should be denoted as NA. Treatments should have positive integer values starting from 1 to total number of treatments.}
 
-\item{Treat}{A vector of treatment indicator for each arm}
+\item{SE}{A matrix of standard error for each contrasts. The matrix would be same dimensions as Outcomes.}
 
-\item{SE}{A vector of standard error for each contrasts.}
+\item{na}{A vector of number of arms in each study.}
 
 \item{V}{Needed if you have multi-arm trials. Length of this vector should be number of studies. If the study is multi-arm trial, need to specify variance of the baseline treatment in that trial. Denote it with NA if the study only has two-arm trials.}
+
+\item{type}{Type of model fitted: either "random" for random effects model or "fixed" for fixed effects model. Default is "random".}
+
+\item{rank.preference}{Set it equal to "higher" if higher values are preferred (i.e. assumes events are good). Set it equal to "lower" if lower values are preferred (i.e. assumes events are bad). Default is "higher".}
 }
 \description{
-This is very similar function as \code{\link{network.data}}. Except it uses contrast-level data instead of arms-level data. Contrast-level format is treatment differences relative to the control arm.
+This is similar to the function \code{\link{network.data}}, except it uses contrast-level data instead of arms-level data. Contrast-level format uses treatment differences relative to the control arm.
 Note that in two arm trials there is only one contrast value per trial, but in three arm trials there are two contrast values relative to the control arm.
 }
 \references{
