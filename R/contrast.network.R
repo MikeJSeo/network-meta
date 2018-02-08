@@ -73,7 +73,7 @@ contrast.network.rjags <- function(network){
         code <- paste0(code, "\n\tfor(i in ", cumsum(na_count)[i-1] + 1, ":", cumsum(na_count)[i], ") {", 
                        "\n\t\tfor(k in 1:(na[i]-1)) {",
                        "\n\t\t\tfor(j in 1:(na[i]-1)) {",
-                       "\n\t\t\t\tSigma[i,j,k] <- V[i]*(1-equals(j,k)) + var[i,k+1] * equals(j,k)",
+                       "\n\t\t\t\tSigma[i,j,k] <- V[i]*(1-equals(j,k)) + Var[i,k+1] * equals(j,k)",
                        "\n\t\t\t}",
                        "\n\t\t}",
                        "\n\t\tOmega[i,1:(na[i]-1),1:(na[i]-1)] <- inverse(Sigma[i,,])",
@@ -86,8 +86,8 @@ contrast.network.rjags <- function(network){
                    "\n\t\tw[i,1] <- 0",
                    "\n\t\tdelta[i,1] <- 0",
                    "\n\t\tfor(k in 2:na[i]) {",
-                   "\n\t\t\tvar[i,k] <- pow(se[i,k], 2)",
-                   "\n\t\t\tprec[i,k] <- 1/var[i,k]",
+                   "\n\t\t\tVar[i,k] <- pow(se[i,k], 2)",
+                   "\n\t\t\tprec[i,k] <- 1/Var[i,k]",
                    "\n\t\t}",
                    "\n\t\tfor(k in 2:na[i]) {",
                    "\n\t\t\tdelta[i,k] ~ dnorm(md[i,k], taud[i,k])",
@@ -163,9 +163,9 @@ contrast.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 
     }
     
     
-    if(is.null(inits)){
-      inits <- network.inits(network, n.chains)
-    }
+    # if(is.null(inits)){
+    #   inits <- network.inits(network, n.chains)
+    # }
     samples <- jags.fit(network, data, pars.save, inits, n.chains, max.run, setsize, n.run, conv.limit)
     result <- list(network = network, data.rjags = data, inits = inits, pars.save = pars.save)
     result <- c(result, samples)

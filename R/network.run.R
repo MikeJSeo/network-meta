@@ -31,7 +31,7 @@
 
 network.run <- function(network, inits = NULL, n.chains = 3, max.run = 100000, setsize = 10000, n.run = 50000,
                         conv.limit = 1.05, extra.pars.save = NULL){
-
+  
   if (!inherits(network, "network.data")) {
     stop('Given network is not network.data. Run network.data function first')
   }
@@ -169,9 +169,7 @@ jags.fit <- function(network, data, pars.save, inits, n.chains, max.run, setsize
   } else if(class(network) == "contrast.network.data"){
     conv.save <- pars.save
   }
-  
-  
-  
+
 
   samples <- rjags::coda.samples(model = mod, variable.names = pars.save, n.iter = setsize)
   varnames <- dimnames(samples[[1]])[[2]]
