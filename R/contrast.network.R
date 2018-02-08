@@ -155,7 +155,7 @@ contrast.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 
     
     pars.save <- c("d", "sd")
     
-    pars.save <- c(pars.save, "totresdev")
+    #pars.save <- c(pars.save, "totresdev")
     
     if(!is.null(extra.pars.save)) {
       extra.pars.save.check(extra.pars.save)
