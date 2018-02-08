@@ -188,7 +188,7 @@ contrast.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 
 #' Add
 #' @export
 
-summary.network.result <- function(object){
+summary.contrast.network.result <- function(object){
   
   if(!inherits(object, "contrast.network.result")) {
     stop('This is not the output from contrast.network.run. Need to run contrast.network.run function first')
