@@ -17,7 +17,7 @@
 contrast.network.data <- function(Outcomes, Treat, SE, na, V = NULL, type = "random", rank.preference = "higher"){
 
   if(missing(Outcomes) || missing(Treat) || missing(SE) || missing(na)){
-    stop("OUtcomes, Treat, SE, and na have to be all specified")
+    stop("Outcomes, Treat, SE, and na have to be all specified")
   }
   
   if(any(na == 1)) stop("study cannot have only 1 arm")
@@ -177,6 +177,27 @@ contrast.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 
     class(result) <- "contrast.network.result"
     return(result)
   })
+}
+
+#' Summarize result run by \code{\link{contrast.network.run}}
+#'
+#' This function uses summary function in coda package to summarize mcmc.list object. Monte carlo error (Time-series SE) is also obtained using the coda package and is printed in the summary as a default.
+#'
+#' @param object Result object created by \code{\link{contrast.network.run}} function
+#' @examples
+#' Add
+#' @export
+
+summary.network.result <- function(object){
+  
+  if(!inherits(object, "contrast.network.result")) {
+    stop('This is not the output from contrast.network.run. Need to run contrast.network.run function first')
+  }
+  rval <- list("summary.samples"= summary(object$samples),
+               "deviance" = unlist(object$deviance[1:3]),
+               "total_n" = sum(object$network$na))
+  class(rval) <- 'summary.contrast.network.result'
+  rval
 }
 
 
