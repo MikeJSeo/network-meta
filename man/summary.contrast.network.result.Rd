@@ -13,5 +13,9 @@
 This function uses summary function in coda package to summarize mcmc.list object. Monte carlo error (Time-series SE) is also obtained using the coda package and is printed in the summary as a default.
 }
 \examples{
-Add
+network <- with(parkinsons_contrast, {
+ contrast.network.data(Outcomes, Treat, SE, na, V)
+})
+result <- contrast.network.run(network) 
+summary(result)
 }

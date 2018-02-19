@@ -162,7 +162,6 @@ contrast.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 
       pars.save <- c(pars.save, extra.pars.save)
     }
     
-    
     # if(is.null(inits)){
     #   inits <- network.inits(network, n.chains)
     # }
@@ -185,7 +184,11 @@ contrast.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 
 #'
 #' @param object Result object created by \code{\link{contrast.network.run}} function
 #' @examples
-#' Add
+#' network <- with(parkinsons_contrast, {
+#'  contrast.network.data(Outcomes, Treat, SE, na, V)
+#' })
+#' result <- contrast.network.run(network) 
+#' summary(result)
 #' @export
 
 summary.contrast.network.result <- function(object){
@@ -201,4 +204,24 @@ summary.contrast.network.result <- function(object){
 }
 
 
+#' Plot traceplot and posterior density of the result using contrast data
+#'
+#' This function uses plotting function in coda package to plot mcmc.list object
+#'
+#' @param x Result object created by \code{\link{contrast.network.run}} function
+#' @examples
+#' network <- with(parkinsons_contrast, {
+#'  contrast.network.data(Outcomes, Treat, SE, na, V)
+#' })
+#' result <- contrast.network.run(network)
+#' plot(result)
+#' @export
+
+plot.contrast.network.result <- function(x) {
+
+  if(!inherits(object, "contrast.network.result")) {
+    stop('This is not the output from contrast.network.run. Need to run contrast.network.run function first')
+  }
+  plot(x$samples)
+}
 
