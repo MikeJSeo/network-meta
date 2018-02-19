@@ -40,5 +40,8 @@ contrast.network.run(network, inits = NULL, n.chains = 3, max.run = 1e+05,
 This is similar to the function \code{\link{network.data}}, except it uses contrast-level data instead of arms-level data.
 }
 \examples{
-#add
+network <- with(parkinsons_contrast, {
+ contrast.network.data(Outcomes, Treat, SE, na, V)
+})
+result <- contrast.network.run(network)
 }

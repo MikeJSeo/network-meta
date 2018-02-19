@@ -64,6 +64,7 @@ contrast.network.rjags <- function(network){
     code <- paste0("model\n{",
                    "\n\tfor(i in 1:", na_count[1], ") {",
                    "\n\t\ty[i,2] ~ dnorm(delta[i,2], prec[i,2])",
+                   "\n\t\tresdev[i] ~ (y[i,2] - delta[i,2]) * (y[i,2] - delta[i,2]) * prec[i,2]",
                    "\n\t}")
     
     if(length(na_count) > 1){
@@ -78,6 +79,10 @@ contrast.network.rjags <- function(network){
                        "\n\t\t}",
                        "\n\t\tOmega[i,1:(na[i]-1),1:(na[i]-1)] <- inverse(Sigma[i,,])",
                        "\n\t\ty[i,2:na[i]] ~ dmnorm(delta[i,2:na[i]], Omega[i, 1:(na[i]-1), 1:(na[i]-1)])",
+                       "\n\t\tfor(k in 1:(na[i]-1)){",
+                       "\n\t\t\tydiff[i,k] <- y[i,(k+1)] - delta[i,(k+1)]",
+                       "\n\t\t\tz[i,k] <- inprod2(Omega[i,k,1:(na[i]-1)], ydiff[i,1:(na[i]-1)])",
+                       "\n\t\t}",
                        "\n\t}")
       }  
     }
@@ -97,6 +102,7 @@ contrast.network.rjags <- function(network){
                    "\n\t\t\tsw[i,k] <- sum(w[i,1:(k-1)])/ (k-1)",
                    "\n\t\t}",
                    "\n\t}",
+                   "\n\ttotresdev <- sum(resdev[])",
                    "\n\td[1] <- 0",
                    "\n\tfor(k in 2:", ntreat, ") {",
                    "\n\t\td[k] ~ dnorm(0,.0001)",
@@ -131,7 +137,10 @@ contrast.network.rjags <- function(network){
 #' \item{deviance}{Contains deviance statistics such as pD (effective number of parameters) and DIC (Deviance Information Criterion)}
 #' \item{rank.tx}{Rank probability calculated for each treatments. \code{rank.preference} parameter in \code{\link{network.data}} is used to define whether higher or lower value is preferred. The numbers are probabilities that a given treatment has been in certain rank in the sequence.}
 #' @examples
-#' #add
+#' network <- with(parkinsons_contrast, {
+#'  contrast.network.data(Outcomes, Treat, SE, na, V)
+#' })
+#' result <- contrast.network.run(network)
 #' @export
 
 contrast.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 100000, setsize = 10000, n.run = 50000,
@@ -155,7 +164,7 @@ contrast.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 
     
     pars.save <- c("d", "sd")
     
-    #pars.save <- c(pars.save, "totresdev")
+    pars.save <- c(pars.save, "totresdev")
     
     if(!is.null(extra.pars.save)) {
       extra.pars.save.check(extra.pars.save)
