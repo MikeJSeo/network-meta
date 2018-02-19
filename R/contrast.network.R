@@ -64,7 +64,7 @@ contrast.network.rjags <- function(network){
     code <- paste0("model\n{",
                    "\n\tfor(i in 1:", na_count[1], ") {",
                    "\n\t\ty[i,2] ~ dnorm(delta[i,2], prec[i,2])",
-                   "\n\t\tresdev[i] ~ (y[i,2] - delta[i,2]) * (y[i,2] - delta[i,2]) * prec[i,2]",
+                   "\n\t\tresdev[i] <- (y[i,2] - delta[i,2]) * (y[i,2] - delta[i,2]) * prec[i,2]",
                    "\n\t}")
     
     if(length(na_count) > 1){
@@ -83,6 +83,7 @@ contrast.network.rjags <- function(network){
                        "\n\t\t\tydiff[i,k] <- y[i,(k+1)] - delta[i,(k+1)]",
                        "\n\t\t\tz[i,k] <- inprod2(Omega[i,k,1:(na[i]-1)], ydiff[i,1:(na[i]-1)])",
                        "\n\t\t}",
+                       "\n\t\tresdev[i] <- inprod2(ydiff[i,1:(na[i]-1)], z[i, 1:(na[i]-1)])",
                        "\n\t}")
       }  
     }
