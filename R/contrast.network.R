@@ -81,9 +81,9 @@ contrast.network.rjags <- function(network){
                        "\n\t\ty[i,2:na[i]] ~ dmnorm(delta[i,2:na[i]], Omega[i, 1:(na[i]-1), 1:(na[i]-1)])",
                        "\n\t\tfor(k in 1:(na[i]-1)){",
                        "\n\t\t\tydiff[i,k] <- y[i,(k+1)] - delta[i,(k+1)]",
-                       "\n\t\t\tz[i,k] <- inprod2(Omega[i,k,1:(na[i]-1)], ydiff[i,1:(na[i]-1)])",
+                       "\n\t\t\tz[i,k] <- inprod(Omega[i,k,1:(na[i]-1)], ydiff[i,1:(na[i]-1)])",
                        "\n\t\t}",
-                       "\n\t\tresdev[i] <- inprod2(ydiff[i,1:(na[i]-1)], z[i, 1:(na[i]-1)])",
+                       "\n\t\tresdev[i] <- inprod(ydiff[i,1:(na[i]-1)], z[i, 1:(na[i]-1)])",
                        "\n\t}")
       }  
     }
