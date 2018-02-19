@@ -278,6 +278,5 @@ calculate.contrast.deviance <- function(result){
         devtilda_arm[i,j] <- ifelse(se_value != 0, (r_value - ybar_arm[i,j])^2 / se_value^2, 0)
       }
     }
-  }
-  
+
 }
