@@ -165,7 +165,7 @@ contrast.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 
     
     pars.save <- c("d", "sd")
     
-    pars.save <- c(pars.save, "totresdev")
+    pars.save <- c(pars.save, "totresdev", "delta")
     
     if(!is.null(extra.pars.save)) {
       extra.pars.save.check(extra.pars.save)
@@ -235,3 +235,49 @@ plot.contrast.network.result <- function(x) {
   plot(x$samples)
 }
 
+
+#' Find deviance statistics such as DIC and pD.
+#'
+#' Calculates deviance statistics. This function automatically called in \code{\link{contrast.network.run}} and the deviance statistics are stored after sampling is finished.
+#'
+#' @param result Object created by \code{\link{contrast.network.run}} function
+#' @return
+#' \item{Dbar}{Overall residual deviance}
+#' \item{pD}{Sum of leverage_arm (i.e. total leverage)}
+#' \item{DIC}{Deviance information criteria (sum of Dbar and pD)}
+#' @examples
+#' #parkinsons
+#' network <- with(parkinsons, {
+#'  network.data(Outcomes, Study, Treat, SE = SE, response = "normal")
+#' })
+#' result <- network.run(network)
+#' calculate.deviance(result)
+#' @references S. Dias, A.J. Sutton, A.E. Ades, and N.J. Welton (2013a), \emph{A Generalized Linear Modeling Framework for Pairwise and Network Meta-analysis of Randomized Controlled Trials}, Medical Decision Making 33(5):607-617. [\url{https://doi.org/10.1177/0272989X12458724}]
+#' @export
+
+calculate.contrast.deviance <- function(result){
+
+  
+  network <- result$network
+  samples <- result$samples
+  
+  totresdev <- lapply(samples, function(x){ x[,"totresdev"]})
+  Dbar <- mean(unlist(totresdev))
+  
+  ybar <- lapply(samples, function(x){ x[,grep("delta\\[", dimnames(samples[[1]])[[2]])] })
+  ybar <- do.call(rbind, ybar)
+  ybar <- apply(ybar, 2, mean)
+    
+  ybar_arm <- devtilda_arm <- matrix(NA, nrow = network$nstudy, ncol = max(network$na))
+    
+  for(i in 1:length(network$na)){
+      for(j in 1:network$na[i]){
+        r_value <- network$r[i,j]
+        se_value <- network$se[i,j]
+        ybar_arm[i,j] <- ybar[which(paste("theta[", i, ",", j, "]", sep = "") == names(ybar))]
+        devtilda_arm[i,j] <- ifelse(se_value != 0, (r_value - ybar_arm[i,j])^2 / se_value^2, 0)
+      }
+    }
+  }
+  
+}
