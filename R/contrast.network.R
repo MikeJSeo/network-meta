@@ -267,16 +267,83 @@ calculate.contrast.deviance <- function(result){
   ybar <- lapply(samples, function(x){ x[,grep("delta\\[", dimnames(samples[[1]])[[2]])] })
   ybar <- do.call(rbind, ybar)
   ybar <- apply(ybar, 2, mean)
+  ybar_arm <- devtilda_arm <- matrix(NA, nrow = sum(network$na_count), ncol = max(network$na))  
+  
+  with(network, {
+    # Find Omega..
+    Sigma <- array(NA, c(sum(na_count), max(na) -1, max(na) -1 ))
+    for(i in 1:sum(na_count)){
+      for(k in 1:(na[i] - 1)){
+        for(j in 1:(na[i] - 1)){
+          Sigma[i,j,k] <- V[i] * (1- (j ==k)) + SE[i, k+1] * (j==k)
+        }
+      }
+    }
+    Omega <- Sigma
+    for(i in 1:sum(na_count)){
+      Omega[i,,] <- solve(Sigma[i,,])  
+    }
     
-  ybar_arm <- devtilda_arm <- matrix(NA, nrow = network$nstudy, ncol = max(network$na))
-    
-  for(i in 1:length(network$na)){
-      for(j in 1:network$na[i]){
-        r_value <- network$r[i,j]
-        se_value <- network$se[i,j]
-        ybar_arm[i,j] <- ybar[which(paste("theta[", i, ",", j, "]", sep = "") == names(ybar))]
+    # 2 arm
+    for(i in 1:na_count[1]){
+      for(j in 2:na[i]){
+        r_value <- Outcomes[i,j]
+        se_value <- SE[i,j]
+        ybar_arm[i,j] <- ybar[which(paste("delta[", i, ",", j, "]", sep = "") == names(ybar))]
         devtilda_arm[i,j] <- ifelse(se_value != 0, (r_value - ybar_arm[i,j])^2 / se_value^2, 0)
       }
     }
+    
+    # 3 or more
+    if(length(na_count) > 1){
+      for(ii in 2:length(na_count)){
+        
+        for(i in cumsum(na_count)[ii-1]: cumsum(na_count)[ii]){
+          for(j in 2:na[i]){
+            r_value <- Outcomes[i,j]
+            omega_value <- Omega[i,,]
+            ybar_arm[i,j] <- ybar[which(paste("delta[", i, ",", j, "]", sep = "") == names(ybar))]
+            devtilda_arm[i,j] <- ifelse(all(se_value != 0), (r_value - ybar_arm[i,j]) %*% omega_value %*% (r_value - ybar_arm[i,j]), 0)
+          }
+        }   
+      }  
+    }
+    return(devtilda_arm)
+    
+  })
+  
+  
+  #for()
+  
+    
+    if(length(na_count) > 1){
+      
+      for(i in 2:length(na_count)){
+        
+        code <- paste0(code, "\n\tfor(i in ", cumsum(na_count)[i-1] + 1, ":", cumsum(na_count)[i], ") {", 
+                       "\n\t\tfor(k in 1:(na[i]-1)) {",
+                       "\n\t\t\tfor(j in 1:(na[i]-1)) {",
+                       "\n\t\t\t\tSigma[i,j,k] <- V[i]*(1-equals(j,k)) + Var[i,k+1] * equals(j,k)",
+                       "\n\t\t\t}",
+                       "\n\t\t}",
+                       "\n\t\tOmega[i,1:(na[i]-1),1:(na[i]-1)] <- inverse(Sigma[i,,])",
+                       "\n\t\ty[i,2:na[i]] ~ dmnorm(delta[i,2:na[i]], Omega[i, 1:(na[i]-1), 1:(na[i]-1)])",
+                       "\n\t\tfor(k in 1:(na[i]-1)){",
+                       "\n\t\t\tydiff[i,k] <- y[i,(k+1)] - delta[i,(k+1)]",
+                       "\n\t\t\tz[i,k] <- inprod(Omega[i,k,1:(na[i]-1)], ydiff[i,1:(na[i]-1)])",
+                       "\n\t\t}",
+                       "\n\t\tresdev[i] <- inprod(ydiff[i,1:(na[i]-1)], z[i, 1:(na[i]-1)])",
+                       "\n\t}")
+        
+    
+  
+  for(i in 1:sum(network$na_count)){
+    for(j in 2:network$na[i]){
+      r_value <- network$Outcomes[i,j]
+      se_value <- network$SE[i,j]
+      ybar_arm[i,j] <- ybar[which(paste("delta[", i, ",", j, "]", sep = "") == names(ybar))]
+      devtilda_arm[i,j] <- ifelse(se_value != 0, (r_value - ybar_arm[i,j])^2 / se_value^2, 0)
+    }
+  }
 
 }
