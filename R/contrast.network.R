@@ -179,7 +179,6 @@ contrast.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 
     samples <- jags.fit(network, data, pars.save, inits, n.chains, max.run, setsize, n.run, conv.limit)
     result <- list(network = network, data.rjags = data, inits = inits, pars.save = pars.save)
     result <- c(result, samples)
-    
     result$deviance <- calculate.contrast.deviance(result)
     
     # result$rank.tx <- rank.tx(result)
