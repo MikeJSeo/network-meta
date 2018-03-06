@@ -265,7 +265,7 @@ calculate.contrast.deviance <- function(result){
   ybar <- lapply(samples, function(x){ x[,grep("delta\\[", dimnames(samples[[1]])[[2]])] })
   ybar <- do.call(rbind, ybar)
   ybar <- apply(ybar, 2, mean)
-  ybar_study <- devtilda_study <- rep(NA, nstudy)
+  ybar_study <- devtilda_study <- rep(NA, network$nstudy)
  
   with(network, {
     
