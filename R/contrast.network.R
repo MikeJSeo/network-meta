@@ -108,8 +108,8 @@ contrast.network.rjags <- function(network){
     } else if(type == "fixed"){
       code <- paste0(code, "\n\tfor(i in 1:", nstudy, ") {",
                      "\n\t\tfor(k in 2:na[i]) {",
-                     "\n\t\t\tvar[i,k] <- pow(se[i,k],2)",
-                     "\n\t\t\tprec[i,k] <- 1/var[i,k]",
+                     "\n\t\t\tVar[i,k] <- pow(se[i,k],2)",
+                     "\n\t\t\tprec[i,k] <- 1/Var[i,k]",
                      "\n\t\t\tdelta[i,k] <- d[t[i,k]] - d[t[i,1]]",
                      "\n\t\t}",
                      "\n\t\tresdev[i] <- sum(dev[i,2:na[i]])",
