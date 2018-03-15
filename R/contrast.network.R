@@ -132,7 +132,7 @@ contrast.network.rjags <- function(network){
                    "\n\t}")
     
     if(type == "random"){
-      code <- paste0(code, hy.prior.rjags(hy.prior, 0))
+      code <- paste0(code, contrast.hy.prior.rjags(hy.prior))
     }
     
     code <- paste0(code, "\n}")
@@ -388,7 +388,7 @@ contrast.inits <- function(network, n.chains){
           }
           
           if(hy.prior[[1]] == "dgamma"){
-            initial.values[[i]][["prec"]] <- 1/sigma2
+            initial.values[[i]][["tau"]] <- 1/sigma2
           } else if(hy.prior[[1]] == "dunif" || hy.prior[[1]] == "dhnorm"){
             initial.values[[i]][["sd"]] <- sqrt(sigma2)
           }
@@ -397,4 +397,25 @@ contrast.inits <- function(network, n.chains){
     }
     return(initial.values)
   })
+}
+
+
+contrast.hy.prior.rjags <- function(hy.prior){
+  
+  code <- ""
+  distr <- hy.prior[[1]]
+  if (distr == "dunif") {
+    code <- paste0(code,
+                   "\n\tsd ~ dunif(hy.prior.1, hy.prior.2)",
+                   "\n\ttau <- pow(sd,-2)")
+  } else if(distr == "dgamma"){
+    code <- paste0(code,
+                   "\n\tsd <- pow(prec, -0.5)",
+                   "\n\ttau ~ dgamma(hy.prior.1, hy.prior.2)")
+  } else if(distr == "dhnorm"){
+    code <- paste0(code,
+                   "\n\tsd ~ dnorm(hy.prior.1, hy.prior.2)T(0,)",
+                   "\n\ttau <- pow(sd, -2)")
+
+  return(code)
 }
