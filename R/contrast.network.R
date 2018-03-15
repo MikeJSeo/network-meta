@@ -49,7 +49,7 @@ contrast.network.data <- function(Outcomes, Treat, SE, na, V = NULL, type = "ran
   nstudy <- sum(na_count)
   
   
-  network <- list(Outcomes = Outcomes, Treat = Treat, SE = SE, na = na, na_count = na_count, ntreat = ntreat, nstudy = nstudy, type = type, mean.d = mean.d, prec.d = prec.d, hy.prior = hy.prior)
+  network <- list(Outcomes = Outcomes, Treat = Treat, SE = SE, na = na, na_count = na_count, ntreat = ntreat, nstudy = nstudy, type = type, mean.d = mean.d, prec.d = prec.d, hy.prior = hy.prior, response = "normal")
   
   if(!is.null(V)){
     network$V <- V
