@@ -51,11 +51,6 @@ contrast.network.data <- function(Outcomes, Treat, SE, na, V = NULL, type = "ran
   
   network <- list(Outcomes = Outcomes, Treat = Treat, SE = SE, na = na, na_count = na_count, ntreat = ntreat, nstudy = nstudy, type = type, mean.d = mean.d, prec.d = prec.d, hy.prior = hy.prior)
   
-  if(type == "random"){
-    network$hy.prior.1 <- hy.prior[[2]]
-    network$hy.prior.2 <- hy.prior[[3]]
-  }
-  
   if(!is.null(V)){
     network$V <- V
   }
@@ -189,8 +184,8 @@ contrast.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 
     }
     
     if(type == "random"){
-      data$hy.prior.1 <- hy.prior.1
-      data$hy.prior.2 <- hy.prior.2
+      data$hy.prior.1 <- hy.prior[[2]]
+      data$hy.prior.2 <- hy.prior[[3]]
     }
     
     pars.save <- c("d", "sd")
