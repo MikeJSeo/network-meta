@@ -407,7 +407,7 @@ contrast.hy.prior.rjags <- function(hy.prior){
                    "\n\ttau <- pow(sd,-2)")
   } else if(distr == "dgamma"){
     code <- paste0(code,
-                   "\n\tsd <- pow(prec, -0.5)",
+                   "\n\tsd <- pow(tau, -0.5)",
                    "\n\ttau ~ dgamma(hy.prior.1, hy.prior.2)")
   } else if(distr == "dhnorm"){
     code <- paste0(code,
