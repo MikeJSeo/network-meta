@@ -255,7 +255,7 @@ relative.effects <- function(result, base.treatment = NULL, comparison.treatment
     response <- network$response
   }
   
-  if(network$response != "multinomial"){
+  if(response != "multinomial"){
     effects <- matrix(0, nrow = network$ntreat, ncol = length(comparison.treatments))
     effects[which(Treat.order == base.treatment),] = -1
 
