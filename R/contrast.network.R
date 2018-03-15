@@ -416,6 +416,6 @@ contrast.hy.prior.rjags <- function(hy.prior){
     code <- paste0(code,
                    "\n\tsd ~ dnorm(hy.prior.1, hy.prior.2)T(0,)",
                    "\n\ttau <- pow(sd, -2)")
-
+  }
   return(code)
 }
