@@ -371,7 +371,7 @@ contrast.inits <- function(network, n.chains){
           sigma2 <- resid.var * df/random.ISigma
           
           if(hy.prior[[1]] == "dunif"){
-            if(sqrt(sigma2) > network$prior.data[[3]]){
+            if(sqrt(sigma2) > network$hy.prior[[3]]){
               stop("data has more variability than your prior does")
             }
           }
