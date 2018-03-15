@@ -348,7 +348,7 @@ contrast.inits <- function(network, n.chains){
     }
     design.mat <- design.mat[,-1,drop=F]
     
-    fit <- summary(lm(y ~ design.mat - 1))
+    fit <- summary(lm(delta ~ design.mat - 1))
     d <- se.d <- rep(NA, ntreat)
     d[-1] <- coef(fit)[,1]
     se.d[-1] <- coef(fit)[,2]
