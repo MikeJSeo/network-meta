@@ -89,22 +89,35 @@ contrast.network.rjags <- function(network){
       }  
     }
     
-    code <- paste0(code, "\n\tfor(i in 1:", nstudy, ") {",
-                   "\n\t\tw[i,1] <- 0",
-                   "\n\t\tdelta[i,1] <- 0",
-                   "\n\t\tfor(k in 2:na[i]) {",
-                   "\n\t\t\tVar[i,k] <- pow(se[i,k], 2)",
-                   "\n\t\t\tprec[i,k] <- 1/Var[i,k]",
-                   "\n\t\t}",
-                   "\n\t\tfor(k in 2:na[i]) {",
-                   "\n\t\t\tdelta[i,k] ~ dnorm(md[i,k], taud[i,k])",
-                   "\n\t\t\tmd[i,k] <- d[t[i,k]] - d[t[i,1]] + sw[i,k]",
-                   "\n\t\t\ttaud[i,k] <- tau * 2 * (k-1)/k",
-                   "\n\t\t\tw[i,k] <- (delta[i,k] - d[t[i,k]] + d[t[i,1]])",
-                   "\n\t\t\tsw[i,k] <- sum(w[i,1:(k-1)])/ (k-1)",
-                   "\n\t\t}",
-                   "\n\t}",
-                   "\n\ttotresdev <- sum(resdev[])",
+    if(type == "random"){
+      code <- paste0(code, "\n\tfor(i in 1:", nstudy, ") {",
+                     "\n\t\tw[i,1] <- 0",
+                     "\n\t\tdelta[i,1] <- 0",
+                     "\n\t\tfor(k in 2:na[i]) {",
+                     "\n\t\t\tVar[i,k] <- pow(se[i,k], 2)",
+                     "\n\t\t\tprec[i,k] <- 1/Var[i,k]",
+                     "\n\t\t}", 
+                     "\n\t\tfor(k in 2:na[i]) {",
+                     "\n\t\t\tdelta[i,k] ~ dnorm(md[i,k], taud[i,k])",
+                     "\n\t\t\tmd[i,k] <- d[t[i,k]] - d[t[i,1]] + sw[i,k]",
+                     "\n\t\t\ttaud[i,k] <- tau * 2 * (k-1)/k",
+                     "\n\t\t\tw[i,k] <- (delta[i,k] - d[t[i,k]] + d[t[i,1]])",
+                     "\n\t\t\tsw[i,k] <- sum(w[i,1:(k-1)])/ (k-1)",
+                     "\n\t\t}",
+                     "\n\t}")
+    } else if(type == "fixed"){
+      code <- paste0(code, "\n\tfor(i in 1:", nstudy, ") {",
+                     "\n\t\tfor(k in 2:na[i]) {",
+                     "\n\t\t\tvar[i,k] <- pow(se[i,k],2)",
+                     "\n\t\t\tprec[i,k] <- 1/var[i,k]",
+                     "\n\t\t\tdelta[i,k] <- d[t[i,k]] - d[t[i,1]]",
+                     "\n\t\t}",
+                     "\n\t\tresdev[i] <- sum(dev[i,2:na[i]])",
+                     "\n\t}")
+    }
+    
+    
+    code <- paste0(code, "\n\ttotresdev <- sum(resdev[])",
                    "\n\td[1] <- 0",
                    "\n\tfor(k in 2:", ntreat, ") {",
                    "\n\t\td[k] ~ dnorm(0,.0001)",
