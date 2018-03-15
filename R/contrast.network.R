@@ -115,7 +115,6 @@ contrast.network.rjags <- function(network){
                      "\n\t}")
     }
     
-    
     code <- paste0(code, "\n\ttotresdev <- sum(resdev[])",
                    "\n\td[1] <- 0",
                    "\n\tfor(k in 2:", ntreat, ") {",
@@ -298,7 +297,7 @@ calculate.contrast.deviance <- function(result){
           omega_value <- solve(Sigma)
           r_value <- Outcomes[i,2:na[i]]
           ybar_arm <- ybar[grepl(paste0(i, ","), names(ybar), fixed=TRUE)]
-          ybar_arm <- ybar_arm[!grepl(paste0(",", 1), names(ybar_arm), fixed = TRUE)]
+          ybar_arm <- ybar_arm[!grepl(paste0(",", 1), names(ybar_arm), fixed = TRUE)] #get rid of the delta[,1] column if it exists
           devtilda_study[i] <- (r_value - ybar_arm) %*% omega_value %*% (r_value - ybar_arm)
         }   
       }  
