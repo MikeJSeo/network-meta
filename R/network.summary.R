@@ -249,6 +249,12 @@ relative.effects <- function(result, base.treatment = NULL, comparison.treatment
   }
   vars <- dimnames(summary.samples[[1]])[[2]]
 
+  if(class(network) == "contrast.network.data"){
+    response <- "dummy" #dummy quick fix for contrast 
+  } else{
+    response <- network$response
+  }
+  
   if(network$response != "multinomial"){
     effects <- matrix(0, nrow = network$ntreat, ncol = length(comparison.treatments))
     effects[which(Treat.order == base.treatment),] = -1
