@@ -297,14 +297,15 @@ calculate.contrast.deviance <- function(result){
           diag(Sigma) <- SE[i, 2:na[i]]
           omega_value <- solve(Sigma)
           r_value <- Outcomes[i,2:na[i]]
-          ybar_arm <- ybar[grepl(paste0(i, ","), names(ybar), fixed=TRUE)][-1]
+          ybar_arm <- ybar[grepl(paste0(i, ","), names(ybar), fixed=TRUE)]
+          ybar_arm <- ybar_arm[!grepl(paste0(",", 1), names(ybar_arm), fixed = TRUE)]
           devtilda_study[i] <- (r_value - ybar_arm) %*% omega_value %*% (r_value - ybar_arm)
         }   
       }  
     }
-    
-    pd <- Dbar - sum(devtilda_study)
-    DIC <- pd + Dbar
-    return(list(Dbar = Dbar, pd = pd, DIC = DIC))
+    return(devtilda_study)
+#    pd <- Dbar - sum(devtilda_study)
+#    DIC <- pd + Dbar
+#    return(list(Dbar = Dbar, pd = pd, DIC = DIC))
   })
 }
