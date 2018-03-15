@@ -303,9 +303,8 @@ calculate.contrast.deviance <- function(result){
         }   
       }  
     }
-    return(devtilda_study)
-#    pd <- Dbar - sum(devtilda_study)
-#    DIC <- pd + Dbar
-#    return(list(Dbar = Dbar, pd = pd, DIC = DIC))
+    pd <- Dbar - sum(devtilda_study)
+    DIC <- pd + Dbar
+    return(list(Dbar = Dbar, pd = pd, DIC = DIC))
   })
 }
