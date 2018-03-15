@@ -10,11 +10,15 @@
 #' @param V Needed if you have multi-arm trials. Length of this vector should be number of studies. If the study is multi-arm trial, need to specify variance of the baseline treatment in that trial. Denote it with NA if the study only has two-arm trials.
 #' @param type Type of model fitted: either "random" for random effects model or "fixed" for fixed effects model. Default is "random".
 #' @param rank.preference Set it equal to "higher" if higher values are preferred (i.e. assumes events are good). Set it equal to "lower" if lower values are preferred (i.e. assumes events are bad). Default is "higher".
+#' @param mean.d Prior mean for the relative effect
+#' @param prec.d Prior precision for the relative effect
+#' @param hy.prior Prior for the heterogeneity parameter. Supports uniform, gamma, and half normal for normal. It should be a list of length 3, where first element should be the distribution (one of dunif, dgamma, dhnorm, dwish) and the next two are the parameters associated with the distribution. For example, list("dunif", 0, 5) give uniform prior with lower bound 0 and upper bound 5 for the heterogeneity parameter.
 #' @references A.J. Franchini, S. Dias, A.E. Ades, J.P. Jansen, N.J. Welton (2012), \emph{Accounting for correlation in network meta-analysis with multi-arm trials}, Research Synthesis Methods 3(2):142-160. [\url{https://doi.org/10.1002/jrsm.1049}] 
 #' @references S. Dias, A.J. Sutton, A.E. Ades, and N.J. Welton (2013a), \emph{A Generalized Linear Modeling Framework for Pairwise and Network Meta-analysis of Randomized Controlled Trials}, Medical Decision Making 33(5):607-617. [\url{https://doi.org/10.1177/0272989X12458724}]
 #' @export
 
-contrast.network.data <- function(Outcomes, Treat, SE, na, V = NULL, type = "random", rank.preference = "higher"){
+contrast.network.data <- function(Outcomes, Treat, SE, na, V = NULL, type = "random", rank.preference = "higher",
+                                  mean.d = 0, prec.d = 0.0001, hy.prior = list("dunif", 0, 100)){
 
   if(missing(Outcomes) || missing(Treat) || missing(SE) || missing(na)){
     stop("Outcomes, Treat, SE, and na have to be all specified")
@@ -44,7 +48,7 @@ contrast.network.data <- function(Outcomes, Treat, SE, na, V = NULL, type = "ran
   ntreat <- length(ntreat[!is.na(ntreat)])
   nstudy <- sum(na_count)
   
-  network <- list(Outcomes = Outcomes, Treat = Treat, SE = SE, na = na, na_count = na_count, ntreat = ntreat, nstudy = nstudy, type = type)
+  network <- list(Outcomes = Outcomes, Treat = Treat, SE = SE, na = na, na_count = na_count, ntreat = ntreat, nstudy = nstudy, type = type, mean.d = mean.d, prec.d = prec.d, hy.prior = hy.prior)
   
   if(!is.null(V)){
     network$V <- V
@@ -118,11 +122,14 @@ contrast.network.rjags <- function(network){
     code <- paste0(code, "\n\ttotresdev <- sum(resdev[])",
                    "\n\td[1] <- 0",
                    "\n\tfor(k in 2:", ntreat, ") {",
-                   "\n\t\td[k] ~ dnorm(0,.0001)",
-                   "\n\t}",
-                   "\n\tsd ~ dunif(0,5)",
-                   "\n\ttau <- pow(sd,-2)",
-                   "\n}")
+                   "\n\t\td[k] ~ dnorm(", mean.d, ",", prec.d, ")",
+                   "\n\t}")
+    
+    if(type == "random"){
+      code <- paste0(code, hy.prior.rjags(hy.prior, 0))
+    }
+    
+    code <- paste0(code, "\n}")
     return(code)
   })
 }
@@ -184,9 +191,9 @@ contrast.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 
       pars.save <- c(pars.save, extra.pars.save)
     }
     
-    # if(is.null(inits)){
-    #   inits <- network.inits(network, n.chains)
-    # }
+    if(is.null(inits)){
+      inits <- contrast.inits(network, n.chains)
+    }
     samples <- jags.fit(network, data, pars.save, inits, n.chains, max.run, setsize, n.run, conv.limit)
     result <- list(network = network, data.rjags = data, inits = inits, pars.save = pars.save)
     result <- c(result, samples)
@@ -305,5 +312,78 @@ calculate.contrast.deviance <- function(result){
     pd <- Dbar - sum(devtilda_study)
     DIC <- pd + Dbar
     return(list(Dbar = Dbar, pd = pd, DIC = DIC))
+  })
+}
+
+contrast.inits <- function(network, n.chains){
+  
+  with(network, {
+    delta <- as.vector(t(Outcomes))
+    delta <- delta[!is.na(delta)]
+    
+    Treat <- as.vector(t(Treat))
+    Treat <- Treat[!is.na(Treat)]
+    
+    ends <- cumsum(na) # End row of trials
+    starts <- c(1, ends[-length(ends)] + 1) # Start row of trials
+    b.Treat <- rep(NA, length(na))
+    b.id <- rep(F, sum(na))
+    for (i in 1:length(na)){
+      limits <- starts[i]:ends[i]
+      b.Treat[i] <- min(Treat[limits])
+      b.id[limits[b.Treat[i] == Treat[limits]]] <- T
+    }
+    
+    # design matrix
+    base.tx <- Treat[b.id]    # base treatment for N studies
+    end.Study <- c(0, cumsum(na))  # end row number of each trial
+    rows <- end.Study - seq(0, nstudy)   # end number of each trial not including base treatment arms
+    design.mat <- matrix(0, sum(na) - nstudy, ntreat) # no. non-base arms x #txs
+    for (i in seq(nstudy)){
+      studytx <- Treat[(end.Study[i]+1):end.Study[i+1]]  #treatments in ith Study
+      nonbase.tx <- studytx[studytx!=base.tx[i]]    #non-baseline treatments for ith Study
+      design.mat[(1+rows[i]):rows[i+1],base.tx[i]] <- -1
+      for (j in seq(length(nonbase.tx)))
+        design.mat[j+rows[i],nonbase.tx[j]] <- 1
+    }
+    design.mat <- design.mat[,-1,drop=F]
+    
+    fit <- summary(lm(y ~ design.mat - 1))
+    d <- se.d <- rep(NA, ntreat)
+    d[-1] <- coef(fit)[,1]
+    se.d[-1] <- coef(fit)[,2]
+    resid.var <- fit$sigma^2
+    
+    initial.values = list()
+    for(i in 1:n.chains){
+      initial.values[[i]] = list()
+    }
+    
+    if(!is.nan(fit$fstat[1])){
+      for(i in 1:n.chains){
+        random.d = rnorm(length(d))
+        initial.values[[i]][["d"]] <- d + se.d * random.d
+        
+        if(type == "random"){
+          
+          df <- fit$df[2]
+          random.ISigma <- rchisq(1, df)
+          sigma2 <- resid.var * df/random.ISigma
+          
+          if(hy.prior[[1]] == "dunif"){
+            if(sqrt(sigma2) > network$prior.data$hy.prior.2){
+              stop("data has more variability than your prior does")
+            }
+          }
+          
+          if(hy.prior[[1]] == "dgamma"){
+            initial.values[[i]][["prec"]] <- 1/sigma2
+          } else if(hy.prior[[1]] == "dunif" || hy.prior[[1]] == "dhnorm"){
+            initial.values[[i]][["sd"]] <- sqrt(sigma2)
+          }
+        }
+      }
+    }
+    return(initial.values)
   })
 }

@@ -2,12 +2,12 @@ network.inits <- function(network, n.chains){
 
   response <- network$response
   
-  if(response == "multinomial"){
-    inits = multinomial.inits(network, n.chains)
+  inits <- if(response == "multinomial"){
+    multinomial.inits(network, n.chains)
   } else if(response == "binomial"){
-    inits = binomial.inits(network, n.chains)
+    binomial.inits(network, n.chains)
   } else if(response == "normal"){
-    inits = normal.inits(network, n.chains)
+    normal.inits(network, n.chains)
   }
   return(inits)
 }
@@ -15,13 +15,13 @@ network.inits <- function(network, n.chains){
 normal.inits <- function(network, n.chains){
 
   with(network,{
-    delta = Outcomes
-    Eta = Outcomes[b.id]
-    se.Eta = SE[b.id]
-    delta = Outcomes - rep(Eta, times = na)
+    delta <- Outcomes
+    Eta <- Outcomes[b.id]
+    se.Eta <- SE[b.id]
+    delta <- Outcomes - rep(Eta, times = na)
     delta <- delta[!b.id,] #eliminate base-arm
-    
-    inits = make.inits(network, n.chains, delta, Eta, se.Eta)
+ 
+    inits <- make.inits(network, n.chains, delta, Eta, se.Eta)
     return(inits)
   })
 
@@ -44,7 +44,6 @@ binomial.inits <- function(network, n.chains){
     
     inits = make.inits(network, n.chains, delta, Eta, se.Eta)
     return(inits)  
-
   })
 }
 
@@ -68,7 +67,7 @@ make.inits <- function(network, n.chains, delta, Eta, se.Eta){
       design.mat[j+rows[i],nonbase.tx[j]] <- 1
   }
   design.mat <- design.mat[,-1,drop=F]
-  
+
   fit <- summary(lm(y ~ design.mat - 1))
   d <- se.d <- rep(NA, ntreat)
   d[-1] <- coef(fit)[,1]
