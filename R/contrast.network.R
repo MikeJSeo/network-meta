@@ -48,7 +48,13 @@ contrast.network.data <- function(Outcomes, Treat, SE, na, V = NULL, type = "ran
   ntreat <- length(ntreat[!is.na(ntreat)])
   nstudy <- sum(na_count)
   
+  
   network <- list(Outcomes = Outcomes, Treat = Treat, SE = SE, na = na, na_count = na_count, ntreat = ntreat, nstudy = nstudy, type = type, mean.d = mean.d, prec.d = prec.d, hy.prior = hy.prior)
+  
+  if(type == "random"){
+    network$hy.prior.1 <- hy.prior[[2]]
+    network$hy.prior.2 <- hy.prior[[3]]
+  }
   
   if(!is.null(V)){
     network$V <- V
@@ -371,7 +377,7 @@ contrast.inits <- function(network, n.chains){
           sigma2 <- resid.var * df/random.ISigma
           
           if(hy.prior[[1]] == "dunif"){
-            if(sqrt(sigma2) > network$hy.prior[[3]]){
+            if(sqrt(sigma2) > network$hy.prior.2){
               stop("data has more variability than your prior does")
             }
           }
