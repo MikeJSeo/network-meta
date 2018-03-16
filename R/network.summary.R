@@ -781,6 +781,7 @@ calculate.deviance <- function(result){
   return(out)
 }
 
+
 #' Make a deviance plot
 #'
 #' This makes a deviance plot which plots residual deviance (dev_arm) vs. all the arms for each study.

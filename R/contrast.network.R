@@ -187,7 +187,7 @@ contrast.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 
       data$hy.prior.2 <- hy.prior[[3]]
     }
     
-    pars.save <- c("d", "totresdev", "delta")
+    pars.save <- c("d", "totresdev", "delta", "resdev")
     
     if(type == "random"){
       pars.save <- c(pars.save, "sd")  
@@ -269,6 +269,11 @@ plot.contrast.network.result <- function(x) {
 #' \item{Dbar}{Overall residual deviance}
 #' \item{pD}{Sum of leverage_arm (i.e. total leverage)}
 #' \item{DIC}{Deviance information criteria (sum of Dbar and pD)}
+#' \item{dev_arm}{Posterior mean of the residual deviance in each trial arm}
+#' \item{devtilda_arm}{Deviance at the posterior mean of the fitted values}
+#' \item{leverage_arm}{Difference between dev_arm and devtilda_arm for each trial}
+#' \item{rtilda_arm}{Posterior mean of the fitted value for binomial and multinomial}
+#' \item{ybar_arm}{Posterior mean of the fitted value for normal}
 #' @examples
 #' #parkinsons
 #' network <- with(parkinsons, {
@@ -287,6 +292,25 @@ calculate.contrast.deviance <- function(result){
   totresdev <- lapply(samples, function(x){ x[,"totresdev"]})
   Dbar <- mean(unlist(totresdev))
   
+  #posterior mean of residual deviance 
+  resdev <- lapply(samples, function(x) { x[,grep("resdev\\[", dimnames(samples[[1]])[[2]])]})
+  resdev <- do.call(rbind, resdev)
+  resdev <- apply(resdev, 2, mean)
+  
+  resdev_matrix <- matrix(NA, nrow =  network$nstudy, ncol = max(network$na))
+  for(i in 1:dim(resdev_matrix)[1]){
+    for(j in 1:dim(resdev_matrix)[2]){
+      ind <- which(paste("resdev[", i, ",", j, "]", sep = "") == names(resdev))
+      if(length(ind) != 0){
+        resdev_matrix[i,j] <- resdev[ind]
+      }
+    }
+  }
+  resdev_study <- resdev_matrix
+  
+  
+  
+  #devtilda
   ybar <- lapply(samples, function(x){ x[,grep("delta\\[", dimnames(samples[[1]])[[2]])] })
   ybar <- do.call(rbind, ybar)
   ybar <- apply(ybar, 2, mean)
@@ -318,9 +342,11 @@ calculate.contrast.deviance <- function(result){
     }
     pd <- Dbar - sum(devtilda_study)
     DIC <- pd + Dbar
-    return(list(Dbar = Dbar, pd = pd, DIC = DIC))
+    return(list(Dbar = Dbar, pd = pd, DIC = DIC, devtilda_study = devtilda_study))
   })
 }
+
+
 
 contrast.inits <- function(network, n.chains){
   
