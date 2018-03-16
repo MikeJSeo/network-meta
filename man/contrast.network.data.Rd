@@ -5,7 +5,8 @@
 \title{Make a network object for contrast-level data containing data, priors, and a JAGS model file}
 \usage{
 contrast.network.data(Outcomes, Treat, SE, na, V = NULL, type = "random",
-  rank.preference = "higher")
+  rank.preference = "higher", mean.d = 0, prec.d = 1e-04,
+  hy.prior = list("dunif", 0, 100))
 }
 \arguments{
 \item{Outcomes}{Contrast-level outcomes. Outcome is assumed to be normally distributed. Outcome should be a matrix with dimensions number of studies by maximum number of contrasts. If the maximum number of arms in a trial is three, then there should be two columns. See parkinsons_contrast data for an example. All the missing value in the matrix would be denoted as NA.}
@@ -21,6 +22,12 @@ contrast.network.data(Outcomes, Treat, SE, na, V = NULL, type = "random",
 \item{type}{Type of model fitted: either "random" for random effects model or "fixed" for fixed effects model. Default is "random".}
 
 \item{rank.preference}{Set it equal to "higher" if higher values are preferred (i.e. assumes events are good). Set it equal to "lower" if lower values are preferred (i.e. assumes events are bad). Default is "higher".}
+
+\item{mean.d}{Prior mean for the relative effect}
+
+\item{prec.d}{Prior precision for the relative effect}
+
+\item{hy.prior}{Prior for the heterogeneity parameter. Supports uniform, gamma, and half normal for normal. It should be a list of length 3, where first element should be the distribution (one of dunif, dgamma, dhnorm, dwish) and the next two are the parameters associated with the distribution. For example, list("dunif", 0, 5) give uniform prior with lower bound 0 and upper bound 5 for the heterogeneity parameter.}
 }
 \description{
 This is similar to the function \code{\link{network.data}}, except it uses contrast-level data instead of arms-level data. Contrast-level format uses treatment differences relative to the control arm.

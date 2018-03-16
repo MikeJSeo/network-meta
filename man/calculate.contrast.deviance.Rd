@@ -13,6 +13,9 @@ calculate.contrast.deviance(result)
 \item{Dbar}{Overall residual deviance}
 \item{pD}{Sum of leverage_arm (i.e. total leverage)}
 \item{DIC}{Deviance information criteria (sum of Dbar and pD)}
+\item{resdev_study}{Posterior mean of the residual deviance in each study}
+\item{devtilda_study}{Deviance at the posterior mean of the fitted values}
+\item{leverage_study}{Difference between resdev_study and devtilda_study for each trial}
 }
 \description{
 Calculates deviance statistics. This function automatically called in \code{\link{contrast.network.run}} and the deviance statistics are stored after sampling is finished.
