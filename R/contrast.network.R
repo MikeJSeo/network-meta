@@ -207,7 +207,7 @@ contrast.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 
     result <- c(result, samples)
     result$deviance <- calculate.contrast.deviance(result)
     
-    #result$rank.tx <- rank.tx(result)
+    result$rank.tx <- rank.tx(result)
     class(result) <- "contrast.network.result"
     return(result)
   })
