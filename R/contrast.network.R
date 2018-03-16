@@ -128,6 +128,7 @@ contrast.network.rjags <- function(network){
     if(type == "random"){
       code <- paste0(code, contrast.hy.prior.rjags(hy.prior))
     }
+    code <- paste0(code, rank.rjags(rank.preference, ntreat))
     
     code <- paste0(code, "\n}")
     return(code)
@@ -187,7 +188,7 @@ contrast.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 
       data$hy.prior.2 <- hy.prior[[3]]
     }
     
-    pars.save <- c("d", "totresdev", "delta", "resdev")
+    pars.save <- c("d", "totresdev", "delta", "resdev", "prob")
     
     if(type == "random"){
       pars.save <- c(pars.save, "sd")  
