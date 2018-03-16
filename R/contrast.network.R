@@ -333,30 +333,40 @@ calculate.contrast.deviance <- function(result){
   })
 }
 
-#' contrast.network.deviance.plot <- function(result){
-#'   deviance <- result$deviance
-#'   dev_vector <- c(t(deviance$dev_arm))
-#'   dev_vector <- dev_vector[!is.na(dev_vector)]
-#'   plot(seq(sum(result$network$na)), dev_vector, xlab = "Arm", ylab = "Residual Deviance", main = "Per-arm residual deviance")
-#' }
-#' 
-#' #' Make a leverage plot
-#' #'
-#' #' This function makes a leverage vs. square root of residual deviance plot
-#' #' 
-#' #' @param result Object created by \code{\link{network.run}} function
-#' #' @export
-#' 
-#' network.leverage.plot <- function(result){
-#'   deviance <- result$deviance
-#'   dev <- sqrt(apply(deviance$dev_arm, 1, mean, na.rm = TRUE))
-#'   leverage <- apply(deviance$leverage, 1, mean, na.rm = TRUE)
-#'   plot(dev, leverage, xlim = c(0, max(c(dev, 2.5))), ylim = c(0, max(c(leverage,4))),
-#'        xlab = "Square root of residual deviance", ylab = "Leverage", main = "Leverage versus residual deviance")
-#'   mtext("Per-study mean per-datapoint contribution")
-#' }
 
+#' Make a contrast network deviance plot
+#'
+#' This makes a contrasrt network deviance plot which plots residual deviance (resdev_study) vs. all study.
+#' @param result Object created by \code{\link{contrast.network.run}} function
+#' @examples
+#' network <- with(parkinsons_contrast, {
+#' contrast.network.data(Outcomes, Treat, SE, na, V)
+#' })
+#' result <- contrast.network.run(network)
+#' contrast.network.deviance.plot(result)
+#' @export
 
+contrast.network.deviance.plot <- function(result){
+  deviance <- result$deviance
+  dev_vector <- deviance$resdev_study
+  dev_vector <- dev_vector[!is.na(dev_vector)]
+  plot(1:result$network$nstudy, dev_vector, xlab = "Study", ylab = "Residual Deviance", main = "Per-study residual deviance")
+}
+
+#' Make a leverage plot
+#'
+#' This function makes a leverage vs. square root of residual deviance plot
+#'
+#' @param result Object created by \code{\link{contrast.network.run}} function
+#' @export
+
+contrast.network.leverage.plot <- function(result){
+  deviance <- result$deviance
+  resdev <- sqrt(deviance$resdev_study)
+  leverage <- deviance$leverage_study
+  plot(resdev, leverage, xlim = c(0, max(c(resdev, 2.5))), ylim = c(0, max(c(leverage,4))),
+       xlab = "Square root of residual deviance", ylab = "Leverage", main = "Leverage versus residual deviance")
+}
 
 contrast.inits <- function(network, n.chains){
   
