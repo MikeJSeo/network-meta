@@ -44,7 +44,7 @@ contrast.network.data <- function(Outcomes, Treat, SE, na, V = NULL, type = "ran
   SE <- cbind(NA, SE)
   
   na_count <- as.vector(table(na))
-  ntreat <- unique(as.vector(parkinsons_contrast$Treat))
+  ntreat <- unique(as.vector(Treat))
   ntreat <- length(ntreat[!is.na(ntreat)])
   nstudy <- sum(na_count)
   
