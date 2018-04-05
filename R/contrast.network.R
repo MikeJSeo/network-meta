@@ -150,7 +150,7 @@ contrast.network.rjags <- function(network){
 #' @param conv.limit Convergence limit for Gelman and Rubin's convergence diagnostic. Point estimate is used to test convergence of parameters for study effect (eta), relative effect (d), and heterogeneity (log variance (logvar)).
 #' @param extra.pars.save Parameters that user wants to save besides the default parameters saved. See code using \code{cat(network$code)} to see which parameters can be saved.
 #' @return
-#' \item{data_rjags}{Data that is put into rjags function \code{\link{contrast.jags.model}}}
+#' \item{data_rjags}{Data that is put into rjags function jags.model}
 #' \item{inits}{Initial values that are either specified by the user or generated as a default}
 #' \item{pars.save}{Parameters that are saved. Add more parameters in extra.pars.save if other variables are desired}
 #' \item{burnin}{Half of the converged sequence is thrown out as a burnin}
