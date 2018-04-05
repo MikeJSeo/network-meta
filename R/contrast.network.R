@@ -48,11 +48,11 @@ contrast.network.data <- function(Outcomes, Treat, SE, na, V = NULL, type = "ran
   ntreat <- length(ntreat[!is.na(ntreat)])
   nstudy <- sum(na_count)
   
-  network <- list(Outcomes = Outcomes, Treat = Treat, SE = SE, na = na, na_count = na_count, ntreat = ntreat, nstudy = nstudy, type = type, mean.d = mean.d, prec.d = prec.d, hy.prior = hy.prior, response = "normal", Treat.order = 1:ntreat, rank.preference = rank.preference)
+  network <- list(Outcomes = Outcomes, Treat = Treat, SE = SE, na = na, na_count = na_count, ntreat = ntreat, nstudy = nstudy, type = type, mean.d = mean.d, prec.d = prec.d, hy.prior = hy.prior, response = "normal", Treat.order = 1:ntreat, rank.preference = rank.preference, V = V)
   
   if(!is.null(V)){
     network$V <- V
-  }
+  } 
   
   code <- contrast.network.rjags(network)
   network$code <- code
@@ -193,7 +193,7 @@ contrast.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 
     if(type == "random"){
       pars.save <- c(pars.save, "sd")  
     }
-    
+
     if(!is.null(extra.pars.save)) {
       extra.pars.save.check(extra.pars.save)
       pars.save <- c(pars.save, extra.pars.save)
@@ -205,8 +205,9 @@ contrast.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 
     samples <- jags.fit(network, data, pars.save, inits, n.chains, max.run, setsize, n.run, conv.limit)
     result <- list(network = network, data.rjags = data, inits = inits, pars.save = pars.save)
     result <- c(result, samples)
+  
     result$deviance <- calculate.contrast.deviance(result)
-    
+  
     result$rank.tx <- rank.tx(result)
     class(result) <- "contrast.network.result"
     return(result)
