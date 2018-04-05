@@ -52,7 +52,9 @@ contrast.network.data <- function(Outcomes, Treat, SE, na, V = NULL, type = "ran
   
   if(!is.null(V)){
     network$V <- V
-  } 
+  } else{
+    network$V <- NULL
+  }
   
   code <- contrast.network.rjags(network)
   network$code <- code
