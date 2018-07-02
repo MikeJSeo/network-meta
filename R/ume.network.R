@@ -69,54 +69,54 @@ ume.network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, respon
   
 }
 # make data first...
+# # 
+#                           
+# data.src <- read.table(textConnection('
+# r[,1] n[,1] r[,2] n[,2] r[,3] n[,3] t[,1] t[,2] t[,3] na[]
+# 9 140 23 140 10 138 1 3 4 3 # trial 1 ACD
+# 11 78 12 85 29 170 2 3 4 3 # trial 2 BCD
+# 75 731 363 714 NA 1 1 3 NA 2 # 3
+# 2 106 9 205 NA 1 1 3 NA 2 # 4
+# 58 549 237 1561 NA 1 1 3 NA 2 # 5
+# 0 33 9 48 NA 1 1 3 NA 2 # 6
+# 3 100 31 98 NA 1 1 3 NA 2 # 7
+# 1 31 26 95 NA 1 1 3 NA 2 # 8
+# 6 39 17 77 NA 1 1 3 NA 2 # 9
+# 79 702 77 694 NA 1 1 2 NA 2 # 10
+# 18 671 21 535 NA 1 1 2 NA 2 # 11
+# 64 642 107 761 NA 1 1 3 NA 2 # 12
+# 5 62 8 90 NA 1 1 3 NA 2 # 13
+# 20 234 34 237 NA 1 1 3 NA 2 # 14
+# 0 20 9 20 NA 1 1 4 NA 2 # 15
+# 8 116 19 149 NA 1 1 2 NA 2 # 16
+# 95 1107 143 1031 NA 1 1 3 NA 2 # 17
+# 15 187 36 504 NA 1 1 3 NA 2 # 18
+# 78 584 73 675 NA 1 1 3 NA 2 # 19
+# 69 1177 54 888 NA 1 1 3 NA 2 # 20
+# 20 49 16 43 NA 1 2 3 NA 2 # 21
+# 7 66 32 127 NA 1 2 4 NA 2 # 22
+# 12 76 20 74 NA 1 3 4 NA 2 # 23
+# 9 55 3 26 NA 1 3 4 NA 2 # 24
+# '), header = TRUE)
 # 
-                          
-data.src <- read.table(textConnection('
-r[,1] n[,1] r[,2] n[,2] r[,3] n[,3] t[,1] t[,2] t[,3] na[]
-9 140 23 140 10 138 1 3 4 3 # trial 1 ACD
-11 78 12 85 29 170 2 3 4 3 # trial 2 BCD
-75 731 363 714 NA 1 1 3 NA 2 # 3
-2 106 9 205 NA 1 1 3 NA 2 # 4
-58 549 237 1561 NA 1 1 3 NA 2 # 5
-0 33 9 48 NA 1 1 3 NA 2 # 6
-3 100 31 98 NA 1 1 3 NA 2 # 7
-1 31 26 95 NA 1 1 3 NA 2 # 8
-6 39 17 77 NA 1 1 3 NA 2 # 9
-79 702 77 694 NA 1 1 2 NA 2 # 10
-18 671 21 535 NA 1 1 2 NA 2 # 11
-64 642 107 761 NA 1 1 3 NA 2 # 12
-5 62 8 90 NA 1 1 3 NA 2 # 13
-20 234 34 237 NA 1 1 3 NA 2 # 14
-0 20 9 20 NA 1 1 4 NA 2 # 15
-8 116 19 149 NA 1 1 2 NA 2 # 16
-95 1107 143 1031 NA 1 1 3 NA 2 # 17
-15 187 36 504 NA 1 1 3 NA 2 # 18
-78 584 73 675 NA 1 1 3 NA 2 # 19
-69 1177 54 888 NA 1 1 3 NA 2 # 20
-20 49 16 43 NA 1 2 3 NA 2 # 21
-7 66 32 127 NA 1 2 4 NA 2 # 22
-12 76 20 74 NA 1 3 4 NA 2 # 23
-9 55 3 26 NA 1 3 4 NA 2 # 24
-'), header = TRUE)
-
-#data.src = data.src[,c(7,8,9,1,3,5,2,4,6)]
-library(gemtc)
-data <- mtc.data.studyrow(data.src, armVars = c('treatment'='t', 'responders' = 'r', 'sampleSize' = 'n'))
-                          
-Outcomes <- data[,3]
-N <- data[,4]
-Treat <- data[,2]
-Study <- data[,1]
-
-smoking <- list(Outcomes = Outcomes, N = N, Study = Study, Treat = Treat)
-devtools::use_data(smoking, mcnet)
-
-                          
-                                      library(gemtc)
-                                      data <- mtc.data.studyrow(data.src, armVars=c('treatment'='t', 'mean'='y', 'std.err'='se'))
-                                      
-                                      Outcomes <- data[,3]
-                                      SE <- data[,4]
-                                      Treat <- data[,2]
-                                      Study <- data[,1]
+# #data.src = data.src[,c(7,8,9,1,3,5,2,4,6)]
+# library(gemtc)
+# data <- mtc.data.studyrow(data.src, armVars = c('treatment'='t', 'responders' = 'r', 'sampleSize' = 'n'))
+#                           
+# Outcomes <- data[,3]
+# N <- data[,4]
+# Treat <- data[,2]
+# Study <- data[,1]
+# 
+# smoking <- list(Outcomes = Outcomes, N = N, Study = Study, Treat = Treat)
+# devtools::use_data(smoking, mcnet)
+# 
+#                           
+#                                       library(gemtc)
+#                                       data <- mtc.data.studyrow(data.src, armVars=c('treatment'='t', 'mean'='y', 'std.err'='se'))
+#                                       
+#                                       Outcomes <- data[,3]
+#                                       SE <- data[,4]
+#                                       Treat <- data[,2]
+#                                       Study <- data[,1]
                                       
