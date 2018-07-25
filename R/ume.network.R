@@ -66,7 +66,14 @@ ume.network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, respon
   if(response != "multinomial"){
     r <- r[,,1]
   }
-  network <- list(Outcomes = Outcomes, Study = Study, Treat = Treat, r = r, t = t, n = n, se = se, type = type, rank.preference = rank.preference, miss.matrix = miss.matrix, nrow = nrow, ncol = ncol, nstudy = nstudy, na = na, ntreat = ntreat, b.id = b.id, t = t, r = r, response = response, baseline = baseline, baseline.risk = baseline.risk, covariate = covariate, covariate.model = covariate.model, dic = dic)
+  network <- list(Outcomes = Outcomes, Study = Study, Treat = Treat, r = r, t = t, type = type, rank.preference = rank.preference, miss.matrix = miss.matrix, nrow = nrow, ncol = ncol, nstudy = nstudy, na = na, ntreat = ntreat, b.id = b.id, t = t, r = r, response = response, baseline = baseline, baseline.risk = baseline.risk, covariate = covariate, covariate.model = covariate.model, dic = dic)
+  
+  else if(response == "binomial"){
+    network$n = n
+  } else if (response == "normal"){
+    network$se = se
+  }
+  
   return(network)
 }
 
