@@ -66,57 +66,40 @@ ume.network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, respon
   }
   network <- list(Outcomes = Outcomes, Study = Study, Treat = Treat, r = r, t = t, n = n, se = se, type = type, rank.preference = rank.preference, miss.matrix = miss.matrix, nrow = nrow, ncol = ncol, nstudy = nstudy, na = na, ntreat = ntreat, b.id = b.id, t = t, r = r, response = response, baseline = baseline, baseline.risk = baseline.risk, covariate = covariate, covariate.model = covariate.model, dic = dic)
   
-  
 }
-# make data first...
-# # 
-#                           
-# data.src <- read.table(textConnection('
-# r[,1] n[,1] r[,2] n[,2] r[,3] n[,3] t[,1] t[,2] t[,3] na[]
-# 9 140 23 140 10 138 1 3 4 3 # trial 1 ACD
-# 11 78 12 85 29 170 2 3 4 3 # trial 2 BCD
-# 75 731 363 714 NA 1 1 3 NA 2 # 3
-# 2 106 9 205 NA 1 1 3 NA 2 # 4
-# 58 549 237 1561 NA 1 1 3 NA 2 # 5
-# 0 33 9 48 NA 1 1 3 NA 2 # 6
-# 3 100 31 98 NA 1 1 3 NA 2 # 7
-# 1 31 26 95 NA 1 1 3 NA 2 # 8
-# 6 39 17 77 NA 1 1 3 NA 2 # 9
-# 79 702 77 694 NA 1 1 2 NA 2 # 10
-# 18 671 21 535 NA 1 1 2 NA 2 # 11
-# 64 642 107 761 NA 1 1 3 NA 2 # 12
-# 5 62 8 90 NA 1 1 3 NA 2 # 13
-# 20 234 34 237 NA 1 1 3 NA 2 # 14
-# 0 20 9 20 NA 1 1 4 NA 2 # 15
-# 8 116 19 149 NA 1 1 2 NA 2 # 16
-# 95 1107 143 1031 NA 1 1 3 NA 2 # 17
-# 15 187 36 504 NA 1 1 3 NA 2 # 18
-# 78 584 73 675 NA 1 1 3 NA 2 # 19
-# 69 1177 54 888 NA 1 1 3 NA 2 # 20
-# 20 49 16 43 NA 1 2 3 NA 2 # 21
-# 7 66 32 127 NA 1 2 4 NA 2 # 22
-# 12 76 20 74 NA 1 3 4 NA 2 # 23
-# 9 55 3 26 NA 1 3 4 NA 2 # 24
-# '), header = TRUE)
-# 
-# #data.src = data.src[,c(7,8,9,1,3,5,2,4,6)]
-# library(gemtc)
-# data <- mtc.data.studyrow(data.src, armVars = c('treatment'='t', 'responders' = 'r', 'sampleSize' = 'n'))
-#                           
-# Outcomes <- data[,3]
-# N <- data[,4]
-# Treat <- data[,2]
-# Study <- data[,1]
-# 
-# smoking <- list(Outcomes = Outcomes, N = N, Study = Study, Treat = Treat)
-# devtools::use_data(smoking, mcnet)
-# 
-#                           
-#                                       library(gemtc)
-#                                       data <- mtc.data.studyrow(data.src, armVars=c('treatment'='t', 'mean'='y', 'std.err'='se'))
-#                                       
-#                                       Outcomes <- data[,3]
-#                                       SE <- data[,4]
-#                                       Treat <- data[,2]
-#                                       Study <- data[,1]
-                                      
+
+
+
+ume.network.rjags <- function(network){
+  
+  with(network, {
+    
+    code <- paste0("model\n{",
+                   "\n\tfor(i in 1:", nstudy, ") {",
+                   "\n\t\tdelta[i,1] <- 0",
+                   "\n\t\tmu[i] ~ dnorm(0,.0001)",
+                   "\n\t\tfor(k in 1:na[i]) {",
+                   "\n\t\t\tr[i,k] ~ dbin(p[i,k], n[i,k])",
+                   "\n\t\t\tlogit(p[i,k]) <- mu[i] + delta[i,k]",
+                   "\n\t\t\trhat[i,k] <- p[i,k] * n[i,k]",
+                   "\n\t\t\tdev[i,k] <- 2 * (r[i,k] * (log(r[i,k])- log(rhat[i,k])) + (n[i,k] - r[i,k]) * (log(n[i,k] - r[i,k]) - log(n[i,k] - rhat[i,k])))",
+                   "\n\t\t}",
+                   "\n\t\tfor (k in 2:na[i]) {",
+                   "\n\t\t\tdelta[i,k] ~ dnorm(md[i,k], taud[i,k])",
+                   "\n\t\t\tmd[i,k] <- d[t[i,k]] - d[t[i,1]] + sw[i,k]",
+                   "\n\t\t\ttaud[i,k] <- tau * 2 * (k-1) / k",
+                   "\n\t\t\tw[i,k] <- (delta[i,k] - d[t[i,k]] + d[t[i,1]])",
+                   "\n\t\t\tsw[i,k] <- sum(w[i,1:(k-1)])/ (k-1)",
+                   "\n\t\t}",
+                   "\n\t}"
+                   "\n\ttotresdev <- sum(resdev[])",
+                   "\n\td[1] <- 0",
+                   "\n\tfor (k in 2:", ntreat, "){",
+                   "\n\t\td[k] ~ dnorm(mean.d, prec.d)",
+                   "\n\t\tsd ~ dunif(0,5)",
+                   "\n\t\ttau <- pow(sd, -2)",
+                   "\n\t}")
+                   
+    return(code)
+  })
+}
