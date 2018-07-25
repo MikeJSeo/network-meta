@@ -43,6 +43,7 @@ ume.network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, respon
   nstudy <- length(unique(Study))
   ntreat <- unique(as.vector(Treat))
   ntreat <- length(ntreat[!is.na(ntreat)])
+  Outcomes <- as.matrix(Outcomes)
   
   ends <- cumsum(na) # End row of trials
   starts <- c(1, ends[-length(ends)] + 1) # Start row of trials
@@ -66,7 +67,7 @@ ume.network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, respon
     r <- r[,,1]
   }
   network <- list(Outcomes = Outcomes, Study = Study, Treat = Treat, r = r, t = t, n = n, se = se, type = type, rank.preference = rank.preference, miss.matrix = miss.matrix, nrow = nrow, ncol = ncol, nstudy = nstudy, na = na, ntreat = ntreat, b.id = b.id, t = t, r = r, response = response, baseline = baseline, baseline.risk = baseline.risk, covariate = covariate, covariate.model = covariate.model, dic = dic)
-  
+  return(network)
 }
 
 
