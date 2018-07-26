@@ -166,6 +166,7 @@ ume.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 10000
       data <- c(data, n)
     }
     
+    print(data)
 #    if(type == "random"){
 #      data$hy.prior.1 <- hy.prior[[2]]
 #      data$hy.prior.2 <- hy.prior[[3]]
