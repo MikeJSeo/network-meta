@@ -66,13 +66,16 @@ ume.network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, respon
   if(response != "multinomial"){
     r <- r[,,1]
   }
-  network <- list(Outcomes = Outcomes, Study = Study, Treat = Treat, r = r, t = t, type = type, rank.preference = NULL, nrow = nrow, ncol = ncol, nstudy = nstudy, na = na, ntreat = ntreat, b.id = b.id, t = t, r = r, response = response, dic = NULL)
+  network <- list(Outcomes = Outcomes, Study = Study, Treat = Treat, r = r, t = t, type = type, rank.preference = NULL, nstudy = nstudy, na = na, ntreat = ntreat, b.id = b.id, t = t, r = r, response = response, dic = NULL)
   
   if(response == "binomial"){
     network$n = n
   } else if (response == "normal"){
     network$se = se
   }
+  
+  code <- ume.network.rjags(network)
+  network$code <- code
   
   return(network)
 }
@@ -107,7 +110,8 @@ ume.network.rjags <- function(network){
                    "\n\t\td[k] ~ dnorm(mean.d, prec.d)",
                    "\n\t\tsd ~ dunif(0,5)",
                    "\n\t\ttau <- pow(sd, -2)",
-                   "\n\t}")
+                   "\n\t}",
+                   "\n}")
                    
     return(code)
   })
