@@ -160,7 +160,11 @@ ume.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 10000
   
   with(network, {
     
-    data <- list(y = Outcomes, t = Treat, se = SE, na = na)
+    data <- list(y = Outcomes, t = Treat, na = na)
+    
+    if(response == "binomial"){
+      data <- c(data, n)
+    }
     
 #    if(type == "random"){
 #      data$hy.prior.1 <- hy.prior[[2]]
