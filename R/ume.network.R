@@ -77,6 +77,7 @@ ume.network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, respon
   code <- ume.network.rjags(network)
   network$code <- code
   
+  class(network) <- "ume.network.data"
   return(network)
 }
 
@@ -114,5 +115,53 @@ ume.network.rjags <- function(network){
                    "\n}")
                    
     return(code)
+  })
+}
+
+
+
+ume.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 100000, setsize = 10000, n.run = 50000,
+                                 conv.limit = 1.05, extra.pars.save = NULL){
+  
+  if (!inherits(network, "ume.network.data")) {
+    stop('Given network is not ume.network.data. Run ume.network.data function first')
+  }
+  
+  if(max.run < setsize){
+    stop("setsize should be smaller than max.run")
+  }
+  
+  with(network, {
+    
+    data <- list(y = Outcomes, t = Treat, se = SE, na = na)
+    
+#    if(type == "random"){
+#      data$hy.prior.1 <- hy.prior[[2]]
+#      data$hy.prior.2 <- hy.prior[[3]]
+#    }
+    
+    pars.save <- c("d", "totresdev", "delta", "resdev")
+    
+    if(type == "random"){
+      pars.save <- c(pars.save, "sd")  
+    }
+    
+    if(!is.null(extra.pars.save)) {
+      extra.pars.save.check(extra.pars.save)
+      pars.save <- c(pars.save, extra.pars.save)
+    }
+    
+#    if(is.null(inits)){
+#      inits <- contrast.inits(network, n.chains)
+#    }
+    samples <- jags.fit(network, data, pars.save, inits, n.chains, max.run, setsize, n.run, conv.limit)
+    result <- list(network = network, data.rjags = data, inits = inits, pars.save = pars.save)
+    result <- c(result, samples)
+    
+#    result$deviance <- calculate.contrast.deviance(result)
+    
+#    result$rank.tx <- rank.tx(result)
+    class(result) <- "ume.network.result"
+    return(result)
   })
 }
