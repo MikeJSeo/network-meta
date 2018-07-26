@@ -104,7 +104,7 @@ ume.network.rjags <- function(network){
                    "\n\t\t\tsw[i,k] <- sum(w[i,1:(k-1)])/ (k-1)",
                    "\n\t\t}",
                    "\n\t}",
-                   "\n\ttotresdev <- sum(resdev[])",
+                   "\n\t#totresdev <- sum(resdev[])",
                    "\n\td[1] <- 0",
                    "\n\tfor (k in 2:", ntreat, "){",
                    "\n\t\td[k] ~ dnorm(0, 0.001)",
