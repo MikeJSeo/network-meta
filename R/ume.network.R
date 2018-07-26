@@ -160,7 +160,7 @@ ume.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 10000
   
   with(network, {
     
-    data <- list(y = Outcomes, t = Treat, na = na, mean.d = mean.d, prec.d = prec.d)
+    data <- list(y = Outcomes, t = Treat, na = na)
     
     if(response == "binomial"){
       data <- c(data, n)
