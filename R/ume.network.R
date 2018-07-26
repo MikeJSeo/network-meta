@@ -82,7 +82,6 @@ ume.network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, respon
 }
 
 
-
 ume.network.rjags <- function(network){
   
   with(network, {
@@ -119,6 +118,34 @@ ume.network.rjags <- function(network){
 }
 
 
+#' Run the model using the network object
+#' 
+#' This is similar to the function \code{\link{network.run}}, except this is used for the unrelated mean effects model.
+#'
+#' @param network network object created from \code{\link{ume.network.data}} function
+#' @param inits Initial values for the parameters being sampled. If left unspecified, program will generate reasonable initial values.
+#' @param n.chains Number of chains to run
+#' @param max.run Maximum number of iterations that user is willing to run. If the algorithm is not converging, it will run up to \code{max.run} iterations before printing a message that it did not converge
+#' @param setsize Number of iterations that are run between convergence checks. If the algorithm converges fast, user wouldn't need a big setsize. The number that is printed between each convergence checks is the gelman-rubin diagnostics and we would want that to be below the conv.limit the user specifies.
+#' @param n.run Final number of iterations that the user wants to store. If after the algorithm converges, user wants less number of iterations, we thin the sequence. If the user wants more iterations, we run extra iterations to reach the specified number of runs
+#' @param conv.limit Convergence limit for Gelman and Rubin's convergence diagnostic. Point estimate is used to test convergence of parameters for study effect (eta), relative effect (d), and heterogeneity (log variance (logvar)).
+#' @param extra.pars.save Parameters that user wants to save besides the default parameters saved. See code using \code{cat(network$code)} to see which parameters can be saved.
+#' @return
+#' \item{data_rjags}{Data that is put into rjags function jags.model}
+#' \item{inits}{Initial values that are either specified by the user or generated as a default}
+#' \item{pars.save}{Parameters that are saved. Add more parameters in extra.pars.save if other variables are desired}
+#' \item{burnin}{Half of the converged sequence is thrown out as a burnin}
+#' \item{n.thin}{If the number of iterations user wants (n.run) is less than the number of converged sequence after burnin, we thin the sequence and store the thinning interval}
+#' \item{samples}{MCMC samples stored using jags. The returned samples have the form of mcmc.list and can be directly applied to coda functions}
+#' \item{max.gelman}{Maximum Gelman and Rubin's convergence diagnostic calculated for the final sample}
+#' \item{deviance}{Contains deviance statistics such as pD (effective number of parameters) and DIC (Deviance Information Criterion)}
+#' \item{rank.tx}{Rank probability calculated for each treatments. \code{rank.preference} parameter in \code{\link{network.data}} is used to define whether higher or lower value is preferred. The numbers are probabilities that a given treatment has been in certain rank in the sequence.}
+#' @examples
+#' network <- with(thrombolytic, {
+#'  ume.network.data(Outcomes, Study, Treat, N = N, response = "binomial")
+#' })
+#' result <- ume.network.run(network)
+#' @export
 
 ume.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 100000, setsize = 10000, n.run = 50000,
                                  conv.limit = 1.05, extra.pars.save = NULL){

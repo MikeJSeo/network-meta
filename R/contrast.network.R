@@ -133,7 +133,7 @@ contrast.network.rjags <- function(network){
 
 #' Run the model using the network object
 #' 
-#' This is similar to the function \code{\link{network.data}}, except it uses contrast-level data instead of arms-level data.
+#' This is similar to the function \code{\link{network.run}}, except it uses contrast-level data instead of arms-level data.
 #'
 #' @param network contrast level network object created from \code{\link{contrast.network.data}} function
 #' @param inits Initial values for the parameters being sampled. If left unspecified, program will generate reasonable initial values.
