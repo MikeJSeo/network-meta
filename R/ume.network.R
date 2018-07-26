@@ -107,7 +107,7 @@ ume.network.rjags <- function(network){
                    "\n\ttotresdev <- sum(resdev[])",
                    "\n\td[1] <- 0",
                    "\n\tfor (k in 2:", ntreat, "){",
-                   "\n\t\td[k] ~ dnorm(mean.d, prec.d)",
+                   "\n\t\td[k] ~ dnorm(0, 0.001)", #mean.d, prec.d
                    "\n\t\tsd ~ dunif(0,5)",
                    "\n\t\ttau <- pow(sd, -2)",
                    "\n\t}",
@@ -160,7 +160,7 @@ ume.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 10000
   
   with(network, {
     
-    data <- list(y = Outcomes, t = Treat, na = na)
+    data <- list(y = Outcomes, t = Treat, na = na, mean.d = mean.d, prec.d = prec.d)
     
     if(response == "binomial"){
       data <- c(data, n)
