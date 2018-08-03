@@ -66,7 +66,7 @@ ume.network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, respon
   if(response != "multinomial"){
     r <- r[,,1]
   }
-  network <- list(Outcomes = Outcomes, Study = Study, Treat = Treat, r = r, t = t, type = type, rank.preference = NULL, nstudy = nstudy, na = na, ntreat = ntreat, b.id = b.id, t = t, r = r, response = response, dic = NULL)
+  network <- list(Outcomes = Outcomes, Study = Study, Treat = Treat, r = r, t = t, type = type, rank.preference = NULL, nstudy = nstudy, na = na, ntreat = ntreat, b.id = b.id, response = response, dic = NULL)
   
   if(response == "binomial"){
     network$n = n
@@ -97,20 +97,18 @@ ume.network.rjags <- function(network){
                    "\n\t\t\tdev[i,k] <- 2 * (r[i,k] * (log(r[i,k])- log(rhat[i,k])) + (n[i,k] - r[i,k]) * (log(n[i,k] - r[i,k]) - log(n[i,k] - rhat[i,k])))",
                    "\n\t\t}",
                    "\n\t\tfor (k in 2:na[i]) {",
-                   "\n\t\t\tdelta[i,k] ~ dnorm(md[i,k], taud[i,k])",
-                   "\n\t\t\tmd[i,k] <- d[t[i,k]] - d[t[i,1]] + sw[i,k]",
-                   "\n\t\t\ttaud[i,k] <- tau * 2 * (k-1) / k",
-                   "\n\t\t\tw[i,k] <- (delta[i,k] - d[t[i,k]] + d[t[i,1]])",
-                   "\n\t\t\tsw[i,k] <- sum(w[i,1:(k-1)])/ (k-1)",
+                   "\n\t\t\tdelta[i,k] ~ dnorm(d[t[i,1],t[i,k]], tau)",
                    "\n\t\t}",
                    "\n\t}",
                    "\n\t#totresdev <- sum(resdev[])",
-                   "\n\td[1] <- 0",
-                   "\n\tfor (k in 2:", ntreat, "){",
-                   "\n\t\td[k] ~ dnorm(0, 0.001)",
-                   "\n\t\tsd ~ dunif(0,5)",
-                   "\n\t\ttau <- pow(sd, -2)",
+                   "\n\tfor(c in 1:", ntreat -1, ") {",
+                   "\n\t\tfor(k in (c+1):", ntreat, "{ ",
+                   "\n\t\t\td[c,k] ~ dnorm(0,.0001)"
+                   "\n\t\t}",
                    "\n\t}",
+                   "\n\tsd ~ dunif(0,5)",
+                   "\n\tvar <- pow(sd, 2)",
+                   "\n\ttau <- 1/var",
                    "\n}")
                    
     return(code)
