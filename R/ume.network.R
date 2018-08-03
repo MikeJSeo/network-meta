@@ -107,7 +107,7 @@ ume.network.rjags <- function(network){
                    "\n\t\t}",
                    "\n\t}",
                    "\n\tsd ~ dunif(0,5)",
-                   "\n\tvar <- pow(sd, 2)",
+                   "\n\tvar <- pow(sd,2)",
                    "\n\ttau <- 1/var",
                    "\n}")
                    
