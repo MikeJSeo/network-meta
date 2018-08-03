@@ -166,7 +166,7 @@ jags.fit <- function(network, data, pars.save, inits, n.chains, max.run, setsize
     if(network$type == "fixed"){
       conv.save <- conv.save[!conv.save %in% c("logvar", "sigma_transformed")]
     }  
-  } else if(class(network) == "contrast.network.data"){
+  } else if(class(network) == "contrast.network.data" || class(network) == "ume.network.data"){
     conv.save <- pars.save
   }
 
