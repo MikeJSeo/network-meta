@@ -106,7 +106,7 @@ ume.network.rjags <- function(network){
                    "\n\t\t}")
     
     if(type == "fixed"){
-      code <- paste0(code, "\n\t\tfor(k in 1:", ntreat, ") {"
+      code <- paste0(code, "\n\t\tfor(k in 1:", ntreat, ") {",
                            "\n\t\t\td[k,k] <- 0",
                            "\n\t\t}")
     } else if(type == "random"){
