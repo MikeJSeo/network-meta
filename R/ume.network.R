@@ -91,8 +91,16 @@ ume.network.rjags <- function(network){
                    "\n\t\tdelta[i,1] <- 0",
                    "\n\t\tmu[i] ~ dnorm(0,.0001)",
                    "\n\t\tfor(k in 1:na[i]) {",
-                   "\n\t\t\tr[i,k] ~ dbin(p[i,k], n[i,k])",
-                   "\n\t\t\tlogit(p[i,k]) <- mu[i] + delta[i,k]",
+                   "\n\t\t\tr[i,k] ~ dbin(p[i,k], n[i,k])")
+    
+    
+    if(type == "fixed"){
+      code <- paste0(code, "\n\t\t\tlogit(p[i,k]) <- mu[i] + d[t[i,1], t[i,k]]")
+    } else{
+      code <- paste0(code, "\n\t\t\tlogit(p[i,k]) <- mu[i] + delta[i,k]")
+    }
+                   
+    code <- paste0(code,          
                    "\n\t\t\trhat[i,k] <- p[i,k] * n[i,k]",
                    "\n\t\t\tdev[i,k] <- 2 * (r[i,k] * (log(r[i,k])- log(rhat[i,k])) + (n[i,k] - r[i,k]) * (log(n[i,k] - r[i,k]) - log(n[i,k] - rhat[i,k])))",
                    "\n\t\t}",
@@ -106,9 +114,14 @@ ume.network.rjags <- function(network){
                    "\n\t\t\td[c,k] ~ dnorm(0,.0001)",
                    "\n\t\t}",
                    "\n\t}",
-                   "\n\tsd ~ dunif(0,5)",
-                   "\n\ttau <- pow(sd,-2)",
-                   "\n}")
+                   
+    if(type == "random"){
+      code <- paste0(code,
+                     "\n\tsd ~ dunif(0,5)",
+                     "\n\ttau <- pow(sd,-2)")
+    }
+    
+    code <- paste0(code, "\n}")
                    
     return(code)
   })
