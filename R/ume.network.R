@@ -96,17 +96,26 @@ ume.network.rjags <- function(network){
     
     if(type == "fixed"){
       code <- paste0(code, "\n\t\t\tlogit(p[i,k]) <- mu[i] + d[t[i,1], t[i,k]]")
-    } else{
+    } else if(type == "random"){
       code <- paste0(code, "\n\t\t\tlogit(p[i,k]) <- mu[i] + delta[i,k]")
     }
                    
     code <- paste0(code,          
                    "\n\t\t\trhat[i,k] <- p[i,k] * n[i,k]",
                    "\n\t\t\tdev[i,k] <- 2 * (r[i,k] * (log(r[i,k])- log(rhat[i,k])) + (n[i,k] - r[i,k]) * (log(n[i,k] - r[i,k]) - log(n[i,k] - rhat[i,k])))",
-                   "\n\t\t}",
-                   "\n\t\tfor (k in 2:na[i]) {",
-                   "\n\t\t\tdelta[i,k] ~ dnorm(d[t[i,1],t[i,k]], tau)",
-                   "\n\t\t}",
+                   "\n\t\t}")
+    
+    if(type == "fixed"){
+      code <- paste0(code, "\n\t\tfor(k in 1:", ntreat, ") {"
+                           "\n\t\t\td[k,k] <- 0",
+                           "\n\t\t}")
+    } else if(type == "random"){
+      code <- paste0(code, "\n\t\tfor (k in 2:na[i]) {",
+                           "\n\t\t\tdelta[i,k] ~ dnorm(d[t[i,1],t[i,k]], tau)",
+                           "\n\t\t}")
+    }
+    
+    code <- paste0(code, 
                    "\n\t}",
                    "\n\t#totresdev <- sum(resdev[])",
                    "\n\tfor(c in 1:", ntreat -1, ") {",
