@@ -122,7 +122,6 @@ ume.network.rjags <- function(network){
     }
     
     code <- paste0(code, "\n}")
-                   
     return(code)
   })
 }
