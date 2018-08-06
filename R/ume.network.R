@@ -194,10 +194,10 @@ ume.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 10000
 #      data$hy.prior.2 <- hy.prior[[3]]
 #    }
     
-    pars.save <- c("d", "delta") #include totresdev, resdev
+    pars.save <- c("d") #include totresdev, resdev
     
     if(type == "random"){
-      pars.save <- c(pars.save, "sd")  
+      pars.save <- c(pars.save, "sd", "delta")  
     }
     
     if(!is.null(extra.pars.save)) {
