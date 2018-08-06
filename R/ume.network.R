@@ -113,7 +113,7 @@ ume.network.rjags <- function(network){
                    "\n\t\tfor(k in (c+1):", ntreat, ") {",
                    "\n\t\t\td[c,k] ~ dnorm(0,.0001)",
                    "\n\t\t}",
-                   "\n\t}",
+                   "\n\t}")
                    
     if(type == "random"){
       code <- paste0(code,
