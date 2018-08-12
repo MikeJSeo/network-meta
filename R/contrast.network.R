@@ -24,11 +24,16 @@ contrast.network.data <- function(Outcomes, Treat, SE, na, V = NULL, type = "ran
     stop("Outcomes, Treat, SE, and na have to be all specified")
   }
   
+  
+  
+  V=rep(NA,5),
   if(any(na == 1)) stop("study cannot have only 1 arm")
   if(is.unsorted(na)) stop("please sort the studies so that studies with higher number of arms are at the end (in a increasing order)")
   
   if(max(na) >= 3 & is.null(V)){
     stop("Need to specify variance of the baseline treatment if you have multi-arm trials")
+  } else if(max(na) < 3 & !is.null(V)){
+    stop("Since you do not have multi-arm trial, V is not needed")
   }
   
   if(!type %in% c("fixed", "random")){
