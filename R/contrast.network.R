@@ -24,9 +24,6 @@ contrast.network.data <- function(Outcomes, Treat, SE, na, V = NULL, type = "ran
     stop("Outcomes, Treat, SE, and na have to be all specified")
   }
   
-  
-  
-  V=rep(NA,5),
   if(any(na == 1)) stop("study cannot have only 1 arm")
   if(is.unsorted(na)) stop("please sort the studies so that studies with higher number of arms are at the end (in a increasing order)")
   
