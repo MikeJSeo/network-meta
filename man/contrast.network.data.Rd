@@ -9,11 +9,11 @@ contrast.network.data(Outcomes, Treat, SE, na, V = NULL, type = "random",
   hy.prior = list("dunif", 0, 100))
 }
 \arguments{
-\item{Outcomes}{Contrast-level outcomes. Outcome is assumed to be normally distributed. Outcome should be a matrix with dimensions number of studies by maximum number of contrasts. If the maximum number of arms in a trial is three, then there should be two columns. See parkinsons_contrast data for an example. All the missing value in the matrix would be denoted as NA.}
+\item{Outcomes}{A vector of Contrast-level outcomes. Outcome is assumed to be normally distributed. If there are three arms in a trial, need to include two contrast values for that trial. See parkinsons_contrast data for an example.}
 
-\item{Treat}{A matrix of treatment for each arm. This will be a matrix with dimensions number of study by maximum number of arms. If the maximum arms in a trial is three, then the matrix should have three columns. All the missing value in the matrix should be denoted as NA. Treatments should have positive integer values starting from 1 to total number of treatments.}
+\item{Treat}{A vector of treatments for each arm. Treatments should have positive integer values starting from 1 to total number of treatments.}
 
-\item{SE}{A matrix of standard error for each contrasts. The matrix would be same dimensions as Outcomes.}
+\item{SE}{A vector of standard error for each contrasts.}
 
 \item{na}{A vector of number of arms in each study.}
 
