@@ -475,7 +475,7 @@ contrast.make.matrix <- function(vec, na){
     for(i in 1:length(na)){
       arms_index <- c(arms_index, seq(na[i]))
     }
-    for(i in 1:length(Treat)){
+    for(i in 1:length(vec)){
       mat[Study[i], arms_index[i]] <- vec[i]  
     }
     mat
