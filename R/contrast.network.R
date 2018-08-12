@@ -3,9 +3,9 @@
 #' This is similar to the function \code{\link{network.data}}, except it uses contrast-level data instead of arms-level data. Contrast-level format uses treatment differences relative to the control arm.
 #' Note that in two arm trials there is only one contrast value per trial, but in three arm trials there are two contrast values relative to the control arm.
 #'
-#' @param Outcomes Contrast-level outcomes. Outcome is assumed to be normally distributed. If there are three arm trial, need to include two contrast values for that trial.Outcome should be a matrix with dimensions number of studies by maximum number of contrasts. If the maximum number of arms in a trial is three, then there should be two columns. See parkinsons_contrast data for an example. All the missing value in the matrix would be denoted as NA.
-#' @param Treat A matrix of treatment for each arm. This will be a matrix with dimensions number of study by maximum number of arms. If the maximum arms in a trial is three, then the matrix should have three columns. All the missing value in the matrix should be denoted as NA. Treatments should have positive integer values starting from 1 to total number of treatments.
-#' @param SE A matrix of standard error for each contrasts. The matrix would be same dimensions as Outcomes.
+#' @param Outcomes A vector of Contrast-level outcomes. Outcome is assumed to be normally distributed. If there are three arms in a trial, need to include two contrast values for that trial. See parkinsons_contrast data for an example.
+#' @param Treat A vector of treatments for each arm. Treatments should have positive integer values starting from 1 to total number of treatments.
+#' @param SE A vector of standard error for each contrasts. 
 #' @param na A vector of number of arms in each study.
 #' @param V Needed if you have multi-arm trials. Length of this vector should be number of studies. If the study is multi-arm trial, need to specify variance of the baseline treatment in that trial. Denote it with NA if the study only has two-arm trials.
 #' @param type Type of model fitted: either "random" for random effects model or "fixed" for fixed effects model. Default is "random".
