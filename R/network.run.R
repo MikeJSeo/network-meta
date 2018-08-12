@@ -87,7 +87,7 @@ network.run <- function(network, inits = NULL, n.chains = 3, max.run = 100000, s
   }
 
   if(!is.null(extra.pars.save)) {
-    extra.pars.save.check(extra.pars.save)
+    extra.pars.save.check(extra.pars.save, pars.save)
     pars.save <- c(pars.save, extra.pars.save)
   }
   if(dic == TRUE){
@@ -224,10 +224,11 @@ jags.fit <- function(network, data, pars.save, inits, n.chains, max.run, setsize
   return(out)
 }
 
-extra.pars.save.check <- function(extra.pars.save){
+extra.pars.save.check <- function(extra.pars.save, pars.save){
   if(!is.atomic(extra.pars.save) || !is.vector(extra.pars.save)) stop("extra pars should be a vector of strings")
   for(i in 1:length(extra.pars.save)){
     if(!is.character(extra.pars.save[i])) stop("extra pars should be a vector of strings")
+    if(extra.pars.save[i] %in% pars.save) stop(paste0(extra.pars.save[i], " is already one of default parameters to save") )
   }
 }
 

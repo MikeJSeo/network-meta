@@ -191,7 +191,7 @@ contrast.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 
     }
 
     if(!is.null(extra.pars.save)) {
-      extra.pars.save.check(extra.pars.save)
+      extra.pars.save.check(extra.pars.save, pars.save)
       pars.save <- c(pars.save, extra.pars.save)
     }
     
