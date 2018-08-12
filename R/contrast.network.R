@@ -3,7 +3,7 @@
 #' This is similar to the function \code{\link{network.data}}, except it uses contrast-level data instead of arms-level data. Contrast-level format uses treatment differences relative to the control arm.
 #' Note that in two arm trials there is only one contrast value per trial, but in three arm trials there are two contrast values relative to the control arm.
 #'
-#' @param Outcomes Contrast-level outcomes. Outcome is assumed to be normally distributed. Outcome should be a matrix with dimensions number of studies by maximum number of contrasts. If the maximum number of arms in a trial is three, then there should be two columns. See parkinsons_contrast data for an example. All the missing value in the matrix would be denoted as NA.
+#' @param Outcomes Contrast-level outcomes. Outcome is assumed to be normally distributed. If there are three arm trial, need to include two contrast values for that trial.Outcome should be a matrix with dimensions number of studies by maximum number of contrasts. If the maximum number of arms in a trial is three, then there should be two columns. See parkinsons_contrast data for an example. All the missing value in the matrix would be denoted as NA.
 #' @param Treat A matrix of treatment for each arm. This will be a matrix with dimensions number of study by maximum number of arms. If the maximum arms in a trial is three, then the matrix should have three columns. All the missing value in the matrix should be denoted as NA. Treatments should have positive integer values starting from 1 to total number of treatments.
 #' @param SE A matrix of standard error for each contrasts. The matrix would be same dimensions as Outcomes.
 #' @param na A vector of number of arms in each study.
@@ -39,6 +39,10 @@ contrast.network.data <- function(Outcomes, Treat, SE, na, V = NULL, type = "ran
     stop("rank preference has to be either higher or lower")
   }
 
+  Outcomes <- contrast.make.matrix(Outcomes, na -1)
+  SE <- contrast.make.matrix(SE, na -1)
+  Treat <- contrast.make.matrix(Treat, na)
+  
   # Attach NA column for the first column
   Outcomes <- cbind(NA, Outcomes)
   SE <- cbind(NA, SE)
@@ -459,3 +463,21 @@ contrast.hy.prior.rjags <- function(hy.prior){
   }
   return(code)
 }
+
+
+contrast.make.matrix <- function(vec, na){
+
+    nstudy <- length(na)
+    mat <- matrix(NA, nstudy, max(na))
+    Study <- rep(1:nstudy, na)
+    
+    arms_index <- NULL
+    for(i in 1:length(na)){
+      arms_index <- c(arms_index, seq(na[i]))
+    }
+    for(i in 1:length(Treat)){
+      mat[Study[i], arms_index[i]] <- vec[i]  
+    }
+    mat
+}
+
