@@ -17,7 +17,7 @@
 #' @export
 
 ume.network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, response = NULL, type = "random",
-                             mean.d = NULL, prec.d = NULL, hy.prior = list("dunif", 0, 5)){
+                             mean.d = 0, prec.d = 0.0001, hy.prior = list("dunif", 0, 5)){
   
   if(missing(Study) || missing(Treat) || missing(Outcomes)){
     stop("Study, Treat, and Outcomes have to be all specified")
@@ -66,7 +66,7 @@ ume.network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, respon
   if(response != "multinomial"){
     r <- r[,,1]
   }
-  network <- list(Outcomes = Outcomes, Study = Study, Treat = Treat, r = r, t = t, type = type, rank.preference = NULL, nstudy = nstudy, na = na, ntreat = ntreat, b.id = b.id, response = response, dic = NULL, hy.prior = hy.prior)
+  network <- list(Outcomes = Outcomes, Study = Study, Treat = Treat, r = r, t = t, type = type, rank.preference = NULL, nstudy = nstudy, na = na, ntreat = ntreat, b.id = b.id, response = response, dic = NULL, hy.prior = hy.prior, mean.d = mean.d, prec.d = prec.d)
   
   if(response == "binomial"){
     network$n = n
@@ -124,7 +124,7 @@ ume.network.rjags <- function(network){
     code <- paste0(code,
                    "\n\tfor(c in 1:", ntreat -1, ") {",
                    "\n\t\tfor(k in (c+1):", ntreat, ") {",
-                   "\n\t\t\td[c,k] ~ dnorm(0,.0001)",
+                   "\n\t\t\td[c,k] ~ dnorm(", mean.d, ", ", prec.d, ")",
                    "\n\t\t}",
                    "\n\t}")
                    
@@ -181,7 +181,7 @@ ume.hy.prior.rjags <- function(hy.prior){
 #' \item{samples}{MCMC samples stored using jags. The returned samples have the form of mcmc.list and can be directly applied to coda functions}
 #' \item{max.gelman}{Maximum Gelman and Rubin's convergence diagnostic calculated for the final sample}
 #' \item{deviance}{Contains deviance statistics such as pD (effective number of parameters) and DIC (Deviance Information Criterion)}
-#' \item{rank.tx}{Rank probability calculated for each treatments. \code{rank.preference} parameter in \code{\link{network.data}} is used to define whether higher or lower value is preferred. The numbers are probabilities that a given treatment has been in certain rank in the sequence.}
+#' \item{rank.tx}{Rank probability calculated for each treatments. \code{rank.preference} parameter in \code{\link{ume.network.data}} is used to define whether higher or lower value is preferred. The numbers are probabilities that a given treatment has been in certain rank in the sequence.}
 #' @examples
 #' network <- with(thrombolytic, {
 #'  ume.network.data(Outcomes, Study, Treat, N = N, response = "binomial")
@@ -213,7 +213,7 @@ ume.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 10000
       data$hy.prior.2 <- hy.prior[[3]]
     }
     
-    pars.save <- c("d") #include totresdev, resdev
+    pars.save <- c("d", "delta") #include totresdev, resdev
     
     if(type == "random"){
       pars.save <- c(pars.save, "sd")  
@@ -231,7 +231,7 @@ ume.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 10000
     result <- list(network = network, data.rjags = data, inits = inits, pars.save = pars.save)
     result <- c(result, samples)
     
-#    result$deviance <- calculate.contrast.deviance(result)
+#    result$deviance <- calculate.ume.deviance(result)
     
 #    result$rank.tx <- rank.tx(result)
     class(result) <- "ume.network.result"
