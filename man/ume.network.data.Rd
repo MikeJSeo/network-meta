@@ -6,7 +6,7 @@
 \usage{
 ume.network.data(Outcomes, Study, Treat, N = NULL, SE = NULL,
   response = NULL, type = "random", mean.d = NULL, prec.d = NULL,
-  hy.prior = NULL)
+  hy.prior = list("dunif", 0, 5))
 }
 \arguments{
 \item{Outcomes}{Arm-level outcomes. If it is a multinomial response, the matrix would be arms (row) by multinomial categories (column). If it is binomial or normal, it would be a vector.}

@@ -238,3 +238,52 @@ ume.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 10000
     return(result)
   })
 }
+
+
+#' Summarize result run by \code{\link{ume.network.run}}
+#'
+#' This function uses summary function in coda package to summarize mcmc.list object. Monte carlo error (Time-series SE) is also obtained using the coda package and is printed in the summary as a default.
+#'
+#' @param object Result object created by \code{\link{ume.network.run}} function
+#' @examples
+#' network <- with(smoking, {
+#'  ume.network.data(Outcomes, Study, Treat, N = N, response = "binomial", type = "random")
+#' })
+#' result <- ume.network.run(network) 
+#' summary(result)
+#' @export
+
+summary.ume.network.result <- function(object){
+  
+  if(!inherits(object, "ume.network.result")) {
+    stop('This is not the output from ume.network.run. Need to run ume.network.run function first')
+  }
+  rval <- list("summary.samples"= summary(object$samples),
+               "deviance" = 0, #FIX unlist(object$deviance[1:3]),
+               "total_n" = sum(object$network$na))
+  class(rval) <- 'summary.ume.network.result'
+  rval
+}
+
+
+#' Plot traceplot and posterior density of the result using contrast data
+#'
+#' This function uses plotting function in coda package to plot mcmc.list object
+#'
+#' @param x Result object created by \code{\link{ume.network.run}} function
+#' @examples
+#' network <- with(smoking, {
+#'  ume.network.data(Outcomes, Study, Treat, N = N, response = "binomial", type = "random")
+#' })
+#' result <- ume.network.run(network)
+#' plot(result)
+#' @export
+
+plot.contrast.network.result <- function(x) {
+  
+  if(!inherits(x, "ume.network.result")) {
+    stop('This is not the output from ume.network.run. Need to run ume.network.run function first')
+  }
+  plot(x$samples)
+}
+
