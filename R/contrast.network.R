@@ -193,7 +193,7 @@ contrast.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 
     pars.save <- c("d", "totresdev", "resdev", "prob")
     
     if(type == "random"){
-      pars.save <- c(pars.save, "sd")  
+      pars.save <- c(pars.save, "sd", "delta")  
     }
 
     if(!is.null(extra.pars.save)) {
