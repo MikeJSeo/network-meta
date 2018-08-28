@@ -188,7 +188,6 @@ ume.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 10000
       data$n <- n
     }
     
-    print(data)
 #    if(type == "random"){
 #      data$hy.prior.1 <- hy.prior[[2]]
 #      data$hy.prior.2 <- hy.prior[[3]]
@@ -197,7 +196,7 @@ ume.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 10000
     pars.save <- c("d") #include totresdev, resdev
     
     if(type == "random"){
-      pars.save <- c(pars.save, "sd", "delta")  
+      pars.save <- c(pars.save, "sd")  
     }
     
     if(!is.null(extra.pars.save)) {
