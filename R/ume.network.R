@@ -279,7 +279,7 @@ summary.ume.network.result <- function(object){
 #' plot(result)
 #' @export
 
-plot.contrast.network.result <- function(x) {
+plot.ume.network.result <- function(x) {
   
   if(!inherits(x, "ume.network.result")) {
     stop('This is not the output from ume.network.run. Need to run ume.network.run function first')
