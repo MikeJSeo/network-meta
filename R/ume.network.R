@@ -129,14 +129,34 @@ ume.network.rjags <- function(network){
                    "\n\t}")
                    
     if(type == "random"){
-      code <- paste0(code,
-                     "\n\tsd ~ dunif(0,5)",
-                     "\n\ttau <- pow(sd,-2)")
+      code <- paste0(code, ume.hy.prior.rjags(hy.prior))
     }
     
     code <- paste0(code, "\n}")
     return(code)
   })
+}
+
+
+
+ume.hy.prior.rjags <- function(hy.prior){
+  
+  code <- ""
+  distr <- hy.prior[[1]]
+  if (distr == "dunif") {
+    code <- paste0(code,
+                   "\n\tsd ~ dunif(hy.prior.1, hy.prior.2)",
+                   "\n\ttau <- pow(sd,-2)")
+  } else if(distr == "dgamma"){
+    code <- paste0(code,
+                   "\n\tsd <- pow(tau, -0.5)",
+                   "\n\ttau ~ dgamma(hy.prior.1, hy.prior.2)")
+  } else if(distr == "dhnorm"){
+    code <- paste0(code,
+                   "\n\tsd ~ dnorm(hy.prior.1, hy.prior.2)T(0,)",
+                   "\n\ttau <- pow(sd, -2)")
+  }
+  return(code)
 }
 
 
@@ -188,10 +208,10 @@ ume.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 10000
       data$n <- n
     }
     
-#    if(type == "random"){
-#      data$hy.prior.1 <- hy.prior[[2]]
-#      data$hy.prior.2 <- hy.prior[[3]]
-#    }
+    if(type == "random"){
+      data$hy.prior.1 <- hy.prior[[2]]
+      data$hy.prior.2 <- hy.prior[[3]]
+    }
     
     pars.save <- c("d") #include totresdev, resdev
     
