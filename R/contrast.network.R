@@ -190,7 +190,7 @@ contrast.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 
       data$hy.prior.2 <- hy.prior[[3]]
     }
     
-    pars.save <- c("d", "totresdev", "delta", "resdev", "prob")
+    pars.save <- c("d", "totresdev", "resdev", "prob")
     
     if(type == "random"){
       pars.save <- c(pars.save, "sd")  
