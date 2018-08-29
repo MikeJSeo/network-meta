@@ -277,12 +277,12 @@ plot.contrast.network.result <- function(x) {
 #' \item{devtilda_study}{Deviance at the posterior mean of the fitted values}
 #' \item{leverage_study}{Difference between resdev_study and devtilda_study for each trial}
 #' @examples
-#' #parkinsons
-#' network <- with(parkinsons, {
-#'  network.data(Outcomes, Study, Treat, SE = SE, response = "normal")
+#' network <- with(parkinsons_contrast, {
+#'  contrast.network.data(Outcomes, Treat, SE, na, V)
 #' })
-#' result <- network.run(network)
-#' calculate.deviance(result)
+#' result <- contrast.network.run(network)
+#' calculate.contrast.deviance(result)
+#' @references A.J. Franchini, S. Dias, A.E. Ades, J.P. Jansen, N.J. Welton (2012), \emph{Accounting for correlation in network meta-analysis with multi-arm trials}, Research Synthesis Methods 3(2):142-160. [\url{https://doi.org/10.1002/jrsm.1049}] 
 #' @references S. Dias, A.J. Sutton, A.E. Ades, and N.J. Welton (2013a), \emph{A Generalized Linear Modeling Framework for Pairwise and Network Meta-analysis of Randomized Controlled Trials}, Medical Decision Making 33(5):607-617. [\url{https://doi.org/10.1177/0272989X12458724}]
 #' @export
 
