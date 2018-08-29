@@ -394,7 +394,7 @@ calculate.contrast.deviance <- function(result){
   #   pD <- sum(leverage_study, na.rm = TRUE)
   #   DIC <- Dbar + pD
     
-    return(list(Dbar = Dbar, pD = pD, DIC = DIC, resdev_study = resdev_study, devtilda_study = devtilda_study, leverage_study = leverage_study))
-  })
+  #  return(list(Dbar = Dbar, pD = pD, DIC = DIC, resdev_study = resdev_study, devtilda_study = devtilda_study, leverage_study = leverage_study))
+  #})
 }
 
