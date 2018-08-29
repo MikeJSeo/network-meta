@@ -13,11 +13,12 @@
 #' @param mean.d Prior mean for the relative effect
 #' @param prec.d Prior precision for the relative effect
 #' @param hy.prior Prior for the heterogeneity parameter. Supports uniform, gamma, and half normal for normal. It should be a list of length 3, where first element should be the distribution (one of dunif, dgamma, dhnorm, dwish) and the next two are the parameters associated with the distribution. For example, list("dunif", 0, 5) give uniform prior with lower bound 0 and upper bound 5 for the heterogeneity parameter.
+#' @param dic This is an indicator for whether user wants to calculate DIC. Model stores less information if you set it to FALSE.
 #' @references S. Dias, N.J. Welton, A.J. Sutton, D.M. Caldwell, G. Lu, and A.E. Ades (2013), \emph{Evidence synthesis for decision making 4: inconsistency in networks of evidence based on randomized controlled trials}, Medical Decision Making 33(5):641-656. [\url{https://doi.org/10.1177/0272989X12455847}]
 #' @export
 
 ume.network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, response = NULL, type = "random",
-                             mean.d = 0, prec.d = 0.0001, hy.prior = list("dunif", 0, 5)){
+                             mean.d = 0, prec.d = 0.0001, hy.prior = list("dunif", 0, 5), dic = TRUE){
   
   if(missing(Study) || missing(Treat) || missing(Outcomes)){
     stop("Study, Treat, and Outcomes have to be all specified")
@@ -66,7 +67,7 @@ ume.network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, respon
   if(response != "multinomial"){
     r <- r[,,1]
   }
-  network <- list(Outcomes = Outcomes, Study = Study, Treat = Treat, r = r, t = t, type = type, rank.preference = NULL, nstudy = nstudy, na = na, ntreat = ntreat, b.id = b.id, response = response, dic = NULL, hy.prior = hy.prior, mean.d = mean.d, prec.d = prec.d)
+  network <- list(Outcomes = Outcomes, Study = Study, Treat = Treat, r = r, t = t, type = type, rank.preference = NULL, nstudy = nstudy, na = na, ntreat = ntreat, b.id = b.id, response = response, dic = NULL, hy.prior = hy.prior, mean.d = mean.d, prec.d = prec.d, dic = dic)
   
   if(response == "binomial"){
     network$n = n
@@ -225,15 +226,18 @@ ume.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 10000
       data$hy.prior.2 <- hy.prior[[3]]
     }
     
-    pars.save <- c("d", "totresdev", "resdev") 
+    pars.save <- c("d")
     
     if(type == "random"){
       pars.save <- c(pars.save, "sd", "delta")  
     }
     
-    if(response == "binomial"){
-      pars.save <- c(pars.save, "rhat", "dev")
-    } 
+    if(dic == TRUE){
+      pars.save <- c(pars.save, "totresdev", "resdev")
+      if(response == "binomial"){
+        pars.save <- c(pars.save, "rhat", "dev")
+      }
+    }
     
 
     if(!is.null(extra.pars.save)) {
@@ -248,7 +252,7 @@ ume.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 10000
     result <- list(network = network, data.rjags = data, inits = inits, pars.save = pars.save)
     result <- c(result, samples)
     
-#    result$deviance <- calculate.ume.deviance(result)
+    result$deviance <- calculate.deviance(result)
     
 #    result$rank.tx <- rank.tx(result)
     class(result) <- "ume.network.result"
@@ -305,96 +309,4 @@ plot.ume.network.result <- function(x) {
 }
 
 
-#' Find deviance statistics such as DIC and pD.
-#'
-#' Calculates deviance statistics. This function automatically called in \code{\link{ume.network.run}} and the deviance statistics are stored after sampling is finished.
-#'
-#' @param result Object created by \code{\link{ume.network.run}} function
-#' @return
-#' \item{Dbar}{Overall residual deviance}
-#' \item{pD}{Sum of leverage_arm (i.e. total leverage)}
-#' \item{DIC}{Deviance information criteria (sum of Dbar and pD)}
-#' \item{resdev_study}{Posterior mean of the residual deviance in each study}
-#' \item{devtilda_study}{Deviance at the posterior mean of the fitted values}
-#' \item{leverage_study}{Difference between resdev_study and devtilda_study for each trial}
-#' @examples
-#' #smoking
-#' network <- with(smoking, {
-#'  ume.network.data(Outcomes, Study, Treat, N = N, response = "binomial", type = "random")
-#' })
-#' result <- ume.network.run(network) 
-#' calculate.ume.deviance(result) 
-#' @references S. Dias, A.J. Sutton, A.E. Ades, and N.J. Welton (2013a), \emph{A Generalized Linear Modeling Framework for Pairwise and Network Meta-analysis of Randomized Controlled Trials}, Medical Decision Making 33(5):607-617. [\url{https://doi.org/10.1177/0272989X12458724}]
-#' @export
-
-calculate.contrast.deviance <- function(result){
-  
-  network <- result$network
-  samples <- result$samples
-  
-  totresdev <- lapply(samples, function(x){ x[,"totresdev"]})
-  Dbar <- mean(unlist(totresdev))
-  
-  #posterior mean of residual deviance 
-  resdev <- lapply(samples, function(x) { x[,grep("resdev\\[", dimnames(samples[[1]])[[2]])]})
-  resdev <- do.call(rbind, resdev)
-  resdev_study <- apply(resdev, 2, mean)
-  
-  if(network$response == "binomial"){
-    rtilda <- lapply(samples, function(x){ x[,grep("rhat\\[", dimnames(samples[[1]])[[2]])] })
-    rtilda <- do.call(rbind, rtilda)
-    rtilda <- apply(rtilda, 2, mean)
-    
-    rtilda_arm <- devtilda_arm <- matrix(NA, nrow = network$nstudy, ncol = max(network$na))
-    for(i in 1:network$nstudy){
-      for(j in 1:network$na[i]){
-        r_value <- network$r[i,j]
-        n_value <- network$n[i,j]
-        rtilda_arm[i,j] <- rtilda[which(paste("rhat[", i, ",", j, "]", sep = "") == names(rtilda))]
-        
-        devtilda_arm[i,j] <- ifelse(r_value != 0, 2 * r_value * (log(r_value)-log(rtilda_arm[i,j])), 0)
-        devtilda_arm[i,j] <- devtilda_arm[i,j] + ifelse((n_value - r_value) != 0, 2 * (n_value-r_value) *(log(n_value-r_value) - log(n_value- rtilda_arm[i,j])), 0)
-      }
-    }
-  }
-  
-  
-  
-  #devtilda - deviance at the posterior mean of the fitted values
-  # ybar <- lapply(samples, function(x){ x[,grep("delta\\[", dimnames(samples[[1]])[[2]])] })
-  # ybar <- do.call(rbind, ybar)
-  # ybar <- apply(ybar, 2, mean)
-  # ybar_study <- devtilda_study <- rep(NA, network$nstudy)
-  # 
-  # with(network, {
-  #   
-  #   # 2 arm
-  #   for(i in 1:na_count[1]){
-  #     r_value <- Outcomes[i,2]
-  #     se_value <- SE[i,2]
-  #     ybar_study[i] <- ybar[which(paste("delta[", i, ",", 2, "]", sep = "") == names(ybar))]
-  #     devtilda_study[i] <- ifelse(se_value != 0, (r_value - ybar_study[i])^2 / se_value^2, 0)
-  #   }
-  #   
-  #   # 3 arm or more
-  #   if(length(na_count) > 1){
-  #     for(ii in 2:length(na_count)){
-  #       for(i in (cumsum(na_count)[ii-1]+1): cumsum(na_count)[ii]){
-  #         Sigma <- matrix(V[i], na[i] - 1, na[i] - 1)
-  #         diag(Sigma) <- SE[i, 2:na[i]]
-  #         omega_value <- solve(Sigma)
-  #         r_value <- Outcomes[i,2:na[i]]
-  #         ybar_arm <- ybar[grepl(paste0(i, ","), names(ybar), fixed=TRUE)]
-  #         ybar_arm <- ybar_arm[!grepl(paste0(",", 1), names(ybar_arm), fixed = TRUE)] #get rid of the delta[,1] column if it exists
-  #         devtilda_study[i] <- (r_value - ybar_arm) %*% omega_value %*% (r_value - ybar_arm)
-  #       }   
-  #     }  
-  #   }
-  #   leverage_study <- resdev_study - devtilda_study
-  #   pD <- sum(leverage_study, na.rm = TRUE)
-  #   DIC <- Dbar + pD
-    
-  #  return(list(Dbar = Dbar, pD = pD, DIC = DIC, resdev_study = resdev_study, devtilda_study = devtilda_study, leverage_study = leverage_study))
-  #})
-}
 
