@@ -81,8 +81,18 @@ ume.network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, respon
   return(network)
 }
 
-
 ume.network.rjags <- function(network){
+  
+  network <- with(network, {
+    if(response == "binomial"){
+      ume.binomial.rjags(network)  
+    }
+  })
+  
+}
+
+
+ume.binomial.rjags <- function(network){
   
   with(network, {
     
@@ -103,7 +113,9 @@ ume.network.rjags <- function(network){
     code <- paste0(code,          
                    "\n\t\t\trhat[i,k] <- p[i,k] * n[i,k]",
                    "\n\t\t\tdev[i,k] <- 2 * (r[i,k] * (log(r[i,k])- log(rhat[i,k])) + (n[i,k] - r[i,k]) * (log(n[i,k] - r[i,k]) - log(n[i,k] - rhat[i,k])))",
-                   "\n\t\t}")
+                   "\n\t\t}",
+                   "\n\t\tresdev[i] <- sum(dev[i,1:na[i]])"
+                   )
     
     if(type == "random"){
       code <- paste0(code, "\n\t\tfor (k in 2:na[i]) {",
@@ -113,7 +125,7 @@ ume.network.rjags <- function(network){
     
     code <- paste0(code, 
                    "\n\t}",
-                   "\n\t#totresdev <- sum(resdev[])")
+                   "\n\ttotresdev <- sum(resdev[])")
     
     if(type == "fixed"){
       code <- paste0(code, "\n\tfor(k in 1:", ntreat, ") {",
@@ -213,7 +225,7 @@ ume.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 10000
       data$hy.prior.2 <- hy.prior[[3]]
     }
     
-    pars.save <- c("d") #include totresdev, resdev
+    pars.save <- c("d", "totresdev", "resdev") #include totresdev, resdev
     
     if(type == "random"){
       pars.save <- c(pars.save, "sd", "delta")  
