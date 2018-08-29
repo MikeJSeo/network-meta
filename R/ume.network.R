@@ -280,7 +280,7 @@ summary.ume.network.result <- function(object){
     stop('This is not the output from ume.network.run. Need to run ume.network.run function first')
   }
   rval <- list("summary.samples"= summary(object$samples),
-               "deviance" = 0, #FIX unlist(object$deviance[1:3]),
+               "deviance" = unlist(object$deviance[1:3]),
                "total_n" = sum(object$network$na))
   class(rval) <- 'summary.ume.network.result'
   rval
