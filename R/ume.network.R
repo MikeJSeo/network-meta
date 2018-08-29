@@ -67,7 +67,7 @@ ume.network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, respon
   if(response != "multinomial"){
     r <- r[,,1]
   }
-  network <- list(Outcomes = Outcomes, Study = Study, Treat = Treat, r = r, t = t, type = type, rank.preference = NULL, nstudy = nstudy, na = na, ntreat = ntreat, b.id = b.id, response = response, dic = NULL, hy.prior = hy.prior, mean.d = mean.d, prec.d = prec.d, dic = dic)
+  network <- list(Outcomes = Outcomes, Study = Study, Treat = Treat, r = r, t = t, type = type, rank.preference = NULL, nstudy = nstudy, na = na, ntreat = ntreat, b.id = b.id, response = response, hy.prior = hy.prior, mean.d = mean.d, prec.d = prec.d, dic = dic)
   
   if(response == "binomial"){
     network$n = n
