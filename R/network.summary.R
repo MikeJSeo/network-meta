@@ -702,7 +702,10 @@ calculate.deviance <- function(result){
         r_value <- network$r[i,j]
         n_value <- network$n[i,j]
         rtilda_arm[i,j] <- rtilda[which(paste("rhat[", i, ",", j, "]", sep = "") == names(rtilda))]
-   
+
+        if(r_value == 0) r_value = 1
+        if(r_value == n_value) r_value = n_value - 1
+        
         devtilda_arm[i,j] <- ifelse(r_value != 0, 2 * r_value * (log(r_value)-log(rtilda_arm[i,j])), 0)
         devtilda_arm[i,j] <- devtilda_arm[i,j] + ifelse((n_value - r_value) != 0, 2 * (n_value-r_value) *(log(n_value-r_value) - log(n_value- rtilda_arm[i,j])), 0)
       }
