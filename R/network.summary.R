@@ -768,7 +768,7 @@ calculate.deviance <- function(result){
       devtilda_arm <- do.call(rbind, devtilda_value)
     }
   }
-  #leverage_arm <- dev_arm - devtilda_arm
+  leverage_arm <- dev_arm - devtilda_arm
   #pD <- sum(leverage_arm, na.rm = TRUE)
   pD <- Dbar - sum(devtilda_arm, na.rm = TRUE)
   DIC <- Dbar + pD
