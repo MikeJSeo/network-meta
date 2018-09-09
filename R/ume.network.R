@@ -239,7 +239,7 @@ ume.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 10000
       }
     }
     
-
+    
     if(!is.null(extra.pars.save)) {
       extra.pars.save.check(extra.pars.save, pars.save)
       pars.save <- c(pars.save, extra.pars.save)
@@ -261,6 +261,36 @@ ume.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 10000
 }
 
 
+
+pick.summary.variables.ume <- function(result, extra.pars = NULL, only.pars = NULL){
+  samples <- result[["samples"]]
+  varnames <- dimnames(samples[[1]])[[2]]
+  varnames.split <- sapply(strsplit(varnames, "\\["), '[[', 1)
+  varnames.split <- gsub("[[:digit:]]","",varnames.split)
+  
+  if(!is.null(only.pars)){
+    if(!all(only.pars %in% varnames.split)){
+      stop(paste0(only.pars, "was not sampled"))
+    }
+  }
+  if(is.null(only.pars)){
+    pars <- c("d", "sd", "sigma")
+  } else{
+    pars <- only.pars
+  }
+  if(!is.null(extra.pars)){
+    if(!extra.pars %in% varnames.split){
+      stop(paste0(extra.pars, " is not saved in result"))
+    }
+    pars <- c(pars, extra.pars)
+  }
+  summary.samples <- lapply(samples, function(x){x[,varnames.split %in% pars, drop = F]})
+  summary.samples <- coda::mcmc.list(summary.samples)
+  summary.samples
+}
+
+
+
 #' Summarize result run by \code{\link{ume.network.run}}
 #'
 #' This function uses summary function in coda package to summarize mcmc.list object. Monte carlo error (Time-series SE) is also obtained using the coda package and is printed in the summary as a default.
@@ -274,17 +304,21 @@ ume.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 10000
 #' summary(result)
 #' @export
 
-summary.ume.network.result <- function(object){
+summary.ume.network.result <- function(object, ...){
   
   if(!inherits(object, "ume.network.result")) {
     stop('This is not the output from ume.network.run. Need to run ume.network.run function first')
   }
-  rval <- list("summary.samples"= summary(object$samples),
+  summary.samples <- pick.summary.variables.ume(object, ...)
+  
+  rval <- list("summary.samples"= summary(summary.samples),
                "deviance" = unlist(object$deviance[1:3]),
                "total_n" = sum(object$network$na))
   class(rval) <- 'summary.ume.network.result'
   rval
 }
+
+
 
 
 #' Plot traceplot and posterior density of the result using contrast data
