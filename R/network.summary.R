@@ -692,16 +692,24 @@ calculate.deviance <- function(result){
 
   ############find leverage
   if(network$response == "binomial"){
-    rtilda <- lapply(samples, function(x){ x[,grep("rhat\\[", dimnames(samples[[1]])[[2]])] })
-    rtilda <- do.call(rbind, rtilda)
-    rtilda <- apply(rtilda, 2, mean)
+    
+    ptilda <- lapply(samples, function(x){ x[,grep("p\\[", dimnames(samples[[1]])[[2]])] })
+    ptilda <- do.call(rbind, ptilda)
+    ptilda <- apply(ptilda, 2, mean)
+    
+  #  rtilda <- lapply(samples, function(x){ x[,grep("rhat\\[", dimnames(samples[[1]])[[2]])] })
+  #  rtilda <- do.call(rbind, rtilda)
+  #  rtilda <- apply(rtilda, 2, mean)
 
     rtilda_arm <- devtilda_arm <- matrix(NA, nrow = network$nstudy, ncol = max(network$na))
     for(i in 1:network$nstudy){
       for(j in 1:network$na[i]){
         r_value <- network$r[i,j]
         n_value <- network$n[i,j]
-        rtilda_arm[i,j] <- rtilda[which(paste("rhat[", i, ",", j, "]", sep = "") == names(rtilda))]
+        
+        rtilda_arm[i,j] <- ptilda[which(paste("p[", i, ",", j, "]", sep = "") == names(ptilda))] * n_value
+        
+      #  rtilda_arm[i,j] <- rtilda[which(paste("rhat[", i, ",", j, "]", sep = "") == names(rtilda))]
         
         devtilda_arm[i,j] <- ifelse(r_value != 0, 2 * r_value * (log(r_value)-log(rtilda_arm[i,j])), 0)
         devtilda_arm[i,j] <- devtilda_arm[i,j] + ifelse((n_value - r_value) != 0, 2 * (n_value-r_value) *(log(n_value-r_value) - log(n_value- rtilda_arm[i,j])), 0)
