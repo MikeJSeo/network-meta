@@ -695,7 +695,7 @@ calculate.deviance <- function(result){
     
     rtilda <- lapply(samples, function(x){ x[,grep("rhat\\[", dimnames(samples[[1]])[[2]])] })
     rtilda <- do.call(rbind, rtilda)
-    rtilda <- apply(rtilda, 2, mean)
+    rtilda <- apply(rtilda, 2, median)
 
     rtilda_arm <- devtilda_arm <- matrix(NA, nrow = network$nstudy, ncol = max(network$na))
     for(i in 1:network$nstudy){
