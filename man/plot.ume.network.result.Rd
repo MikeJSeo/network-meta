@@ -4,7 +4,7 @@
 \alias{plot.ume.network.result}
 \title{Plot traceplot and posterior density of the result using contrast data}
 \usage{
-\method{plot}{ume.network.result}(x)
+\method{plot}{ume.network.result}(x, ...)
 }
 \arguments{
 \item{x}{Result object created by \code{\link{ume.network.run}} function}
@@ -16,6 +16,6 @@ This function uses plotting function in coda package to plot mcmc.list object
 network <- with(smoking, {
  ume.network.data(Outcomes, Study, Treat, N = N, response = "binomial", type = "random")
 })
-result <- ume.network.run(network)
+result <- ume.network.run(network, only.pars = "sd")
 plot(result)
 }

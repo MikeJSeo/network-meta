@@ -330,17 +330,17 @@ summary.ume.network.result <- function(object, ...){
 #' network <- with(smoking, {
 #'  ume.network.data(Outcomes, Study, Treat, N = N, response = "binomial", type = "random")
 #' })
-#' result <- ume.network.run(network)
+#' result <- ume.network.run(network, only.pars = "sd")
 #' plot(result)
 #' @export
 
-plot.ume.network.result <- function(x) {
+plot.ume.network.result <- function(x, ...) {
   
   if(!inherits(x, "ume.network.result")) {
     stop('This is not the output from ume.network.run. Need to run ume.network.run function first')
   }
-  plot(x$samples)
+  summary.samples <- pick.summary.variables.ume(x, ...)
+  plot(summary.samples)
 }
-
 
 
