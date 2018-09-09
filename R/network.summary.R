@@ -769,8 +769,8 @@ calculate.deviance <- function(result){
     }
   }
   leverage_arm <- dev_arm - devtilda_arm
-  pD <- sum(leverage_arm, na.rm = TRUE)
-  #pD <- Dbar - sum(devtilda_arm, na.rm = TRUE)
+  #pD <- sum(leverage_arm, na.rm = TRUE)
+  pD <- Dbar - sum(devtilda_arm, na.rm = TRUE)
   DIC <- Dbar + pD
 
   out <- list(Dbar = Dbar, pD = pD, DIC = DIC, data.points = sum(network$na), dev_arm = dev_arm, devtilda_arm = devtilda_arm, leverage_arm = leverage_arm)
