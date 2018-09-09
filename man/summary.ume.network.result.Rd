@@ -4,7 +4,7 @@
 \alias{summary.ume.network.result}
 \title{Summarize result run by \code{\link{ume.network.run}}}
 \usage{
-\method{summary}{ume.network.result}(object)
+\method{summary}{ume.network.result}(object, ...)
 }
 \arguments{
 \item{object}{Result object created by \code{\link{ume.network.run}} function}
