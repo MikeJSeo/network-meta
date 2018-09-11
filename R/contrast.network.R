@@ -266,7 +266,7 @@ summary.contrast.network.result <- function(object, ...){
   }
   summary.samples <- pick.summary.variables.contrast(object, ...)
   
-  rval <- list("summary.samples"= summary(object$samples),
+  rval <- list("summary.samples"= summary(summary.samples),
                "deviance" = unlist(object$deviance[1:3]),
                "total_n" = sum(object$network$na))
   class(rval) <- 'summary.contrast.network.result'
