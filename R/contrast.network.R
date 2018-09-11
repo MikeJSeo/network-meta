@@ -216,11 +216,41 @@ contrast.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 
   })
 }
 
+pick.summary.variables.contrast <- function(result, extra.pars = NULL, only.pars = NULL){
+  samples <- result[["samples"]]
+  varnames <- dimnames(samples[[1]])[[2]]
+  varnames.split <- sapply(strsplit(varnames, "\\["), '[[', 1)
+  varnames.split <- gsub("[[:digit:]]","",varnames.split)
+  
+  if(!is.null(only.pars)){
+    if(!all(only.pars %in% varnames.split)){
+      stop(paste0(only.pars, "was not sampled"))
+    }
+  }
+  if(is.null(only.pars)){
+    pars <- c("d", "sd")
+  } else{
+    pars <- only.pars
+  }
+  if(!is.null(extra.pars)){
+    if(!extra.pars %in% varnames.split){
+      stop(paste0(extra.pars, " is not saved in result"))
+    }
+    pars <- c(pars, extra.pars)
+  }
+  summary.samples <- lapply(samples, function(x){x[,varnames.split %in% pars, drop = F]})
+  summary.samples <- coda::mcmc.list(summary.samples)
+  summary.samples
+}
+
+
+
 #' Summarize result run by \code{\link{contrast.network.run}}
 #'
 #' This function uses summary function in coda package to summarize mcmc.list object. Monte carlo error (Time-series SE) is also obtained using the coda package and is printed in the summary as a default.
 #'
 #' @param object Result object created by \code{\link{contrast.network.run}} function
+#' @param ... Additional arguments affecting the summary produced
 #' @examples
 #' network <- with(parkinsons_contrast, {
 #'  contrast.network.data(Outcomes, Treat, SE, na, V)
@@ -229,11 +259,13 @@ contrast.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 
 #' summary(result)
 #' @export
 
-summary.contrast.network.result <- function(object){
+summary.contrast.network.result <- function(object, ...){
   
   if(!inherits(object, "contrast.network.result")) {
     stop('This is not the output from contrast.network.run. Need to run contrast.network.run function first')
   }
+  summary.samples <- pick.summary.variables.contrast(object, ...)
+  
   rval <- list("summary.samples"= summary(object$samples),
                "deviance" = unlist(object$deviance[1:3]),
                "total_n" = sum(object$network$na))

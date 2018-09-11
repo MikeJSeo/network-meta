@@ -78,12 +78,12 @@ network.run <- function(network, inits = NULL, n.chains = 3, max.run = 100000, s
   ########## parameters to save in the model
   pars.save <-
   if(response == "binomial" || response == "normal"){
-    c("Eta", "d", "sd", "logvar","prob")
+    c("Eta", "d", "sd", "logvar","prob","delta")
   } else if(response == "multinomial"){
-    c("Eta", "d", "sigma", "sigma_transformed","prob")
+    c("Eta", "d", "sigma", "sigma_transformed","prob","delta")
   }
   if(type == "fixed"){
-    pars.save <- pars.save[!pars.save %in% c("sd", "sigma", "logvar", "sigma_transformed")]
+    pars.save <- pars.save[!pars.save %in% c("sd", "sigma", "logvar", "sigma_transformed", "delta")]
   }
 
   if(!is.null(extra.pars.save)) {
