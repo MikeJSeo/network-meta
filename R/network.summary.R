@@ -1008,8 +1008,9 @@ network.forest.plot <- function(result, level = 0.95, ticks.position = NULL, lab
          scale_y_continuous(breaks = ticks, labels = ticks) 
   }
   
-  xlim.range <- ggplot_build(p)$layout$panel_ranges[[1]]$x.range
-  
+  #find actual xlim range; this part of code keeps changing with ggplot update..
+  xlim.range <- ggplot_build(p)$layout$panel_params[[1]]$x.range
+    
   p <- p + geom_text(aes(label = paste0(sprintf("%0.2f", round(OR, digits = 2)), " [", sprintf("%0.2f", round(lower, digits = 2)) , ", ", sprintf("%0.2f", round(upper, digits = 2)), "]")), y = xlim.range[2] + diff(xlim.range)*label.multiplier, x = 1:length(comps[1,]))   # hjust = -1, vjust = 2)
   
   median_name_location <- ifelse(length(odds[,1]) <= 3, length(comps[1,]) + 0.5, length(comps[1,]) + 1)
