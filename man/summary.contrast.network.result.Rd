@@ -4,10 +4,12 @@
 \alias{summary.contrast.network.result}
 \title{Summarize result run by \code{\link{contrast.network.run}}}
 \usage{
-\method{summary}{contrast.network.result}(object)
+\method{summary}{contrast.network.result}(object, ...)
 }
 \arguments{
 \item{object}{Result object created by \code{\link{contrast.network.run}} function}
+
+\item{...}{Additional arguments affecting the summary produced}
 }
 \description{
 This function uses summary function in coda package to summarize mcmc.list object. Monte carlo error (Time-series SE) is also obtained using the coda package and is printed in the summary as a default.

@@ -8,6 +8,8 @@
 }
 \arguments{
 \item{object}{Result object created by \code{\link{ume.network.run}} function}
+
+\item{...}{Additional arguments affecting the summary produced}
 }
 \description{
 This function uses summary function in coda package to summarize mcmc.list object. Monte carlo error (Time-series SE) is also obtained using the coda package and is printed in the summary as a default.
@@ -17,5 +19,5 @@ network <- with(smoking, {
  ume.network.data(Outcomes, Study, Treat, N = N, response = "binomial", type = "random")
 })
 result <- ume.network.run(network) 
-summary(result)
+summary(result, only.pars = c("d", "sd"))
 }
