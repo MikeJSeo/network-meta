@@ -112,7 +112,11 @@ network.run <- function(network, inits = NULL, n.chains = 3, max.run = 100000, s
       pars.save <- c(pars.save, "B")
     }
     if(baseline == "exchangeable"){
-      pars.save <- c(pars.save, "sdB")
+      if(response == "multinomial"){
+        pars.save <- c(pars.save, "sigmaB")
+      } else{
+        pars.save <- c(pars.save, "sdB")  
+      }
     }
   }
   if(!is.null(covariate)){
