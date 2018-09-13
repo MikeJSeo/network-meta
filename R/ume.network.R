@@ -70,8 +70,10 @@ ume.network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, respon
   network <- list(Outcomes = Outcomes, Study = Study, Treat = Treat, r = r, t = t, type = type, rank.preference = NULL, nstudy = nstudy, na = na, ntreat = ntreat, b.id = b.id, response = response, hy.prior = hy.prior, mean.d = mean.d, prec.d = prec.d, dic = dic)
   
   if(response == "binomial"){
+    network$N = N
     network$n = n
   } else if (response == "normal"){
+    netowkr$SE = SE
     network$se = se
   }
   
@@ -246,7 +248,7 @@ ume.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 10000
     }
     
     if(is.null(inits)){
-      inits <- network.inits(network, n.chains)
+      inits <- ume.network.inits(network, n.chains)
     }
     samples <- jags.fit(network, data, pars.save, inits, n.chains, max.run, setsize, n.run, conv.limit)
     result <- list(network = network, data.rjags = data, inits = inits, pars.save = pars.save)
@@ -260,6 +262,41 @@ ume.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 10000
   })
 }
 
+
+ume.network.inits <- function(network, n.chains){
+  
+  response <- network$response
+  
+  inits <- if(response == "multinomial"){
+    ume.multinomial.inits(network, n.chains)
+  } else if(response == "binomial"){
+    ume.binomial.inits(network, n.chains)
+  } else if(response == "normal"){
+    ume.normal.inits(network, n.chains)
+  }
+  return(inits)
+}
+
+ume.binomial.inits <- function(network, n.chains){
+  
+  with(network,{
+    
+    Outcomes <- Outcomes + 0.5 # ensure ratios are always defined
+    n <- n + 1
+    p <- Outcomes/n
+    logits <- log(p/(1-p))
+    se.logits <- sqrt(1/Outcomes + 1/(N - Outcomes))
+    
+    Eta <- logits[b.id]
+    se.Eta <- se.logits[b.id]
+    delta <- logits - rep(Eta, times = na)
+    delta <- delta[!b.id,]
+    
+    inits = make.inits(network, n.chains, delta, Eta, se.Eta)
+    return(inits)  
+  })
+  
+}
 
 
 pick.summary.variables.ume <- function(result, extra.pars = NULL, only.pars = NULL){
