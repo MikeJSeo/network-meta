@@ -282,20 +282,99 @@ ume.binomial.inits <- function(network, n.chains){
   with(network,{
     
     Outcomes <- Outcomes + 0.5 # ensure ratios are always defined
-    n <- n + 1
-    p <- Outcomes/n
+    N <- N + 1
+    p <- Outcomes/N
     logits <- log(p/(1-p))
     se.logits <- sqrt(1/Outcomes + 1/(N - Outcomes))
     
-    Eta <- logits[b.id]
-    se.Eta <- se.logits[b.id]
-    delta <- logits - rep(Eta, times = na)
+    mu <- logits[b.id]
+    se.mu <- se.logits[b.id]
+    delta <- logits - rep(mu, times = na)
     delta <- delta[!b.id,]
     
-    inits = make.inits(network, n.chains, delta, Eta, se.Eta)
+    inits = make.inits(network, n.chains, delta, mu, se.mu)
     return(inits)  
   })
   
+}
+
+
+
+make.inits <- function(network, n.chains, delta, mu, se.mu){
+  
+  with(network,{
+    
+    # dependent variable for regression
+    y <- delta
+    
+    # design matrix
+    base.tx <- Treat[b.id]    # base treatment for N studies
+    end.Study <- c(0, cumsum(na))  # end row number of each trial
+    rows <- end.Study - seq(0, nstudy)   # end number of each trial not including base treatment arms
+    design.mat <- matrix(0, sum(na) - nstudy, ntreat) # no. non-base arms x #txs
+    for (i in seq(nstudy)){
+      studytx <- Treat[(end.Study[i]+1):end.Study[i+1]]  #treatments in ith Study
+      nonbase.tx <- studytx[studytx!=base.tx[i]]    #non-baseline treatments for ith Study
+      design.mat[(1+rows[i]):rows[i+1],base.tx[i]] <- -1
+      for (j in seq(length(nonbase.tx)))
+        design.mat[j+rows[i],nonbase.tx[j]] <- 1
+    }
+    design.mat <- design.mat[,-1,drop=F]
+    
+    fit <- summary(lm(y ~ design.mat - 1))
+    d <- se.d <- rep(NA, ntreat)
+    d[-1] <- coef(fit)[,1]
+    se.d[-1] <- coef(fit)[,2]
+    resid.var <- fit$sigma^2
+    
+    
+    ############# Generate initial values
+    initial.values = list()
+    for(i in 1:n.chains){
+      initial.values[[i]] = list()
+    }
+    for(i in 1:n.chains){
+      random.mu <- rnorm(length(mu))
+      initial.values[[i]][["mu"]] <- mu + se.mu * random.mu
+    }
+    
+    if(!is.nan(fit$fstat[1])){
+      for(i in 1:n.chains){
+        random.d = rnorm(length(d))
+        initial.values[[i]][["d"]] <- d + se.d * random.d
+        
+        if(type == "random"){
+          
+          df <- fit$df[2]
+          random.ISigma <- rchisq(1, df)
+          sigma2 <- resid.var * df/random.ISigma
+          
+          if(hy.prior[[1]] == "dunif"){
+            if(sqrt(sigma2) > hy.prior[[3]]){
+              stop("data has more variability than your prior does")
+            }
+          }
+          
+          if(hy.prior[[1]] == "dgamma"){
+            initial.values[[i]][["prec"]] <- 1/sigma2
+          } else if(hy.prior[[1]] == "dunif" || hy.prior[[1]] == "dhnorm"){
+            initial.values[[i]][["sd"]] <- sqrt(sigma2)
+          }
+          
+          # generate values for delta
+          delta = matrix(NA, nrow = nrow(t), ncol = ncol(t))
+          for(j in 2:ncol(delta)){
+            diff_d <- ifelse(is.na(d[t[,1]]), d[t[,j]], d[t[,j]] - d[t[,1]])
+            for(ii in 1:nrow(delta)){
+              if(!is.na(diff_d[ii])) delta[ii,j] = rnorm(1, mean = diff_d[ii], sd = sqrt(sigma2))
+            }
+          }
+          initial.values[[i]][["delta"]] <- delta
+        }
+      }
+    }
+    return(initial.values)
+  })
 }
 
 
