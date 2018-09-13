@@ -247,9 +247,9 @@ ume.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 10000
       pars.save <- c(pars.save, extra.pars.save)
     }
     
-    # if(is.null(inits)){
-    #   inits <- ume.network.inits(network, n.chains)
-    # }
+    if(is.null(inits)){
+      inits <- ume.network.inits(network, n.chains)
+    }
     samples <- jags.fit(network, data, pars.save, inits, n.chains, max.run, setsize, n.run, conv.limit)
     result <- list(network = network, data.rjags = data, inits = inits, pars.save = pars.save)
     result <- c(result, samples)
