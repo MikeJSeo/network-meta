@@ -292,15 +292,14 @@ ume.binomial.inits <- function(network, n.chains){
     delta <- logits - rep(mu, times = na)
     delta <- delta[!b.id,]
     
-    inits = make.inits(network, n.chains, delta, mu, se.mu)
+    inits = ume.make.inits(network, n.chains, delta, mu, se.mu)
     return(inits)  
   })
   
 }
 
 
-
-make.inits <- function(network, n.chains, delta, mu, se.mu){
+ume.make.inits <- function(network, n.chains, delta, mu, se.mu){
   
   with(network,{
     
