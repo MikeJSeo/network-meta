@@ -4,7 +4,7 @@
 #'
 #' @param Outcomes Arm-level outcomes. If it is a multinomial response, the matrix would be arms (row) by multinomial categories (column). If it is binomial or normal, it would be a vector.
 #' @param Study A vector of study indicator for each arm
-#' @param Treat A vector of treatment indicator for each arm. Treatments should have positive integer values starting from 1 to total number of treatments.
+#' @param Treat A vector of treatment indicator for each arm. Treatments should have positive integer values starting from 1 to total number of treatments. In a study, lowest number is taken as the baseline treatment.
 #' @param N A vector of total number of observations in each arm. Used for binomial and multinomial responses.
 #' @param SE A vector of standard error for each arm. Used only for normal response.
 #' @param response Specification of the outcomes type. Must specify one of the following: "normal", "binomial", or "multinomial".
@@ -291,7 +291,7 @@ ume.binomial.inits <- function(network, n.chains){
     se.mu <- se.logits[b.id]
     delta <- logits - rep(mu, times = na)
     delta <- delta[!b.id,]
-    
+
     inits = ume.make.inits(network, n.chains, delta, mu, se.mu)
     return(inits)  
   })
@@ -309,20 +309,28 @@ ume.make.inits <- function(network, n.chains, delta, mu, se.mu){
     base.tx <- Treat[b.id]    # base treatment for N studies
     end.Study <- c(0, cumsum(na))  # end row number of each trial
     rows <- end.Study - seq(0, nstudy)   # end number of each trial not including base treatment arms
-    design.mat <- matrix(0, sum(na) - nstudy, ntreat) # no. non-base arms x #txs
-    for (i in seq(nstudy)){
+    design.mat <- matrix(0, sum(na) - nstudy, ntreat*(ntreat-1)/2 ) # no. non-base arms x #txs
+    col_names <- NULL
+    
+    for(j in 2:ntreat){
+      for(i in 1:(j-1)){
+        col_names <- c(col_names, paste0("Treat", i, j))
+      }
+    }
+    colnames(design.mat) <- col_names
+    
+    for(i in seq(nstudy)){
       studytx <- Treat[(end.Study[i]+1):end.Study[i+1]]  #treatments in ith Study
       nonbase.tx <- studytx[studytx!=base.tx[i]]    #non-baseline treatments for ith Study
-      design.mat[(1+rows[i]):rows[i+1],base.tx[i]] <- -1
-      for (j in seq(length(nonbase.tx)))
-        design.mat[j+rows[i],nonbase.tx[j]] <- 1
+      for (j in seq(length(nonbase.tx))){
+        design.mat[j+rows[i],paste0("Treat", base.tx[i], nonbase.tx[j])] <- 1
+      }
     }
-    design.mat <- design.mat[,-1,drop=F]
-
+    
     fit <- summary(lm(y ~ design.mat - 1))
-    d <- se.d <- rep(NA, ntreat)
-    d[-1] <- coef(fit)[,1]
-    se.d[-1] <- coef(fit)[,2]
+    d <- se.d <- rep(NA, ntreat*(ntreat-1)/2)
+    d <- coef(fit)[,1]
+    se.d <- coef(fit)[,2]
     resid.var <- fit$sigma^2
     
     
@@ -339,7 +347,10 @@ ume.make.inits <- function(network, n.chains, delta, mu, se.mu){
     if(!is.nan(fit$fstat[1])){
       for(i in 1:n.chains){
         random.d = rnorm(length(d))
-        initial.values[[i]][["d"]] <- d + se.d * random.d
+        d.matrix <- matrix(NA, nrow = ntreat, ncol = ntreat)
+        d.matrix[upper.tri(d.matrix)] <- d + se.d * random.d
+        d.matrix <- d.matrix[-ntreat,]
+        initial.values[[i]][["d"]] <- d.matrix
         
         if(type == "random"){
           
@@ -362,9 +373,8 @@ ume.make.inits <- function(network, n.chains, delta, mu, se.mu){
           # generate values for delta
           delta = matrix(NA, nrow = nrow(t), ncol = ncol(t))
           for(j in 2:ncol(delta)){
-            diff_d <- ifelse(is.na(d[t[,1]]), d[t[,j]], d[t[,j]] - d[t[,1]])
             for(ii in 1:nrow(delta)){
-              if(!is.na(diff_d[ii])) delta[ii,j] = rnorm(1, mean = diff_d[ii], sd = sqrt(sigma2))
+              if(!is.na(d.matrix[t[ii, 1], t[ii, j]])) delta[ii,j] = rnorm(1, mean = d.matrix[t[ii, 1], t[ii, j]], sd = sqrt(sigma2))
             }
           }
           initial.values[[i]][["delta"]] <- delta
