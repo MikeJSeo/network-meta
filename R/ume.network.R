@@ -345,7 +345,7 @@ ume.make.inits <- function(network, n.chains, delta, mu, se.mu){
       initial.values[[i]][["mu"]] <- mu + se.mu * random.mu
     }
     
-    if(!is.nan(fit$fstat[1]) & is.na(d)){
+    if(!is.nan(fit$fstat[1]) & !any(is.na(d))){
       for(i in 1:n.chains){
         random.d = rnorm(length(d))
         d.matrix <- matrix(NA, nrow = ntreat, ncol = ntreat)
