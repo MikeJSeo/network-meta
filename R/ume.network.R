@@ -326,6 +326,7 @@ ume.make.inits <- function(network, n.chains, delta, mu, se.mu){
         design.mat[j+rows[i],paste0("Treat", base.tx[i], nonbase.tx[j])] <- 1
       }
     }
+    print(design.mat)
     
     fit <- summary(lm(y ~ design.mat - 1))
     d <- se.d <- rep(NA, ntreat*(ntreat-1)/2)
