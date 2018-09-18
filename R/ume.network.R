@@ -326,14 +326,14 @@ ume.make.inits <- function(network, n.chains, delta, mu, se.mu){
         design.mat[j+rows[i],paste0("Treat", base.tx[i], nonbase.tx[j])] <- 1
       }
     }
-    print(design.mat)
     
     fit <- summary(lm(y ~ design.mat - 1))
     d <- se.d <- rep(NA, ntreat*(ntreat-1)/2)
-    d <- coef(fit)[,1]
-    se.d <- coef(fit)[,2]
-    resid.var <- fit$sigma^2
-    
+    if(length(coef(fit)[,1]) == length(d)){ #check if there is any NA in the estimated fit
+      d <- coef(fit)[,1]
+      se.d <- coef(fit)[,2]
+      resid.var <- fit$sigma^2
+    }
     
     ############# Generate initial values
     initial.values = list()
@@ -345,7 +345,7 @@ ume.make.inits <- function(network, n.chains, delta, mu, se.mu){
       initial.values[[i]][["mu"]] <- mu + se.mu * random.mu
     }
     
-    if(!is.nan(fit$fstat[1])){
+    if(!is.nan(fit$fstat[1]) & is.na(d)){
       for(i in 1:n.chains){
         random.d = rnorm(length(d))
         d.matrix <- matrix(NA, nrow = ntreat, ncol = ntreat)
