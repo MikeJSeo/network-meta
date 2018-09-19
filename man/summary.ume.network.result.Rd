@@ -19,5 +19,7 @@ network <- with(smoking, {
  ume.network.data(Outcomes, Study, Treat, N = N, response = "binomial", type = "random")
 })
 result <- ume.network.run(network) 
-summary(result, only.pars = c("d", "sd"))
+summary(result)
+#summary(result, only.pars = "sd")
+#summary(result, extra.pars = c("delta"))
 }

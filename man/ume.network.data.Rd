@@ -13,7 +13,7 @@ ume.network.data(Outcomes, Study, Treat, N = NULL, SE = NULL,
 
 \item{Study}{A vector of study indicator for each arm}
 
-\item{Treat}{A vector of treatment indicator for each arm. Treatments should have positive integer values starting from 1 to total number of treatments.}
+\item{Treat}{A vector of treatment indicator for each arm. Treatments should have positive integer values starting from 1 to total number of treatments. In a study, lowest number is taken as the baseline treatment.}
 
 \item{N}{A vector of total number of observations in each arm. Used for binomial and multinomial responses.}
 
@@ -30,8 +30,6 @@ ume.network.data(Outcomes, Study, Treat, N = NULL, SE = NULL,
 \item{hy.prior}{Prior for the heterogeneity parameter. Supports uniform, gamma, and half normal for normal. It should be a list of length 3, where first element should be the distribution (one of dunif, dgamma, dhnorm, dwish) and the next two are the parameters associated with the distribution. For example, list("dunif", 0, 5) give uniform prior with lower bound 0 and upper bound 5 for the heterogeneity parameter.}
 
 \item{dic}{This is an indicator for whether user wants to calculate DIC. Model stores less information if you set it to FALSE.}
-
-\item{rank.preference}{Set it equal to "higher" if higher values are preferred (i.e. assumes events are good). Set it equal to "lower" if lower values are preferred (i.e. assumes events are bad). Default is "higher".}
 }
 \description{
 This is similar to the function \code{\link{network.data}}, except this is used for the unrelated mean effects model.
