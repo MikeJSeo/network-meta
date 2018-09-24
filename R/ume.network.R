@@ -68,11 +68,11 @@ ume.network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, respon
   }
   network <- list(Outcomes = Outcomes, Study = Study, Treat = Treat, r = r, t = t, type = type, rank.preference = NULL, nstudy = nstudy, na = na, ntreat = ntreat, b.id = b.id, response = response, hy.prior = hy.prior, mean.d = mean.d, prec.d = prec.d, dic = dic)
   
-  if(response == "binomial"){
+  if(response == "binomial" || response == "multinomial"){
     network$N = N
     network$n = n
   } else if (response == "normal"){
-    netowkr$SE = SE
+    network$SE = SE
     network$se = se
   }
   
@@ -88,7 +88,62 @@ ume.network.rjags <- function(network){
   network <- with(network, {
     if(response == "binomial"){
       ume.binomial.rjags(network)  
+    } else if(response == "normal"){
+      ume.normal.rjags(network)
     }
+  })
+}
+
+ume.normal.rjags <- function(network){
+  
+  with(network, {
+    
+    code <- paste0("model\n{",
+                   "\n\tfor(i in 1:", nstudy, ") {",
+                   "\n\t\tdelta[i,1] <- 0",
+                   "\n\t\tmu[i] ~ dnorm(0,.0001)",
+                   "\n\t\tfor(k in 1:na[i]) {",
+                   "\n\t\t\ttau[i,k] <- 1/pow(se[i,k],2)",
+                   "\n\t\t\tr[i,k] ~ dnorm(theta[i,k], tau[i,k])")
+    
+    if(type == "fixed"){
+      code <- paste0(code, "\n\t\t\ttheta <- mu[i] + d[t[i,1], t[i,k]]")
+    } else if(type == "random"){
+      code <- paste0(code, "\n\t\t\ttheta <- mu[i] + delta[i,k]")
+    }  
+  
+    code <- paste0(code,   
+                   "\n\t\t\tdev[i,k] <- (r[i,k]-theta[i,k])*(r[i,k]-theta[i,k])*tau[i,k]",
+                   "\n\t\t}",
+                   "\n\t\tresdev[i] <- sum(dev[i,1:na[i]])")
+    
+    
+    if(type == "random"){
+      code <- paste0(code, "\n\t\tfor (k in 2:na[i]) {",
+                     "\n\t\t\tdelta[i,k] ~ dnorm(d[t[i,1],t[i,k]], tau)",
+                     "\n\t\t}")
+    }
+    
+    code <- paste0(code, 
+                   "\n\t}",
+                   "\n\ttotresdev <- sum(resdev[])")
+    
+    code <- paste0(code,
+                   "\n\tfor(c in 1:", ntreat -1, ") {",
+                   "\n\t\tfor(k in (c+1):", ntreat, ") {",
+                   "\n\t\t\td[c,k] ~ dnorm(", mean.d, ", ", prec.d, ")",
+                   "\n\t\t}",
+                   "\n\t}")
+    
+    if(type == "random"){
+      code <- paste0(code, ume.hy.prior.rjags(hy.prior))
+    }
+    
+    code <- paste0(code, "\n}")
+    return(code)
+    
+    
+    
   })
   
 }
@@ -129,12 +184,6 @@ ume.binomial.rjags <- function(network){
                    "\n\t}",
                    "\n\ttotresdev <- sum(resdev[])")
     
-    if(type == "fixed"){
-      code <- paste0(code, "\n\tfor(k in 1:", ntreat, ") {",
-                     "\n\t\td[k,k] <- 0",
-                     "\n\t}")
-    }
-                   
     code <- paste0(code,
                    "\n\tfor(c in 1:", ntreat -1, ") {",
                    "\n\t\tfor(k in (c+1):", ntreat, ") {",
