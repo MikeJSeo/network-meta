@@ -129,6 +129,9 @@ ume.normal.rjags <- function(network){
                    "\n\ttotresdev <- sum(resdev[])")
     
     code <- paste0(code,
+                   "\n\tfor(k in 1:", ntreat, ") {",
+                   "\n\t\td[k,k] <- 0",
+                   "\n\t}",
                    "\n\tfor(c in 1:", ntreat -1, ") {",
                    "\n\t\tfor(k in (c+1):", ntreat, ") {",
                    "\n\t\t\td[c,k] ~ dnorm(", mean.d, ", ", prec.d, ")",
