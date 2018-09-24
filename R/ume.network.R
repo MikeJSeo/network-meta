@@ -269,6 +269,8 @@ ume.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 10000
     
     if(response == "binomial"){
       data$n <- n
+    } else if(response == "normal"){
+      data$se <- se
     }
     
     if(type == "random"){
@@ -283,9 +285,11 @@ ume.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 10000
     }
     
     if(dic == TRUE){
-      pars.save <- c(pars.save, "totresdev", "resdev")
+      pars.save <- c(pars.save, "totresdev", "resdev", "dev")
       if(response == "binomial"){
-        pars.save <- c(pars.save, "rhat", "dev")
+        pars.save <- c(pars.save, "rhat")
+      } else if(response == "normal"){
+        pars.save <- c(pars.save, "theta")
       }
     }
     
@@ -304,7 +308,6 @@ ume.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 10000
     
     result$deviance <- calculate.deviance(result)
     
-#    result$rank.tx <- rank.tx(result)
     class(result) <- "ume.network.result"
     return(result)
   })
@@ -320,7 +323,8 @@ ume.network.inits <- function(network, n.chains){
   } else if(response == "binomial"){
     ume.binomial.inits(network, n.chains)
   } else if(response == "normal"){
-    ume.normal.inits(network, n.chains)
+    NULL
+#    ume.normal.inits(network, n.chains)
   }
   return(inits)
 }
