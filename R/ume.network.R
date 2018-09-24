@@ -107,9 +107,9 @@ ume.normal.rjags <- function(network){
                    "\n\t\t\tr[i,k] ~ dnorm(theta[i,k], tau[i,k])")
     
     if(type == "fixed"){
-      code <- paste0(code, "\n\t\t\ttheta <- mu[i] + d[t[i,1], t[i,k]]")
+      code <- paste0(code, "\n\t\t\ttheta[i,k] <- mu[i] + d[t[i,1], t[i,k]]")
     } else if(type == "random"){
-      code <- paste0(code, "\n\t\t\ttheta <- mu[i] + delta[i,k]")
+      code <- paste0(code, "\n\t\t\ttheta[i,k] <- mu[i] + delta[i,k]")
     }  
   
     code <- paste0(code,   
