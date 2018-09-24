@@ -120,7 +120,7 @@ ume.normal.rjags <- function(network){
     
     if(type == "random"){
       code <- paste0(code, "\n\t\tfor (k in 2:na[i]) {",
-                     "\n\t\t\tdelta[i,k] ~ dnorm(d[t[i,1],t[i,k]], tau)",
+                     "\n\t\t\tdelta[i,k] ~ dnorm(d[t[i,1],t[i,k]], prec)",
                      "\n\t\t}")
     }
     
@@ -176,7 +176,7 @@ ume.binomial.rjags <- function(network){
     
     if(type == "random"){
       code <- paste0(code, "\n\t\tfor (k in 2:na[i]) {",
-                           "\n\t\t\tdelta[i,k] ~ dnorm(d[t[i,1],t[i,k]], tau)",
+                           "\n\t\t\tdelta[i,k] ~ dnorm(d[t[i,1],t[i,k]], prec)",
                            "\n\t\t}")
     }
     
@@ -209,15 +209,15 @@ ume.hy.prior.rjags <- function(hy.prior){
   if (distr == "dunif") {
     code <- paste0(code,
                    "\n\tsd ~ dunif(hy.prior.1, hy.prior.2)",
-                   "\n\ttau <- pow(sd,-2)")
+                   "\n\tprec <- pow(sd,-2)")
   } else if(distr == "dgamma"){
     code <- paste0(code,
-                   "\n\tsd <- pow(tau, -0.5)",
-                   "\n\ttau ~ dgamma(hy.prior.1, hy.prior.2)")
+                   "\n\tsd <- pow(prec, -0.5)",
+                   "\n\tprec ~ dgamma(hy.prior.1, hy.prior.2)")
   } else if(distr == "dhnorm"){
     code <- paste0(code,
                    "\n\tsd ~ dnorm(hy.prior.1, hy.prior.2)T(0,)",
-                   "\n\ttau <- pow(sd, -2)")
+                   "\n\tprec <- pow(sd, -2)")
   }
   return(code)
 }
