@@ -15,7 +15,6 @@ network.inits <- function(network, n.chains){
 normal.inits <- function(network, n.chains){
 
   with(network,{
-    delta <- Outcomes
     Eta <- Outcomes[b.id]
     se.Eta <- SE[b.id]
     delta <- Outcomes - rep(Eta, times = na)

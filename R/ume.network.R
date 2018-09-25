@@ -111,12 +111,11 @@ ume.normal.rjags <- function(network){
     } else if(type == "random"){
       code <- paste0(code, "\n\t\t\ttheta[i,k] <- mu[i] + delta[i,k]")
     }  
-  
+    
     code <- paste0(code,   
                    "\n\t\t\tdev[i,k] <- (r[i,k]-theta[i,k])*(r[i,k]-theta[i,k])*tau[i,k]",
                    "\n\t\t}",
                    "\n\t\tresdev[i] <- sum(dev[i,1:na[i]])")
-    
     
     if(type == "random"){
       code <- paste0(code, "\n\t\tfor (k in 2:na[i]) {",
@@ -141,7 +140,6 @@ ume.normal.rjags <- function(network){
     
     code <- paste0(code, "\n}")
     return(code)
-    
     
     
   })
@@ -327,6 +325,20 @@ ume.network.inits <- function(network, n.chains){
 #    ume.normal.inits(network, n.chains)
   }
   return(inits)
+}
+
+ume.normal.inits <- function(network, n.chains){
+  
+  with(network,{
+    mu <- Outcomes[b.id]
+    se.mu <- SE[b.id]
+    delta <- Outcomes - rep(mu, times = na)
+    delta <- delta[!b.id,] #eliminate base-arm
+    
+    inits <- make.inits(network, n.chains, delta, Eta, se.Eta)
+    return(inits)
+  })
+  
 }
 
 ume.binomial.inits <- function(network, n.chains){
