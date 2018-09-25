@@ -358,7 +358,6 @@ ume.binomial.inits <- function(network, n.chains){
     inits <- ume.make.inits(network, n.chains, delta, mu, se.mu)
     return(inits)  
   })
-  
 }
 
 ume.make.inits <- function(network, n.chains, delta, mu, se.mu){
