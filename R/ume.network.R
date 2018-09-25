@@ -321,8 +321,7 @@ ume.network.inits <- function(network, n.chains){
   } else if(response == "binomial"){
     ume.binomial.inits(network, n.chains)
   } else if(response == "normal"){
-    NULL
-#    ume.normal.inits(network, n.chains)
+    ume.normal.inits(network, n.chains)
   }
   return(inits)
 }
@@ -335,7 +334,7 @@ ume.normal.inits <- function(network, n.chains){
     delta <- Outcomes - rep(mu, times = na)
     delta <- delta[!b.id,] #eliminate base-arm
     
-    inits <- make.inits(network, n.chains, delta, Eta, se.Eta)
+    inits <- ume.make.inits(network, n.chains, delta, mu, se.mu)
     return(inits)
   })
   
@@ -356,7 +355,7 @@ ume.binomial.inits <- function(network, n.chains){
     delta <- logits - rep(mu, times = na)
     delta <- delta[!b.id,]
 
-    inits = ume.make.inits(network, n.chains, delta, mu, se.mu)
+    inits <- ume.make.inits(network, n.chains, delta, mu, se.mu)
     return(inits)  
   })
   
