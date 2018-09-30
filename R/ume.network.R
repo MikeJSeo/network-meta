@@ -66,7 +66,14 @@ ume.network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, respon
   if(response != "multinomial"){
     r <- r[,,1]
   }
-  network <- list(Outcomes = Outcomes, Study = Study, Treat = Treat, r = r, t = t, type = type, rank.preference = NULL, nstudy = nstudy, na = na, ntreat = ntreat, b.id = b.id, response = response, hy.prior = hy.prior, mean.d = mean.d, prec.d = prec.d, dic = dic)
+  
+  if(response == "multinomial")){
+    ncat <- dim(Outcomes)[2]
+    mean.mu <- c(0, ncat)
+    prec.mu <- diag(0.0001, ncat)
+  }
+  
+  network <- list(Outcomes = Outcomes, Study = Study, Treat = Treat, r = r, t = t, type = type, rank.preference = NULL, nstudy = nstudy, na = na, ntreat = ntreat, b.id = b.id, response = response, hy.prior = hy.prior, mean.d = mean.d, prec.d = prec.d, mean.mu = mean.mu, prec.mu = prec.mu, dic = dic)
   
   if(response == "binomial" || response == "multinomial"){
     network$N = N
@@ -74,6 +81,10 @@ ume.network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, respon
   } else if (response == "normal"){
     network$SE = SE
     network$se = se
+  }
+  
+  if(response == "multinomial"){
+    network$ncat = ncat
   }
   
   code <- ume.network.rjags(network)
@@ -90,9 +101,67 @@ ume.network.rjags <- function(network){
       ume.binomial.rjags(network)  
     } else if(response == "normal"){
       ume.normal.rjags(network)
+    } else if(response == "multinomial"){
+      ume.multinomial.rjags(network)
     }
   })
 }
+
+ume.multinomial.rjags <- function(network){
+  
+  with(network, {
+    
+    
+    code <- paste0("model\n{",
+                   "\n\tfor(i in 1:", nstudy, ") {",
+                   "\n\t\tfor(k in 1:na[i]) {",
+                   "\n\t\t\tr[i,k,1:3] ~ dmulti(p[i,k,], n[i,k])",
+                   "\n\t\t\tfor(m in 1:", ncat, ") {",
+                   "\n\t\t\t\tp[i,k,m] <- theta[i,k,m]/sum(theta[i,k,])")
+    
+    if(type == "fixed"){
+      code <- paste0(code, "\n\t\t\t\tlog(theta[i,k,m]) <- mu[i,m] + delta[i,k,m]")
+    } else if(type == "random"){
+      code <- paste0(code, "\n\t\t\t\tlog(theta[i,k,m]) <- mu[i,m] + d[t[i,1], t[i,k], m]")
+    }
+        
+    code <- paste0(code,  "\n\t\t\t\trhat[i,k,m] <- p[i,k,m]*n[i,k]",
+                   "\n\t\t\t\tdv[i,k,m] <- 2*r[i,k,m]*log(r[i,k,m]/rhat[i,k,m])",
+                   "\n\t\t\t}",
+                   "\n\t\t\tdev[i,k] <- sum(dv[i,k,])",
+                   "\n\t\t}",
+                   "\n\t\tresdev[i] <- sum(dev[i,na[i]])",
+                   "\n\t}",
+                   "\n\ttotresdev <- sum(resdev[])")       
+                   
+    if(type == "random"){
+      code <- paste0(code, "\n\tfor(i in 1:", nstudy, "){",
+                     "\n\t\tfor(m in 1:", ncat, "){",
+                     "\n\t\t\tdelta[i,1,m] <- 0",
+                     "\n\t\t}",
+                     "\n\t\tfor(k in 2:na[i]){",
+                     "\n\t\t\tdelta[i,k,1] <- 0",
+                     "\n\t\t\tdelta[i,k,2:", ncat, "] ~ dmnorm(md[i,k,], prec[,])",
+                     "\n\t\t\tfor(j in 1:", ncat-1, "){",
+                     "\n\t\t\t\tmd[i,k,j] <- d[t[i,1], t[i,k], j]",
+                     "\n\t\t\t}",
+                     "\n\t\t}",
+                     "\n\t}")
+    }
+    
+    code <- paste0(code, "\n\tfor(i in 1:", nstudy, "){",
+                   "\n\t\tmu[i,1] <- 0",
+                   "\n\t\tmu[i,2:",  ncat, "] ~ dmnorm(mean.mu[], prec.mu[,])",
+                   "\n\t}")
+                   
+
+    code <- paste0(code, "\n}")
+    return(code)
+    
+    
+  })
+}
+
 
 ume.normal.rjags <- function(network){
   
