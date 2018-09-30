@@ -186,6 +186,10 @@ ume.multinomial.rjags <- function(network){
                   "\n\t\t\td[c,k,1:", ncat-1, "] ~ dmnorm(mean.d[], prec.d[,])",
                   "\n\t\t}",
                   "\n\t}")
+    
+    if(type == "random"){
+      code <- paste0(code, ume.hy.prior.rjags(hy.prior))
+    }
 
     code <- paste0(code, "\n}")
     return(code)
@@ -376,6 +380,11 @@ ume.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 10000
       data$hy.prior.1 <- hy.prior[[2]]
       data$hy.prior.2 <- hy.prior[[3]]
     }
+    
+    data$mean.d = mean.d
+    data$prec.d = prec.d
+    data$mean.mu = mean.mu
+    data$prec.mu = prec.mu
     
     pars.save <- c("d")
     
