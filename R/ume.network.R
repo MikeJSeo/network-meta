@@ -183,7 +183,7 @@ ume.multinomial.rjags <- function(network){
     code <- paste0(code, 
                   "\n\tfor(c in 1:", ntreat-1, "){",
                   "\n\t\tfor(k in c+1:", ntreat, "){",
-                  "\n\t\t\td[c,k,1:", ncat-1, "] ~ dmnorm(mean.d[], prec.d[,])"
+                  "\n\t\t\td[c,k,1:", ncat-1, "] ~ dmnorm(mean.d[], prec.d[,])",
                   "\n\t\t}",
                   "\n\t}")
 
