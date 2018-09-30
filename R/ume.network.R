@@ -418,7 +418,8 @@ ume.network.inits <- function(network, n.chains){
   response <- network$response
   
   inits <- if(response == "multinomial"){
-    ume.multinomial.inits(network, n.chains)
+    NULL
+   # ume.multinomial.inits(network, n.chains)
   } else if(response == "binomial"){
     ume.binomial.inits(network, n.chains)
   } else if(response == "normal"){
