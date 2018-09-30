@@ -17,7 +17,7 @@
 #' @export
 
 ume.network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, response = NULL, type = "random",
-                             mean.d = 0, prec.d = 0.0001, hy.prior = list("dunif", 0, 5), dic = TRUE){
+                             mean.mu = NULL, prec.mu = NULL, mean.d = NULL, prec.d = NULL, hy.prior = list("dunif", 0, 5), dic = TRUE){
   
   if(missing(Study) || missing(Treat) || missing(Outcomes)){
     stop("Study, Treat, and Outcomes have to be all specified")
@@ -67,10 +67,35 @@ ume.network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, respon
     r <- r[,,1]
   }
   
-  if(response == "multinomial"){
+  # Set prior for mu and d
+
+  if(response != "multinomial"){
+    if(is.null(mean.mu)){
+      mean.mu <- 0
+    }
+    if(is.null(mean.d)){
+      mean.d <- 0
+    }
+    if(is.null(prec.mu)){
+      prec.mu <- 0.0001
+    }
+    if(is.null(prec.d)){
+      prec.d <- 0.0001
+    }
+  } else if(response == "multinomial"){
     ncat <- dim(Outcomes)[2]
-    mean.mu <- c(0, ncat)
-    prec.mu <- diag(0.0001, ncat)
+    if(is.null(mean.mu)){
+      mean.mu <- rep(0, ncat)
+    }
+    if(is.null(mean.d)){
+      mean.d <- rep(0, ncat)
+    }
+    if(is.null(prec.mu)){
+      prec.mu <- diag(0.0001, ncat)
+    }
+    if(is.null(prec.d)){
+      prec.d <- diag(0.0001, ncat)
+    }
   }
   
   network <- list(Outcomes = Outcomes, Study = Study, Treat = Treat, r = r, t = t, type = type, rank.preference = NULL, nstudy = nstudy, na = na, ntreat = ntreat, b.id = b.id, response = response, hy.prior = hy.prior, mean.d = mean.d, prec.d = prec.d, mean.mu = mean.mu, prec.mu = prec.mu, dic = dic)
@@ -153,7 +178,12 @@ ume.multinomial.rjags <- function(network){
                    "\n\t\tmu[i,1] <- 0",
                    "\n\t\tmu[i,2:",  ncat, "] ~ dmnorm(mean.mu[], prec.mu[,])",
                    "\n\t}")
-                   
+  
+    
+    code <- paste0(code, 
+                  "\n\tfor(c in 1:", ntreat-1, "){"),
+                  "\n\t\tfor(k in c+1:", ntreat, "){",
+                  "\n\t\t\td[c,k,1:", ncat-1, "] ~ dmnorm(mean.d[], prec.d[,])"
 
     code <- paste0(code, "\n}")
     return(code)
