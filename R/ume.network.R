@@ -110,6 +110,9 @@ ume.network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, respon
   
   if(response == "multinomial"){
     network$ncat = ncat
+    if(network$hy.prior[[1]] != "dwish"){
+      network$hy.prior <- list("dwish", diag(ncat - 1), ncat -1)
+    }
   }
   
   code <- ume.network.rjags(network)
@@ -321,6 +324,10 @@ ume.hy.prior.rjags <- function(hy.prior){
     code <- paste0(code,
                    "\n\tsd ~ dnorm(hy.prior.1, hy.prior.2)T(0,)",
                    "\n\tprec <- pow(sd, -2)")
+  } else if (distr == "dwish"){
+    code <- paste0(code,
+                   "\n\tprec[1:", ncat-1, ",1:", ncat-1, "] ~ dwish(hy.prior.1, hy.prior.2)",
+                   "\n\tsigma[1:", ncat-1, ",1:", ncat-1, "] <- inverse(prec[,])")
   }
   return(code)
 }
