@@ -85,16 +85,16 @@ ume.network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, respon
   } else if(response == "multinomial"){
     ncat <- dim(Outcomes)[2]
     if(is.null(mean.mu)){
-      mean.mu <- rep(0, ncat)
+      mean.mu <- rep(0, ncat-1)
     }
     if(is.null(mean.d)){
-      mean.d <- rep(0, ncat)
+      mean.d <- rep(0, ncat-1)
     }
     if(is.null(prec.mu)){
-      prec.mu <- diag(0.0001, ncat)
+      prec.mu <- diag(0.0001, ncat-1)
     }
     if(is.null(prec.d)){
-      prec.d <- diag(0.0001, ncat)
+      prec.d <- diag(0.0001, ncat-1)
     }
   }
   
