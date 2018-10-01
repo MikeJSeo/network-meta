@@ -399,7 +399,12 @@ ume.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 10000
     pars.save <- c("d")
     
     if(type == "random"){
-      pars.save <- c(pars.save, "sd", "delta")  
+      pars.save <- c(pars.save, "delta")
+      if(response %in% c("normal", "binoimal")){
+        pars.save <- c(pars.save, "sd")
+      } else if (response == "multinomial"){
+        pars.save <- c(pars.save, "sigma")
+      }
     }
     
     if(dic == TRUE){
