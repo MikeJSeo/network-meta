@@ -147,9 +147,9 @@ ume.multinomial.rjags <- function(network){
                    "\n\t\t\tfor(m in 1:", ncat, ") {",
                    "\n\t\t\t\tp[i,k,m] <- theta[i,k,m]/sum(theta[i,k,])")
     
-    if(type == "fixed"){
+    if(type == "random"){
       code <- paste0(code, "\n\t\t\t\tlog(theta[i,k,m]) <- mu[i,m] + delta[i,k,m]")
-    } else if(type == "random"){
+    } else if(type == "fixed"){
       code <- paste0(code, "\n\t\t\t\tlog(theta[i,k,m]) <- mu[i,m] + d[t[i,1], t[i,k], m]")
     }
         
