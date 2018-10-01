@@ -377,7 +377,7 @@ ume.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 10000
     
     data <- list(r = r, t = t, na = na)
     
-    if(response == "binomial"){
+    if(response == "binomial" || response == "multinomial"){
       data$n <- n
     } else if(response == "normal"){
       data$se <- se
@@ -401,13 +401,12 @@ ume.network.run <- function(network, inits = NULL, n.chains = 3, max.run = 10000
     
     if(dic == TRUE){
       pars.save <- c(pars.save, "totresdev", "resdev", "dev")
-      if(response == "binomial"){
+      if(response == "binomial" || response == "multinomial"){
         pars.save <- c(pars.save, "rhat")
       } else if(response == "normal"){
         pars.save <- c(pars.save, "theta")
       }
     }
-    
     
     if(!is.null(extra.pars.save)) {
       extra.pars.save.check(extra.pars.save, pars.save)
