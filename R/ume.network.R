@@ -191,7 +191,7 @@ ume.multinomial.rjags <- function(network){
                   "\n\t}")
     
     if(type == "random"){
-      code <- paste0(code, ume.hy.prior.rjags(hy.prior))
+      code <- paste0(code, ume.hy.prior.rjags(hy.prior, ncat))
     }
 
     code <- paste0(code, "\n}")
@@ -243,7 +243,7 @@ ume.normal.rjags <- function(network){
                    "\n\t}")
     
     if(type == "random"){
-      code <- paste0(code, ume.hy.prior.rjags(hy.prior))
+      code <- paste0(code, ume.hy.prior.rjags(hy.prior, 0))
     }
     
     code <- paste0(code, "\n}")
@@ -298,7 +298,7 @@ ume.binomial.rjags <- function(network){
                    "\n\t}")
                    
     if(type == "random"){
-      code <- paste0(code, ume.hy.prior.rjags(hy.prior))
+      code <- paste0(code, ume.hy.prior.rjags(hy.prior, 0))
     }
     
     code <- paste0(code, "\n}")
@@ -308,7 +308,7 @@ ume.binomial.rjags <- function(network){
 
 
 
-ume.hy.prior.rjags <- function(hy.prior){
+ume.hy.prior.rjags <- function(hy.prior, ncat){
   
   code <- ""
   distr <- hy.prior[[1]]
