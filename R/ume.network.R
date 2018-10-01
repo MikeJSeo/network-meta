@@ -145,13 +145,12 @@ ume.multinomial.rjags <- function(network){
                    "\n\t\tfor(k in 1:na[i]) {",
                    "\n\t\t\tr[i,k,1:3] ~ dmulti(p[i,k,], n[i,k])",
                    "\n\t\t\tfor(m in 1:", ncat, ") {",
-                   "\n\t\t\t\tp[i,k,m] <- theta[i,k,m]/sum(theta[i,k,])")
-    
-    if(type == "random"){
-      code <- paste0(code, "\n\t\t\t\tlog(theta[i,k,m]) <- mu[i,m] + delta[i,k,m]")
-    } else if(type == "fixed"){
-      code <- paste0(code, "\n\t\t\t\tlog(theta[i,k,m]) <- mu[i,m] + d[t[i,1], t[i,k], m]")
-    }
+                   "\n\t\t\t\tp[i,k,m] <- theta[i,k,m]/sum(theta[i,k,])",
+                   "\n\t\t\t\tlog(theta[i,k,m]) <- mu[i,m] + delta[i,k,m]")
+       
+    # else if(type == "fixed"){
+    #   code <- paste0(code, "\n\t\t\t\tlog(theta[i,k,m]) <- mu[i,m] + d[t[i,1], t[i,k], m]")
+    # }
         
     code <- paste0(code,  "\n\t\t\t\trhat[i,k,m] <- p[i,k,m]*n[i,k]",
                    "\n\t\t\t\tdv[i,k,m] <- 2*r[i,k,m]*log(r[i,k,m]/rhat[i,k,m])",
@@ -162,20 +161,25 @@ ume.multinomial.rjags <- function(network){
                    "\n\t}",
                    "\n\ttotresdev <- sum(resdev[])")       
                    
-    if(type == "random"){
-      code <- paste0(code, "\n\tfor(i in 1:", nstudy, "){",
+    code <- paste0(code, "\n\tfor(i in 1:", nstudy, "){",
                      "\n\t\tfor(m in 1:", ncat, "){",
                      "\n\t\t\tdelta[i,1,m] <- 0",
                      "\n\t\t}",
                      "\n\t\tfor(k in 2:na[i]){",
-                     "\n\t\t\tdelta[i,k,1] <- 0",
-                     "\n\t\t\tdelta[i,k,2:", ncat, "] ~ dmnorm(md[i,k,], prec[,])",
+                     "\n\t\t\tdelta[i,k,1] <- 0")
+    
+    if(type == "random"){
+      code <- paste0(code, "\n\t\t\tdelta[i,k,2:", ncat, "] ~ dmnorm(md[i,k,], prec[,])")
+    } else if(type == "fixed"){
+      code <- paste0(code, "\n\t\t\tdelta[i,k,2:", ncat, "] <- md[i,k,]")
+    }
+    
+    code <- paste0(code, "\n\t\t\tdelta[i,k,2:", ncat, "] ~ dmnorm(md[i,k,], prec[,])",
                      "\n\t\t\tfor(j in 1:", ncat-1, "){",
                      "\n\t\t\t\tmd[i,k,j] <- d[t[i,1], t[i,k], j]",
                      "\n\t\t\t}",
                      "\n\t\t}",
                      "\n\t}")
-    }
     
     code <- paste0(code, "\n\tfor(i in 1:", nstudy, "){",
                    "\n\t\tmu[i,1] <- 0",
