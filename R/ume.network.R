@@ -174,8 +174,7 @@ ume.multinomial.rjags <- function(network){
       code <- paste0(code, "\n\t\t\tdelta[i,k,2:", ncat, "] <- md[i,k,]")
     }
     
-    code <- paste0(code, "\n\t\t\tdelta[i,k,2:", ncat, "] ~ dmnorm(md[i,k,], prec[,])",
-                     "\n\t\t\tfor(j in 1:", ncat-1, "){",
+    code <- paste0(code, "\n\t\t\tfor(j in 1:", ncat-1, "){",
                      "\n\t\t\t\tmd[i,k,j] <- d[t[i,1], t[i,k], j]",
                      "\n\t\t\t}",
                      "\n\t\t}",
