@@ -147,10 +147,6 @@ ume.multinomial.rjags <- function(network){
                    "\n\t\t\tfor(m in 1:", ncat, ") {",
                    "\n\t\t\t\tp[i,k,m] <- theta[i,k,m]/sum(theta[i,k,])",
                    "\n\t\t\t\tlog(theta[i,k,m]) <- mu[i,m] + delta[i,k,m]")
-       
-    # else if(type == "fixed"){
-    #   code <- paste0(code, "\n\t\t\t\tlog(theta[i,k,m]) <- mu[i,m] + d[t[i,1], t[i,k], m]")
-    # }
         
     code <- paste0(code,  "\n\t\t\t\trhat[i,k,m] <- p[i,k,m]*n[i,k]",
                    "\n\t\t\t\tdv[i,k,m] <- 2*r[i,k,m]*log(r[i,k,m]/rhat[i,k,m])",
@@ -441,8 +437,7 @@ ume.network.inits <- function(network, n.chains){
   response <- network$response
   
   inits <- if(response == "multinomial"){
-    NULL
-   # ume.multinomial.inits(network, n.chains)
+    ume.multinomial.inits(network, n.chains)
   } else if(response == "binomial"){
     ume.binomial.inits(network, n.chains)
   } else if(response == "normal"){
@@ -450,6 +445,86 @@ ume.network.inits <- function(network, n.chains){
   }
   return(inits)
 }
+
+
+ume.multinomial.inits <- function(network, n.chains)
+{
+  with(network,{
+    
+    Outcomes <- Outcomes + 0.5
+    logits <- as.matrix(log(Outcomes[, -1]) - log(Outcomes[, 1]))
+    se.logits <- as.matrix(sqrt(1/Outcomes[, -1] + 1/Outcomes[, 1]))
+    
+    mu <- se.mu <- matrix(NA, nstudy, ncat)
+    mu[,2:ncat] <- logits[b.id,]
+    se.mu[,2:ncat] <- se.logits[b.id,]
+    
+    delta <- logits - apply(as.matrix(mu[, -1]), 2, rep, times = na)
+    rows.of.basetreat <- seq(dim(as.matrix(delta))[1])*as.numeric(b.id)
+    delta <- delta[-rows.of.basetreat,,drop=F]   # Eliminate base treatment arms
+
+    ###################### Using delta, mu, and se.mu to make initial values
+    
+    # design matrix
+    base.tx <- Treat[b.id]    # base treatment for N studies
+    end.Study <- c(0, cumsum(na))  # end row number of each trial
+    rows <- end.Study - seq(0, nstudy)   # end number of each trial not including base treatment arms
+    design.mat <- matrix(0, sum(na) - nstudy, ntreat*(ntreat-1)/2 ) # no. non-base arms x #txs
+    col_names <- NULL
+    
+    for(j in 2:ntreat){
+      for(i in 1:(j-1)){
+        col_names <- c(col_names, paste0("Treat", i, j))
+      }
+    }
+    colnames(design.mat) <- col_names
+    
+    for(i in seq(nstudy)){
+      studytx <- Treat[(end.Study[i]+1):end.Study[i+1]]  #treatments in ith Study
+      nonbase.tx <- studytx[studytx!=base.tx[i]]    #non-baseline treatments for ith Study
+      for (j in seq(length(nonbase.tx))){
+        design.mat[j+rows[i],paste0("Treat", base.tx[i], nonbase.tx[j])] <- 1
+      }
+    }
+    
+    y <- delta 
+    d <- se.d <- matrix(NA, length(unique(Treat)), ncat - 1)
+    resid.var <- rep(NA, ncat -1)
+    
+    for(k in 1:(ncat - 1)){
+      fit <- summary(lm(y[,k] ~ design.mat - 1))
+      d[,k] <- coef(fit)[,1]
+      se.d[,k] <- coef(fit)[,2]
+      resid.var[k] <- fit$sigma^2
+    }
+    
+    initial.values = list()
+    for(i in 1:n.chains){
+      initial.values[[i]] = list()
+    }
+    for(i in 1:n.chains){
+      random.mu <- rnorm(length(mu))
+      initial.values[[i]][["mu"]] <- mu + se.mu * random.mu
+    }
+    
+    if(!any(is.na(d))){
+      for(i in 1:n.chains){
+        random.d = rnorm(length(d[,1]))
+        d.array <- array(NA, dim = c(ntreat-1, ntreat, ncat-1))
+        for(jj in 1:(ncat-1)){
+          d.matrix <- matrix(NA, nrow = ntreat, ncol = ntreat)
+          d.matrix[upper.tri(d.matrix)] <- d[,jj] + se.d[,jj] * random.d
+          d.matrix <- d.matrix[-ntreat,]
+          d.array[,,jj] <- d.matrix
+        }
+        initial.values[[i]][["d"]] <- d.array
+      }
+    }
+    return(initial.values)
+  })
+}
+
+
 
 ume.normal.inits <- function(network, n.chains){
   
