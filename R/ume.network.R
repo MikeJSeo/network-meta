@@ -462,14 +462,14 @@ ume.multinomial.inits <- function(network, n.chains)
     delta <- logits - apply(as.matrix(mu[, -1]), 2, rep, times = na)
     rows.of.basetreat <- seq(dim(as.matrix(delta))[1])*as.numeric(b.id)
     delta <- delta[-rows.of.basetreat,,drop=F]   # Eliminate base treatment arms
-
+    
     ###################### Using delta, mu, and se.mu to make initial values
     
     # design matrix
     base.tx <- Treat[b.id]    # base treatment for N studies
     end.Study <- c(0, cumsum(na))  # end row number of each trial
     rows <- end.Study - seq(0, nstudy)   # end number of each trial not including base treatment arms
-    design.mat <- matrix(0, sum(na) - nstudy, ntreat*(ntreat-1)/2 ) # no. non-base arms x #txs
+    design.mat <- matrix(0, sum(na) - nstudy, ntreat*(ntreat-1)/2) # no. non-base arms x #txs
     col_names <- NULL
     
     for(j in 2:ntreat){

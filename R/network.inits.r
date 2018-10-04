@@ -23,7 +23,6 @@ normal.inits <- function(network, n.chains){
     inits <- make.inits(network, n.chains, delta, Eta, se.Eta)
     return(inits)
   })
-
 }
 
 binomial.inits <- function(network, n.chains){
