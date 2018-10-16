@@ -127,7 +127,9 @@ network.run <- function(network, inits = NULL, n.chains = 3, max.run = 100000, s
   pars.save <- unique(pars.save)
 
   if(is.null(inits)){
-    inits <- network.inits(network, n.chains)
+    if(!any(is.na(network$data))){
+      inits <- network.inits(network, n.chains)  
+    }
   }
   
   samples <- jags.fit(network, data, pars.save, inits, n.chains, max.run, setsize, n.run, conv.limit)
