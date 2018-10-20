@@ -149,6 +149,10 @@ network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, response =
     add_data <- fictitious.row(response, ncol, no_reference)
     colnames(add_data) <- colnames(data)
     data <- rbind(data, add_data)
+    
+    #redefine some variables
+    na <- rle(data$Study)$lengths
+    nrow <- dim(data)[1]
     print(data)
   }
   
