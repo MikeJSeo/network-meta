@@ -137,6 +137,20 @@ network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, response =
   nstudy <- length(unique(Study))
   ntreat <- length(unique(Treat))
 
+  # If baseline.risk = "exchangeable", add a fictitious arm with overall reference treatment
+  
+  if(baseline.risk == "exchangeable"){
+    no_reference <- vector(mode = "integer")
+    for(i in seq(nstudy)){
+      if(!1 %in% data[data$Study == i, "Treat"]){
+        no_reference <- c(no_reference, i)  
+      } 
+    }
+    data <- rbind(data, no_reference)    
+  }
+
+    
+  
   # permute the data so that base treatment arm is always listed first in each study
   data <- data[order(as.numeric(as.character(data$Study)), data$Treat),,drop=FALSE]
   data[!names(data) %in% c("Orig_Study", "Orig_Treat")] <- suppressWarnings(sapply(data[!names(data) %in% c("Orig_Study", "Orig_Treat")], function(x) {as.numeric(paste(x))}))
@@ -144,13 +158,13 @@ network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, response =
   Outcomes <- as.matrix(data[,1:ncol])
   Treat <- data$Treat
   Study <- data$Study
-
+  
   if(response == "binomial" || response == "multinomial"){
     N <- data$N
   } else if(response == "normal"){
     SE <- data$SE
   }
-
+  
   ends <- cumsum(na) # End row of trials
   starts <- c(1, ends[-length(ends)] + 1) # Start row of trials
   b.Treat <- rep(NA, length(na))
@@ -488,3 +502,18 @@ check.hy.prior <- function(hy.prior, response){
     stopifnot(distr %in% c("dwish"))
   }
 }
+
+
+fictitious.row <- function(response, ncol, no_reference){
+  store <- vector(mode = "integer")
+  if(response == "binomial"){
+    for(i in 1:length(no_reference)){
+      store <- rbind(store, c(rep(NA, ncol), 1, no_reference[i], NA, 1, NA))
+    }
+  }
+  return(store)
+}
+
+cbind(Outcomes, N, Study, Orig_Study, Treat, Orig_Treat)
+} else if(response == "normal"){
+  cbind(Outcomes, SE, Study, Orig_Study, Treat, Orig_Treat)
