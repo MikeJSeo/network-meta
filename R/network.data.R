@@ -149,9 +149,6 @@ network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, response =
     add_data <- fictitious.row(response, ncol, no_reference)
     colnames(add_data) <- colnames(data)
     data <- rbind(data, add_data)
-    
-    #redefine some variables
-    na <- rle(data$Study)$lengths
     nrow <- dim(data)[1]
     print(data)
   }
@@ -169,6 +166,10 @@ network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, response =
   } else if(response == "normal"){
     SE <- data$SE
   }
+  
+  #redefine some variables after permuting the data
+  na <- rle(Study)$lengths
+ 
   
   ends <- cumsum(na) # End row of trials
   starts <- c(1, ends[-length(ends)] + 1) # Start row of trials
