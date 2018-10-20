@@ -149,6 +149,7 @@ network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, response =
     add_data <- fictitious.row(response, ncol, no_reference)
     colnames(add_data) <- colnames(data)
     data <- rbind(data, add_data)
+    print(data)
   }
   
   # permute the data so that base treatment arm is always listed first in each study
