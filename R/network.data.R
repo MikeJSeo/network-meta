@@ -511,7 +511,3 @@ fictitious.row <- function(response, ncol, no_reference){
   }
   return(store)
 }
-
-cbind(Outcomes, N, Study, Orig_Study, Treat, Orig_Treat)
-} else if(response == "normal"){
-  cbind(Outcomes, SE, Study, Orig_Study, Treat, Orig_Treat)
