@@ -68,7 +68,7 @@ make.inits <- function(network, n.chains, delta, Eta, se.Eta){
 
   fit <- summary(lm(y ~ design.mat - 1))
   d <- se.d <- rep(NA, ntreat)
-  if(length(d[-1]) == length(coef(fit)))){
+  if(length(d[-1]) == length(coef(fit))){
     d[-1] <- coef(fit)[,1]
     se.d[-1] <- coef(fit)[,2]    
   }
