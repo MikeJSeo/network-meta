@@ -67,7 +67,7 @@ make.inits <- function(network, n.chains, delta, Eta, se.Eta){
   design.mat <- design.mat[,-1,drop=F]
 
   fit.lm <- lm(y ~design.mat - 1)
-  fit <- summary(fit)
+  fit <- summary(fit.lm)
   d <- se.d <- rep(NA, ntreat)
   d[-1] <- dummy.coef(fit.lm)[,1]
   se.d[-1] <- dummy.coef(fit.lm)[,2]
