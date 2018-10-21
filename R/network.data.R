@@ -146,11 +146,13 @@ network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, response =
         no_reference <- c(no_reference, i)  
       } 
     }
-    add_data <- fictitious.row(response, ncol, no_reference)
-    colnames(add_data) <- colnames(data)
-    data <- rbind(data, add_data)
-    nrow <- dim(data)[1]
-    print(data)
+    
+    if(length(no_reference) != 0){
+      add_data <- fictitious.row(response, ncol, no_reference)
+      colnames(add_data) <- colnames(data)
+      data <- rbind(data, add_data)
+      nrow <- dim(data)[1]
+    }
   }
   
   # permute the data so that base treatment arm is always listed first in each study
@@ -244,9 +246,9 @@ network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, response =
       rdummy[r[,1] == 0] = 0.5
       ndummy = n[,1]
       ndummy[r[,1] == 0 & !is.na(r[,1])] = ndummy[r[,1] == 0 & !is.na(r[,1])] + 1
-
+      
       #take only the non-active control group (treatment A) to calculate the observed mean log odds
-      p = (rdummy/ndummy)[t[,1]==1]
+      p = (rdummy[!is.na(rdummy)]/ndummy[!is.na(rdummy)]) #[t[,1][!is.na(rdummy)]==1]
       lodds = log(p/(1-p))
       network$mx_bl = mean(lodds, na.rm = TRUE)
     }
@@ -265,6 +267,7 @@ network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, response =
       network$mx_bl = apply(lodds, 2, mean, na.rm = TRUE)
     }
   }
+  
   # calculate mean of covariate
   if(!is.null(covariate)){
     for(i in 1:dim(covariate)[2]){
