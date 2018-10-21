@@ -66,10 +66,11 @@ make.inits <- function(network, n.chains, delta, Eta, se.Eta){
   }
   design.mat <- design.mat[,-1,drop=F]
 
-  fit <- summary(lm(y ~ design.mat - 1))
+  fit.lm <- lm(y ~design.mat - 1)
+  fit <- summary(fit)
   d <- se.d <- rep(NA, ntreat)
-  d[-1] <- dummy.coef(fit)[,1]
-  se.d[-1] <- dummy.coef(fit)[,2]
+  d[-1] <- dummy.coef(fit.lm)[,1]
+  se.d[-1] <- dummy.coef(fit.lm)[,2]
   resid.var <- fit$sigma^2
 
   # covariate
