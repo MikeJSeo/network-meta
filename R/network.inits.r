@@ -68,7 +68,9 @@ make.inits <- function(network, n.chains, delta, Eta, se.Eta){
 
   fit <- summary(lm(y ~ design.mat - 1))
   d <- se.d <- rep(NA, ntreat)
+  print(coef(fit, complete = TRUE))
   d[-1] <- coef(fit, complete = TRUE)[,1]
+  
   se.d[-1] <- coef(fit, complete = TRUE)[,2]
   resid.var <- fit$sigma^2
 
