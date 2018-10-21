@@ -208,7 +208,7 @@ ume.normal.rjags <- function(network){
     code <- paste0("model\n{",
                    "\n\tfor(i in 1:", nstudy, ") {",
                    "\n\t\tdelta[i,1] <- 0",
-                   "\n\t\tmu[i] ~ dnorm(0,.0001)",
+                   "\n\t\tmu[i] ~ dnorm(mean.mu, prec.mu)",
                    "\n\t\tfor(k in 1:na[i]) {",
                    "\n\t\t\ttau[i,k] <- 1/pow(se[i,k],2)",
                    "\n\t\t\tr[i,k] ~ dnorm(theta[i,k], tau[i,k])")
@@ -237,7 +237,7 @@ ume.normal.rjags <- function(network){
     code <- paste0(code,
                    "\n\tfor(c in 1:", ntreat -1, ") {",
                    "\n\t\tfor(k in (c+1):", ntreat, ") {",
-                   "\n\t\t\td[c,k] ~ dnorm(", mean.d, ", ", prec.d, ")",
+                   "\n\t\t\td[c,k] ~ dnorm(mean.d, prec.d"),
                    "\n\t\t}",
                    "\n\t}")
     
@@ -261,10 +261,9 @@ ume.binomial.rjags <- function(network){
     code <- paste0("model\n{",
                    "\n\tfor(i in 1:", nstudy, ") {",
                    "\n\t\tdelta[i,1] <- 0",
-                   "\n\t\tmu[i] ~ dnorm(0,.0001)",
+                   "\n\t\tmu[i] ~ dnorm(mean.mu,prec.mu)",
                    "\n\t\tfor(k in 1:na[i]) {",
                    "\n\t\t\tr[i,k] ~ dbin(p[i,k], n[i,k])")
-    
     
     if(type == "fixed"){
       code <- paste0(code, "\n\t\t\tlogit(p[i,k]) <- mu[i] + d[t[i,1], t[i,k]]")
@@ -292,7 +291,7 @@ ume.binomial.rjags <- function(network){
     code <- paste0(code,
                    "\n\tfor(c in 1:", ntreat -1, ") {",
                    "\n\t\tfor(k in (c+1):", ntreat, ") {",
-                   "\n\t\t\td[c,k] ~ dnorm(", mean.d, ", ", prec.d, ")",
+                   "\n\t\t\td[c,k] ~ dnorm(mean.d, prec.d)",
                    "\n\t\t}",
                    "\n\t}")
                    
