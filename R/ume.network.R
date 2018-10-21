@@ -237,7 +237,7 @@ ume.normal.rjags <- function(network){
     code <- paste0(code,
                    "\n\tfor(c in 1:", ntreat -1, ") {",
                    "\n\t\tfor(k in (c+1):", ntreat, ") {",
-                   "\n\t\t\td[c,k] ~ dnorm(mean.d, prec.d"),
+                   "\n\t\t\td[c,k] ~ dnorm(mean.d, prec.d)",
                    "\n\t\t}",
                    "\n\t}")
     
