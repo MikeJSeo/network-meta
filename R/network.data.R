@@ -148,10 +148,12 @@ network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, response =
     }
     
     add_data <- fictitious.row(response, ncol, no_reference)
-    colnames(add_data) <- colnames(data)
-    data <- rbind(data, add_data)
-    nrow <- dim(data)[1]
     
+    if(length(add_data) != 0){
+      colnames(add_data) <- colnames(data)
+      data <- rbind(data, add_data)
+      nrow <- dim(data)[1]  
+    }
   }
   
   # permute the data so that base treatment arm is always listed first in each study
@@ -513,9 +515,10 @@ check.hy.prior <- function(hy.prior, response){
 
 fictitious.row <- function(response, ncol, no_reference){
   store <- vector(mode = "integer")
-  for(i in 1:length(no_reference)){
-    store <- rbind(store, c(rep(NA, ncol), 1, no_reference[i], NA, 1, NA))
+  if(length(no_reference) != 0){
+    for(i in 1:length(no_reference)){
+      store <- rbind(store, c(rep(NA, ncol), 1, no_reference[i], NA, 1, NA))
+    }    
   }
-  
   return(store)
 }
