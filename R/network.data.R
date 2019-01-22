@@ -114,7 +114,6 @@ network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, response =
   } else{
     Treat.order <- sort(unique(Treat))
   }
-
   Orig_Study <- Study
   Orig_Treat <- Treat
 
