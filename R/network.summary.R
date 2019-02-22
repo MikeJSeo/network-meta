@@ -1045,6 +1045,6 @@ draw.network.graph = function(network){
   pairs <- do.call(rbind, lapply(split(Treat, Study),
                                  function(x) t(combn(x,2))))
   pairs <- aggregate(rep(1, length(X1)) ~ X1 + X2, data = data.frame(pairs), sum)
-  g <- graph.edgelist(as.matrix(pairs[,1:2]), directed=FALSE)
+  g <- igraph::graph.edgelist(as.matrix(pairs[,1:2]), directed=FALSE)
   plot(g, edge.curved=FALSE, edge.width=pairs$freq, vertex.label.dist=.7)
 }
