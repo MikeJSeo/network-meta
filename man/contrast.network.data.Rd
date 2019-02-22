@@ -33,6 +33,11 @@ contrast.network.data(Outcomes, Treat, SE, na, V = NULL,
 This is similar to the function \code{\link{network.data}}, except it uses contrast-level data instead of arms-level data. Contrast-level format uses treatment differences relative to the control arm.
 Note that in two arm trials there is only one contrast value per trial, but in three arm trials there are two contrast values relative to the control arm.
 }
+\examples{
+network <- with(parkinsons_contrast, {
+ contrast.network.data(Outcomes, Treat, SE, na, V)
+})
+}
 \references{
 A.J. Franchini, S. Dias, A.E. Ades, J.P. Jansen, N.J. Welton (2012), \emph{Accounting for correlation in network meta-analysis with multi-arm trials}, Research Synthesis Methods 3(2):142-160. [\url{https://doi.org/10.1002/jrsm.1049}]
 

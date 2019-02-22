@@ -9,5 +9,5 @@ Authors@R: c(
 Description: Network meta-analyses using Bayesian framework. Based on the data input, creates prior, model file, and initial values needed to run models in rjags. Able to handle binomial, normal and multinomial arm-based data. Can handle multi-arm trials and includes methods to incorporate covariate and baseline risk effects. Includes standard diagnostics and visualization tools to evaluate the results.
 License: GPL-3
 LazyData: true
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1
 Encoding: UTF-8
