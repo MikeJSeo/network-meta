@@ -181,7 +181,7 @@ jags.fit <- function(network, data, pars.save, inits, n.chains, max.run, setsize
   varnames <- dimnames(samples[[1]])[[2]]
   varnames.split <- sapply(strsplit(varnames, "\\["), '[[', 1)
   conv.save.variables <- varnames.split %in% conv.save
-
+  
   max.gelman <- find.max.gelman(samples, conv.save.variables)
   print(max.gelman)
   check <- max.gelman > conv.limit
@@ -206,7 +206,10 @@ jags.fit <- function(network, data, pars.save, inits, n.chains, max.run, setsize
   burnin <- ceiling(end - mid)
   samples <- window(samples, mid+1, end, 1) #keep the last half of the converged sequence
   samples <- new.mcmc(samples)
-
+  
+#  conv.save.variables.names <- varnames[conv.save.variables]
+#  kappa <- calculate_kappa(samples, conv.save.variables.names)
+  
   n.thin <- 1
   if(check == TRUE){
     print("code didn't converge according to gelman-rubin diagnostics")
@@ -226,7 +229,7 @@ jags.fit <- function(network, data, pars.save, inits, n.chains, max.run, setsize
   max.gelman <- find.max.gelman(samples, conv.save.variables)
   print(max.gelman)
 
-  out <-list(burnin = burnin, n.thin = n.thin, samples = samples, max.gelman = max.gelman)
+  out <-list(burnin = burnin, n.thin = n.thin, samples = samples, max.gelman = max.gelman, kappa = kappa)
   return(out)
 }
 
@@ -273,3 +276,17 @@ find.max.gelman <- function(samples, index){
   max(gelman.diag(samples2, multivariate = FALSE)$psrf[,1]) #look at point estimate instead of 95% C.I.
 }
 
+find.max.gelman.variable <- function(samples, index){
+  samples2 <- lapply(samples, function(x){ x[,index]})
+  samples2 <- lapply(samples2, function(x) { x[,colSums(abs(x)) != 0] })
+  
+  names(which.max(gelman.diag(samples2, multivariate = FALSE)$psrf[,1])) # find the biggest
+}
+
+
+calculate_kappa <- function(samples, max.variable){
+  
+  a <- apply(sapply(conv.save.variables.names, function(x) sapply(autocorr(samples[,x], 1:99), sum)), 2, mean)
+  b <- max(abs(a[!is.nan(a)]))
+  return(ceiling(b))
+}

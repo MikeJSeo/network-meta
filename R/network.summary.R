@@ -1019,3 +1019,45 @@ network.forest.plot <- function(result, level = 0.95, ticks.position = NULL, lab
   grid::grid.draw(gt)
   }
 }
+
+
+#' Draws network graph using igraph package
+#'
+#' This function draws network graph using igraph package
+#' @param network Object created by \code{\link{network.data}} function
+#' @examples
+#' #cardiovascular
+#' network <- with(cardiovascular, {
+#'  network.data(Outcomes, Study, Treat, N, response = "multinomial")
+#' })
+#' result <- network.run(network)
+#' variance.tx.effects(result)
+#' @export
+
+draw.network.graph = function(network){
+  
+  pairs <- do.call(rbind, sapply(split(network$Treat, network$Study)), 
+                                 function(x) t(combn(x,2))))
+  pairs <- aggregate(rep(1, length(X1)) ~ X1 + X2, data = data.frame(pairs), sum)
+  g <- graph.edgelist(as.matrix(pairs[,1:2]), directed=FALSE)
+  plot(g, edge.curved=FALSE, edge.width=pairs$freq, vertex.label.dist=.7,
+       vertex.label=c("Individual\nCounseling", "Group\nCounseling", "No Contact", "Self-Help"))
+  
+  
+  
+}
+
+variance.tx.effects = function(result)
+{
+  if(result$network$response != "multinomial"){
+    stop("this function is used only for multinomial response")
+  }
+  samples_sigma <- pick.summary.variables(result, only.pars = c("sigma"))
+  samples_sigma <- do.call(rbind, samples_sigma)
+  samples_sigma <- apply(samples_sigma, 2, mean)
+  
+  sigma_matrix <- matrix(samples_sigma, nrow = result$network$ncat-1)
+  cor_matrix <- sigma_matrix/outer(sqrt(diag(sigma_matrix)),sqrt(diag(sigma_matrix)))
+  
+  return(list(sigma_matrix = sigma_matrix, cor_matrix = cor_matrix))
+}
