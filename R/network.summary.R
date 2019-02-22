@@ -1027,7 +1027,7 @@ network.forest.plot <- function(result, level = 0.95, ticks.position = NULL, lab
 #' @param network Object created by \code{\link{network.data}} function
 #' @examples
 #' #cardiovascular
-#' network <- withthrombolytic, {
+#' network <- with(thrombolytic, {
 #'  network.data(Outcomes, Study, Treat, N=N, response = "binomial")
 #' })
 #' draw.network.graph(network)
