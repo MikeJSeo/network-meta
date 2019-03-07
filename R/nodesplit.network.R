@@ -98,10 +98,26 @@ nodesplit.binomial.rjags <- function(network){
   with(network, {
     
     code <- paste0("model\n",
-                   "\n\tfor(i in 1:", nstudy, ") {",
-                   "w[i,1] <- 0",
-                   "j[i,1] <- 0",
-                   "delta[i,bi[i]] <- 0"
+                   "\nfor(i in 1:", nstudy, ") {",
+                   "\n\tw[i,1] <- 0",
+                   "\n\tj[i,1] <- 0",
+                   "\n\tdelta[i,bi[i]] <- 0",
+                   "\n\tmu[i] ~ dnorm(0,.0001)",
+                   "\n\tfor (k in 1:na[i]) {",
+                   "\n\t\tr[i,k] ~ dbin(p[i,t[i,k]], n[i,k])",
+                   "\n\t\tlogit(p[i,t[i,k]]) <- mu[i] + delta[i,t[i,k]]",
+                   "\n\t\tindex[i,k] <- split[i] * (equals(t[i,k], pair[1]) "
+                   
+                   
+                   r[i,k] ~ dbin(p[i,t[i,k]],n[i,k])                   # binomial likelihood
+                   logit(p[i,t[i,k]])<-mu[i] + delta[i,t[i,k]]         # model
+                   index[i,k] <- split[i] * (equals(t[i,k], pair[1]) + equals(t[i,k], pair[2]))
+                   #Deviance contribution
+                   rhat[i,k] <- p[i,t[i,k]] * n[i,k]                   # expected value of the numerators
+                   dev[i,k] <- 2 * (r[i,k] * (log(r[i,k])-log(rhat[i,k]))
+                                    + (n[i,k]-r[i,k]) * (log(n[i,k]-r[i,k]) - log(n[i,k]-rhat[i,k])))
+  }
+                   
                    
                    
                    # w[i,1] <-0
