@@ -62,7 +62,7 @@ nodesplit.network.data <- function(Outcomes, Study, Treat,  N = NULL, SE = NULL,
     r <- r[,,1]
   }
   
-  network <- list(Outcomes = Outcomes, Study = Study, Treat = Treat, r = r, t = t, type = type, rank.preference = NULL, nstudy = nstudy, na = na, ntreat = ntreat, b.id = b.id, response = response)
+  network <- list(Outcomes = Outcomes, Study = Study, Treat = Treat, r = r, t = t, type = type, rank.preference = NULL, nstudy = nstudy, na = na, ntreat = ntreat, b.id = b.id, b.Treat = b.Treat response = response)
   
   if(response == "binomial" || response == "multinomial"){
     network$N = N
@@ -83,11 +83,78 @@ nodesplit.network.rjags <- function(network){
   
   network <- with(network, {
     if(response == "binomial"){
-      ume.binomial.rjags(network)  
+      nodesplit.binomial.rjags(network)  
     } else if(response == "normal"){
-      ume.normal.rjags(network)
+      nodesplit.normal.rjags(network)
     } else if(response == "multinomial"){
-      ume.multinomial.rjags(network)
+      nodesplit.multinomial.rjags(network)
     }
+  })
+}
+
+
+nodesplit.binomial.rjags <- function(network){
+  
+  with(network, {
+    
+    code <- paste0("model\n",
+                   "\n\tfor(i in 1:", nstudy, ") {",
+                   "w[i,1] <- 0",
+                   "j[i,1] <- 0",
+                   "delta[i,bi[i]] <- 0"
+                   
+                   
+                   # w[i,1] <-0
+                   # j[i,1] <-0
+                   # delta[i,bi[i]] <- 0
+                   # mu[i] ~ dnorm(0,.0001)                                    # vague priors for 24 trial baselines
+                   # for (k in 1:na[i])  {
+                   
+                   
+                   )
+    
+    code <- paste0("model\n{",
+                   "\n\tfor(i in 1:", nstudy, ") {",
+                   "\n\t\tdelta[i,1] <- 0",
+                   "\n\t\tmu[i] ~ dnorm(mean.mu,prec.mu)",
+                   "\n\t\tfor(k in 1:na[i]) {",
+                   "\n\t\t\tr[i,k] ~ dbin(p[i,k], n[i,k])")
+    
+    if(type == "fixed"){
+      code <- paste0(code, "\n\t\t\tlogit(p[i,k]) <- mu[i] + d[t[i,1], t[i,k]]")
+    } else if(type == "random"){
+      code <- paste0(code, "\n\t\t\tlogit(p[i,k]) <- mu[i] + delta[i,k]")
+    }
+    
+    code <- paste0(code,          
+                   "\n\t\t\trhat[i,k] <- p[i,k] * n[i,k]",
+                   "\n\t\t\tdev[i,k] <- 2 * (r[i,k] * (log(r[i,k])- log(rhat[i,k])) + (n[i,k] - r[i,k]) * (log(n[i,k] - r[i,k]) - log(n[i,k] - rhat[i,k])))",
+                   "\n\t\t}",
+                   "\n\t\tresdev[i] <- sum(dev[i,1:na[i]])"
+    )
+    
+    if(type == "random"){
+      code <- paste0(code, "\n\t\tfor (k in 2:na[i]) {",
+                     "\n\t\t\tdelta[i,k] ~ dnorm(d[t[i,1],t[i,k]], prec)",
+                     "\n\t\t}")
+    }
+    
+    code <- paste0(code, 
+                   "\n\t}",
+                   "\n\ttotresdev <- sum(resdev[])")
+    
+    code <- paste0(code,
+                   "\n\tfor(c in 1:", ntreat -1, ") {",
+                   "\n\t\tfor(k in (c+1):", ntreat, ") {",
+                   "\n\t\t\td[c,k] ~ dnorm(mean.d, prec.d)",
+                   "\n\t\t}",
+                   "\n\t}")
+    
+    if(type == "random"){
+      code <- paste0(code, ume.hy.prior.rjags(hy.prior, 0))
+    }
+    
+    code <- paste0(code, "\n}")
+    return(code)
   })
 }
