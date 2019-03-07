@@ -12,7 +12,7 @@ nodesplit.network.data(Outcomes, Study, Treat, N = NULL, SE = NULL,
 
 \item{Study}{A vector of study indicator for each arm}
 
-\item{Treat}{A vector of treatment indicator for each arm. Treatments should have positive integer values starting from 1 to total number of treatments. In a study, lowest number is taken as the baseline treatment.}
+\item{Treat}{A vector of treatment indicator for each arm. Treatments should have positive integer values starting from 1 to total number of treatments. In a study, lowest number is taken as the baseline treatment. Also, in each study first arm should be the baseline treatment and lower number treatment arms should come before the higher ones. (i.e. treatment arm should go 1, 2, 4 and not 1, 4, 2). See example data for clarification.}
 
 \item{N}{A vector of total number of observations in each arm. Used for binomial and multinomial responses.}
 
