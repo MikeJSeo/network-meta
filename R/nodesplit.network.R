@@ -63,6 +63,7 @@ nodesplit.network.data <- function(Outcomes, Study, Treat,  N = NULL, SE = NULL,
   }
   
   network <- list(Outcomes = Outcomes, Study = Study, Treat = Treat, r = r, t = t)
+  print(network)
   #, type = type, rank.preference = NULL, nstudy = nstudy, na = na, ntreat = ntreat, b.id = b.id, response = response, hy.prior = hy.prior)
   
   if(response == "binomial" || response == "multinomial"){
