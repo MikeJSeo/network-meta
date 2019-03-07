@@ -14,7 +14,7 @@ This function draws network graph using igraph package
 }
 \examples{
 #cardiovascular
-network <- withthrombolytic, {
+network <- with(thrombolytic, {
  network.data(Outcomes, Study, Treat, N=N, response = "binomial")
 })
 draw.network.graph(network)
