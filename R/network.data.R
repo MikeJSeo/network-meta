@@ -1,36 +1,39 @@
 #' Make a network object containing data, priors, and a JAGS model file
 #' 
-#' This function is where the user enters the data and makes a network object that is in a format that can be analyzed using \code{\link{network.run}}.
-#' At the very least, user needs to specify Outcomes, Study, Treat, N or SE, and response. Other parameters such as prior parameters are filled in automatically based on the data type if not specified.
-#' The input data is in arm-level, meaning we have observations for each treatment in each study.
+#' This function makes a network object that can be used to run network meta-analysis using \code{\link{network.run}}.
+#' User needs to specify Outcomes, Study, Treat, N or SE, and response. 
+#' Prior parameters are filled in automatically based on the data type if not specified.
+#' The input data should be arm-level so that we have observations for each treatment in each study.
+#' The input data is preprocessed to fit the format necessary to run model in JAGS. 
+#' See \code{\link{network.run}} for more details on preprocessing.
 #'
-#' @param Outcomes Arm-level outcomes. If it is a multinomial response, the matrix would be arms (row) by multinomial categories (column). If it is binomial or normal, it would be a vector.
+#' @param Outcomes Arm-level outcomes. If it is a multinomial response, the matrix would have dimensions treatment arms (row) by multinomial categories (column). If it is binomial or normal, it would be a vector.
 #' @param Study A vector of study indicator for each arm
 #' @param Treat A vector of treatment indicator for each arm
-#' @param N A vector of total number of observations in each arm. Used for binomial and multinomial responses
+#' @param N A vector of total number of observations in each arm. Used for binomial and multinomial responses.
 #' @param SE A vector of standard error for each arm. Used only for normal response.
 #' @param response Specification of the outcomes type. Must specify one of the following: "normal", "binomial", or "multinomial".
-#' @param Treat.order This specifies the treatment order and therefore how treatments are compared. The first treatment that is specified is considered as a base treatment. Default order is alphabetical. This would hold true for numbers. If the treatments are coded 1, 2, etc, then the treatment with a value of 1 would be assigned as a baseline treatment.
+#' @param miss.matrix This is R code used for multinomial multinomial model. Still under revision
+#' @param Treat.order Treatment order which determines how treatments are compared. The first treatment that is specified is considered to be the baseline treatment. Default order is alphabetical. If the treatments are coded 1, 2, etc, then the treatment with a value of 1 would be assigned as a baseline treatment.
 #' @param type Type of model fitted: either "random" for random effects model or "fixed" for fixed effects model. Default is "random".
 #' @param rank.preference Set it equal to "higher" if higher values are preferred (i.e. assumes events are good). Set it equal to "lower" if lower values are preferred (i.e. assumes events are bad). Default is "higher".
-#' @param miss.matrix This is a parameter for running incomplete multinomial. Still under revision.
 #' @param baseline Three different assumptions for treatment x baseline risk interactions (slopes): "independent", "common", or "exchangeable". Default is "none" which doesn't incorporate baseline risk. 
 #' @param baseline.risk Two different assumptions for baseline risk: "independent" or "exchangeable". See Achana et al. (2012) for more information about baseline risk.
 #' @param covariate A covariate matrix with each row representing each trial and column representing each covariate. This is a study-level data, meaning that the user doesn't need to repeatedly specify covariates for each arm.
 #' @param covariate.type Should be a vector indicating the type of the covariate. Covariate can be either "continuous" or "discrete". If it continuous, covariates are centered. If the covariate is discrete it is not centered and it has to be in a dummy integer format (i.e. 0,1,2,...). The code doesn't factor the covariates for the user, so user needs to specify dummy variables if factor is needed.
 #' @param covariate.model "independent" allows covariate effects for each treatment. "common" restricts same covariate effect for all treatment. Lastly, "exchangeable"  assumes that the covariate effects are different but related and strength is borrowed across them. We set "common" to be default. See Cooper et al. (2009) for more details on covariates.
-#' @param dic This is an indicator for whether user wants to calculate DIC. Model stores less information if you set it to FALSE.
+#' @param dic This is an indicator for whether user wants to calculate DIC. Model stores less information if you set it to FALSE. Default is TRUE.
 #' @param mean.d Prior mean for the relative effect
 #' @param prec.d Prior precision for the relative effect
 #' @param mean.Eta Prior mean for the study effect (baseline risk)
 #' @param prec.Eta Prior precision for the study effect (baseline risk)
-#' @param hy.prior.Eta Between treatment heterogeneity in baseline risk (for exchangeable assumption only). Format of the data is same as hy.prior. 
+#' @param hy.prior.Eta Between treatment heterogeneity in baseline risk (for exchangeable assumption only). Format of the parameter is same as hy.prior. 
 #' @param mean.bl Prior mean for the baseline slope
 #' @param prec.bl Prior precision for the baseline slope
-#' @param hy.prior.bl Between treatment heterogeneity in baseline slope (for exchangeable regression coefficient only). Format of the data is same as hy.prior.
+#' @param hy.prior.bl Between treatment heterogeneity in baseline slope (for exchangeable regression coefficient only). Format of the parameter is same as hy.prior.
 #' @param mean.cov Prior mean for the covariate effect
 #' @param prec.cov Prior precision for the covariate effect
-#' @param hy.prior.cov Between treatment heterogeneity in covariate effect (for exchangeable regression coefficient only). Format of the data is same as hy.prior. Default is set to be dunif(0, 5) for binary, dunif(0, 100) for normal, and wishart with identity scale matrix and (# of categories - 1) degrees of freedom.
+#' @param hy.prior.cov Between treatment heterogeneity in covariate effect (for exchangeable regression coefficient only). Format of the parameter is same as hy.prior. Default is set to be dunif(0, 5) for binary, dunif(0, 100) for normal, and wishart with identity scale matrix and (# of categories - 1) degrees of freedom for multinomial.
 #' @param hy.prior Prior for the heterogeneity parameter. Supports uniform, gamma, and half normal for normal and binomial response and wishart for multinomial response. It should be a list of length 3, where first element should be the distribution (one of dunif, dgamma, dhnorm, dwish) and the next two are the parameters associated with the distribution. For example, list("dunif", 0, 5) give uniform prior with lower bound 0 and upper bound 5 for the heterogeneity parameter. For wishart distribution, the last two parameter would be the scale matrix and the degrees of freedom.
 #' @return Creates list of variables that are used to run the model using \code{\link{network.run}}
 #' \item{data}{Data combining all the input data. User can check this to insure the data is correctly specified. For modelling purposes, character valued studies or treatment variables are changed to numeric values based on alphabetical order.}
@@ -58,8 +61,8 @@
 #' @references N.J. Cooper, A.J. Sutton, D. Morris, A.E. Ades, N.J. Welton (2009), \emph{Addressing between-study heterogeneity and inconsistency in mixed treatment comparisons: Application to stroke prevention treatments in individuals with non-rheumatic atrial fibrillation}, Statistics in Medicine 28:1861-1881. [\url{https://doi.org/10.1002/sim.3594}]
 #' @export
 
-network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, response = NULL, Treat.order = NULL, type = "random", rank.preference = "higher",
-                         miss.matrix = NULL, baseline = "none", baseline.risk = "independent", covariate = NULL, covariate.type = NULL, covariate.model = NULL, dic = TRUE,
+network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, response = NULL, miss.matrix = NULL, Treat.order = NULL, type = "random", rank.preference = "higher",
+                         baseline = "none", baseline.risk = "independent", covariate = NULL, covariate.type = NULL, covariate.model = NULL, dic = TRUE,
                          mean.d = NULL, prec.d = NULL, mean.Eta = NULL, prec.Eta = NULL, hy.prior.Eta = NULL, mean.bl = NULL, prec.bl = NULL, hy.prior.bl = NULL,
                          mean.cov = NULL, prec.cov = NULL, hy.prior.cov = NULL, hy.prior = NULL) {
 
@@ -378,8 +381,10 @@ check.Treat.order <- function(Treat, Treat.order){
   }
 }
 
+
+#### create miss.patterns matrix #######
 create.miss.patterns = function(pattern, miss.matrix, Outcomes, nrow, ncat, ncol, Study){
-  #### create miss.patterns matrix #######
+
   num.pattern = length(levels(pattern))
   rows.all = vector("list", length = num.pattern)
   for(i in seq(num.pattern)){

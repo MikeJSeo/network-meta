@@ -7,6 +7,8 @@
 #' This package is a user friendly application that can run network meta analysis models without having to code a JAGS model.
 #' The program takes the input data and transforms it to a suitable format of analysis, generates a JAGS model and reasonable
 #' initial values and runs the model through the rjags package.
+#' The focus of this package was inclusion of multinomial response and various options for adding covariates and/or baseline risks effects.
+#' Furthermore, package includes different models such as contrast based models and unrelated mean effects (UME) model and nodesplitting model to test for inconsistency.
 #'
 #' @docType package
 #' @name mcnet-package

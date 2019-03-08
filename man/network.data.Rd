@@ -5,8 +5,8 @@
 \title{Make a network object containing data, priors, and a JAGS model file}
 \usage{
 network.data(Outcomes, Study, Treat, N = NULL, SE = NULL,
-  response = NULL, Treat.order = NULL, type = "random",
-  rank.preference = "higher", miss.matrix = NULL, baseline = "none",
+  response = NULL, miss.matrix = NULL, Treat.order = NULL,
+  type = "random", rank.preference = "higher", baseline = "none",
   baseline.risk = "independent", covariate = NULL,
   covariate.type = NULL, covariate.model = NULL, dic = TRUE,
   mean.d = NULL, prec.d = NULL, mean.Eta = NULL, prec.Eta = NULL,
@@ -15,25 +15,25 @@ network.data(Outcomes, Study, Treat, N = NULL, SE = NULL,
   hy.prior.cov = NULL, hy.prior = NULL)
 }
 \arguments{
-\item{Outcomes}{Arm-level outcomes. If it is a multinomial response, the matrix would be arms (row) by multinomial categories (column). If it is binomial or normal, it would be a vector.}
+\item{Outcomes}{Arm-level outcomes. If it is a multinomial response, the matrix would have dimensions treatment arms (row) by multinomial categories (column). If it is binomial or normal, it would be a vector.}
 
 \item{Study}{A vector of study indicator for each arm}
 
 \item{Treat}{A vector of treatment indicator for each arm}
 
-\item{N}{A vector of total number of observations in each arm. Used for binomial and multinomial responses}
+\item{N}{A vector of total number of observations in each arm. Used for binomial and multinomial responses.}
 
 \item{SE}{A vector of standard error for each arm. Used only for normal response.}
 
 \item{response}{Specification of the outcomes type. Must specify one of the following: "normal", "binomial", or "multinomial".}
 
-\item{Treat.order}{This specifies the treatment order and therefore how treatments are compared. The first treatment that is specified is considered as a base treatment. Default order is alphabetical. This would hold true for numbers. If the treatments are coded 1, 2, etc, then the treatment with a value of 1 would be assigned as a baseline treatment.}
+\item{miss.matrix}{This is R code used for multinomial multinomial model. Still under revision}
+
+\item{Treat.order}{Treatment order which determines how treatments are compared. The first treatment that is specified is considered to be the baseline treatment. Default order is alphabetical. If the treatments are coded 1, 2, etc, then the treatment with a value of 1 would be assigned as a baseline treatment.}
 
 \item{type}{Type of model fitted: either "random" for random effects model or "fixed" for fixed effects model. Default is "random".}
 
 \item{rank.preference}{Set it equal to "higher" if higher values are preferred (i.e. assumes events are good). Set it equal to "lower" if lower values are preferred (i.e. assumes events are bad). Default is "higher".}
-
-\item{miss.matrix}{This is a parameter for running incomplete multinomial. Still under revision.}
 
 \item{baseline}{Three different assumptions for treatment x baseline risk interactions (slopes): "independent", "common", or "exchangeable". Default is "none" which doesn't incorporate baseline risk.}
 
@@ -45,7 +45,7 @@ network.data(Outcomes, Study, Treat, N = NULL, SE = NULL,
 
 \item{covariate.model}{"independent" allows covariate effects for each treatment. "common" restricts same covariate effect for all treatment. Lastly, "exchangeable"  assumes that the covariate effects are different but related and strength is borrowed across them. We set "common" to be default. See Cooper et al. (2009) for more details on covariates.}
 
-\item{dic}{This is an indicator for whether user wants to calculate DIC. Model stores less information if you set it to FALSE.}
+\item{dic}{This is an indicator for whether user wants to calculate DIC. Model stores less information if you set it to FALSE. Default is TRUE.}
 
 \item{mean.d}{Prior mean for the relative effect}
 
@@ -55,19 +55,19 @@ network.data(Outcomes, Study, Treat, N = NULL, SE = NULL,
 
 \item{prec.Eta}{Prior precision for the study effect (baseline risk)}
 
-\item{hy.prior.Eta}{Between treatment heterogeneity in baseline risk (for exchangeable assumption only). Format of the data is same as hy.prior.}
+\item{hy.prior.Eta}{Between treatment heterogeneity in baseline risk (for exchangeable assumption only). Format of the parameter is same as hy.prior.}
 
 \item{mean.bl}{Prior mean for the baseline slope}
 
 \item{prec.bl}{Prior precision for the baseline slope}
 
-\item{hy.prior.bl}{Between treatment heterogeneity in baseline slope (for exchangeable regression coefficient only). Format of the data is same as hy.prior.}
+\item{hy.prior.bl}{Between treatment heterogeneity in baseline slope (for exchangeable regression coefficient only). Format of the parameter is same as hy.prior.}
 
 \item{mean.cov}{Prior mean for the covariate effect}
 
 \item{prec.cov}{Prior precision for the covariate effect}
 
-\item{hy.prior.cov}{Between treatment heterogeneity in covariate effect (for exchangeable regression coefficient only). Format of the data is same as hy.prior. Default is set to be dunif(0, 5) for binary, dunif(0, 100) for normal, and wishart with identity scale matrix and (# of categories - 1) degrees of freedom.}
+\item{hy.prior.cov}{Between treatment heterogeneity in covariate effect (for exchangeable regression coefficient only). Format of the parameter is same as hy.prior. Default is set to be dunif(0, 5) for binary, dunif(0, 100) for normal, and wishart with identity scale matrix and (# of categories - 1) degrees of freedom for multinomial.}
 
 \item{hy.prior}{Prior for the heterogeneity parameter. Supports uniform, gamma, and half normal for normal and binomial response and wishart for multinomial response. It should be a list of length 3, where first element should be the distribution (one of dunif, dgamma, dhnorm, dwish) and the next two are the parameters associated with the distribution. For example, list("dunif", 0, 5) give uniform prior with lower bound 0 and upper bound 5 for the heterogeneity parameter. For wishart distribution, the last two parameter would be the scale matrix and the degrees of freedom.}
 }
@@ -88,9 +88,12 @@ Creates list of variables that are used to run the model using \code{\link{netwo
 \item{code}{Rjags model file code that is generated using information provided by the user. To view model file inside R, use \code{cat(network$code).}}
 }
 \description{
-This function is where the user enters the data and makes a network object that is in a format that can be analyzed using \code{\link{network.run}}.
-At the very least, user needs to specify Outcomes, Study, Treat, N or SE, and response. Other parameters such as prior parameters are filled in automatically based on the data type if not specified.
-The input data is in arm-level, meaning we have observations for each treatment in each study.
+This function makes a network object that can be used to run network meta-analysis using \code{\link{network.run}}.
+User needs to specify Outcomes, Study, Treat, N or SE, and response. 
+Prior parameters are filled in automatically based on the data type if not specified.
+The input data should be arm-level so that we have observations for each treatment in each study.
+The input data is preprocessed to fit the format necessary to run model in JAGS. 
+See \code{\link{network.run}} for more details on preprocessing.
 }
 \examples{
 ###Blocker data example
