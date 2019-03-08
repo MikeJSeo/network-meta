@@ -85,15 +85,14 @@ Creates list of variables that are used to run the model using \code{\link{netwo
 \item{mx}{If the continuous covariate is included, it calculates the mean of the covariates which is used to center the covariates. The numeric indicator after mx refers to column number of the covariates if there are more than one covariates included. Discrete covariates are not centered.}
 \item{mx_bl}{If the baseline effect is specified, it also calculates the mean baseline risk.}
 \item{prior.data}{Prior data created using the user inputs or default values. If no user input is specifies for the prior, it uses default values.}
-\item{code}{Rjags model file code that is generated using information provided by the user. To view model file inside R, use \code{cat(network$code).}}
+\item{code}{Rjags model file code that is generated using information provided by the user. To view model file inside R in a nice format, use \code{cat(network$code).}}
 }
 \description{
 This function makes a network object that can be used to run network meta-analysis using \code{\link{network.run}}.
 User needs to specify Outcomes, Study, Treat, N or SE, and response. 
 Prior parameters are filled in automatically based on the data type if not specified.
 The input data should be arm-level so that we have observations for each treatment in each study.
-The input data is preprocessed to fit the format necessary to run model in JAGS. 
-See \code{\link{network.run}} for more details on preprocessing.
+The input data is preprocessed to fit the format necessary to run model in JAGS.
 }
 \examples{
 ###Blocker data example
