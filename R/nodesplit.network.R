@@ -14,8 +14,7 @@
 
 nodesplit.network.data <- function(Outcomes, Study, Treat,  N = NULL, SE = NULL, response = NULL, type = "random"){
   
-  
-  orig <- network.data(Outcomes, Study, Treat, N, SE, response, type)
+  orig <- network.data(Outcomes, Study, Treat, N = N, response = response, type = type)
   
   network <- with(orig, {  list(data = data, Outcomes = Outcomes, Study = Study, Treat = Treat, r = r, t = t, type = type, rank.preference = NULL, nstudy = nstudy, na = na, ntreat = ntreat, b.id = b.id, response = response)})
     
