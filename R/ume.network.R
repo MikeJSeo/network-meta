@@ -39,7 +39,7 @@ ume.network.data <- function(Outcomes, Study, Treat, N = NULL, SE = NULL, respon
   
   na <- rle(Study)$lengths
   if(any(na == 1)) stop("study cannot have only 1 arm or arms have to be next to each other in each study")
-  
+
   nstudy <- length(unique(Study))
   ntreat <- unique(as.vector(Treat))
   ntreat <- length(ntreat[!is.na(ntreat)])
